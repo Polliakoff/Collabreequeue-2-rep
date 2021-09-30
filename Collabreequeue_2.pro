@@ -17,6 +17,8 @@ HEADERS += \
     mainwindow.h \
     straight_line.h
 
+INCLUDEPATH += <your path>
+
 FORMS += \
     mainwindow.ui
 
