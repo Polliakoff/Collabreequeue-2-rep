@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <straight_line.h>
 #include <iostream>
+#include <Eigen/Dense>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
