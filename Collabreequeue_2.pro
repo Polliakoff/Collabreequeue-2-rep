@@ -10,6 +10,7 @@ INCLUDEPATH += "$$PWD/eigen-3.4.0"
 
 SOURCES += \
     func.cpp \
+    brain.cpp \
     main.cpp \
     mainwindow.cpp \
     polygon.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     func.h \
+    brain.h \
     mainwindow.h \
     polygon.h \
     straight_line.h
