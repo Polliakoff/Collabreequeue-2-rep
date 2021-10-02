@@ -49,13 +49,48 @@ void straight_line::move_by(const double &x, const double &y)
 
 double straight_line::get_x(const double &y)
 {
-    return ((y-point(1))/direction(1)*direction(0)+point(0));
+    if(round_to(direction(1),5)!=0){
+        return ((y-point(1))/direction(1)*direction(0)+point(0));
+    }
+    else{
+        return std::numeric_limits<double>::infinity();
+    }
 }
 
 double straight_line::get_y(const double &x)
 {
-    return ((x-point(0))/direction(0)*direction(1)+point(1));
+    if(round_to(direction(0),5)!=0){
+        return ((x-point(0))/direction(0)*direction(1)+point(1));
+    }
+    else{
+        return std::numeric_limits<double>::infinity();
+    }
 }
 
 
 
+
+double intersect(straight_line &line_1, straight_line &line_2)
+{
+    if(round_to(line_1.direction(0),5)==0){
+        if(round_to(line_2.direction(0),5)==0){
+            return std::numeric_limits<double>::infinity();
+        }
+        else{
+            return line_1.get_x(0);
+        }
+    }
+    else if(round_to(line_2.direction(0),5)==0){
+        if(round_to(line_1.direction(0),5)==0){
+            return std::numeric_limits<double>::infinity();
+        }
+        else{
+            return line_2.get_x(0);
+        }
+    }
+    else{
+        double q1p1 = line_1.direction(0)/line_1.direction(1);
+        double q2p2 = line_2.direction(0)/line_2.direction(1);
+        return((line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2));
+    }
+}

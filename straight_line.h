@@ -20,4 +20,6 @@ public:
     double get_y(const double& x);
 };
 
+double intersect(straight_line& line_1,straight_line& line_2);
+
 #endif // STRAIGHT_LINE_H

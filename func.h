@@ -3,7 +3,9 @@
 
 #include <cmath>
 #include <Eigen/Dense>
+//#include <iostream>
+#include <limits>
 
-double roundTo(double inpValue, int inpCount);
+double round_to(double inpValue, int inpCount);
 
 #endif // FUNC_H

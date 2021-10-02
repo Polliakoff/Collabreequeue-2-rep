@@ -1,6 +1,6 @@
 #include "func.h"
 
-double roundTo(double inpValue, int inpCount)
+double round_to(double inpValue, int inpCount)
 {
     double outpValue;
     double tempVal;
