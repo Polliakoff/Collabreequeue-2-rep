@@ -12,11 +12,13 @@ SOURCES += \
     func.cpp \
     main.cpp \
     mainwindow.cpp \
+    polygon.cpp \
     straight_line.cpp
 
 HEADERS += \
     func.h \
     mainwindow.h \
+    polygon.h \
     straight_line.h
 
 
