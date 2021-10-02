@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 using std::vector;
 using std::pair;
