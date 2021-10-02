@@ -39,9 +39,6 @@ void straight_line::rotate(const double &angle)
     rotation(2,2) = 1;
 
     direction = rotation*direction;
-    bool kek;
-    if(direction(0) == 0){kek = 1;}else{kek = 0;}
-    while(0){}
 }
 
 void straight_line::move_by(const double &x, const double &y)

@@ -2,8 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <straight_line.h>
-#include <iostream>
+#include "straight_line.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

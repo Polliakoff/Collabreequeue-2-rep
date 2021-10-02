@@ -1,11 +1,5 @@
 #include "func.h"
 
-
-void intersect(straight_line &line_1, straight_line &line_2)
-{
-//    if(line_1.direction(0) == 0)
-}
-
 double roundTo(double inpValue, int inpCount)
 {
     double outpValue;

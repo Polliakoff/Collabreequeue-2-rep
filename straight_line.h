@@ -1,8 +1,7 @@
 #ifndef STRAIGHT_LINE_H
 #define STRAIGHT_LINE_H
 
-#include <cmath>
-#include <Eigen/Dense>
+#include "func.h"
 
 class straight_line
 {
