@@ -26,7 +26,7 @@ void straight_line::rotate(const double &angle)
 {
     Eigen::Matrix3d rotation;
     double cs = cos(angle);
-    double sn = cos(angle);
+    double sn = sin(angle);
 
     rotation(0,0) = cs;
     rotation(0,1) = sn;
@@ -35,10 +35,13 @@ void straight_line::rotate(const double &angle)
     rotation(1,1) = cs;
     rotation(1,2) = 0;
     rotation(2,0) = -rotation_point(0)*(cs-1)+rotation_point(1)*sn;
-    rotation(2,1) = -rotation_point(1)*(cs-1)+rotation_point(0)*sn;
+    rotation(2,1) = -rotation_point(1)*(cs-1)-rotation_point(0)*sn;
     rotation(2,2) = 1;
 
     direction = rotation*direction;
+    bool kek;
+    if(direction(0) == 0){kek = 1;}else{kek = 0;}
+    while(0){}
 }
 
 void straight_line::move_by(const double &x, const double &y)

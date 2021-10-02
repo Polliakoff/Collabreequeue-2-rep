@@ -17,8 +17,10 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     straight_line test(2,1,1,2);
-    test.rotate(M_PI/2);
-    ui->lineEdit->setText(QString::number(test.get_y(0)));
-    ui->lineEdit_2->setText(QString::number(test.get_y(2)));
+    test.rotate(M_PI/4);
+    ui->lineEdit->setText(QString::number(test.direction(0)));
+    ui->lineEdit_2->setText(QString::number(test.direction(1)));
+    ui->lineEdit_3->setText(QString::number(test.point(0)));
+    ui->lineEdit_4->setText(QString::number(test.point(1)));
 }
 
