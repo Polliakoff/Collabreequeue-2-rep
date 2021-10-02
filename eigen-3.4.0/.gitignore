@@ -2,13 +2,13 @@ qrc_*cxx
 *.orig
 *.pyc
 *.diff
-diff
+#diff
 *.save
-save
+#save
 *.old
 *.gmo
 *.qm
-core
+#core
 core.*
 *.bak
 *~
@@ -17,7 +17,7 @@ core.*
 *.moc
 ui_*
 CMakeCache.txt
-tags
+#tags
 .*.swp
 activity.png
 *.out
