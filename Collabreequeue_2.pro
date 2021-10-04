@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     polygon.cpp \
+    ship.cpp \
     straight_line.cpp
 
 HEADERS += \
@@ -21,6 +22,7 @@ HEADERS += \
     brain.h \
     mainwindow.h \
     polygon.h \
+    ship.h \
     straight_line.h
 
 

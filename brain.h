@@ -1,9 +1,6 @@
 #pragma once
 
-#include <cmath>
-#include <Eigen/Dense>
-#include <cstdlib>
-#include <iostream>
+#include "func.h"
 
 class brain
 {

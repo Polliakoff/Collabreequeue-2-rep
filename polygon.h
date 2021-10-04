@@ -1,9 +1,8 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include <utility>
-#include <vector>
-#include <algorithm>
+#include "func.h"
+#include "straight_line.h"
 
 using std::vector;
 using std::pair;
@@ -14,7 +13,8 @@ public:
     polygon();
     ~polygon();
 
-    vector <pair<double, double>> point;
+    vector <pair<double, double>> vertexes;
+    vector <straight_line> faces;
 
     void add_point(double x, double y);
     bool search_for_point(double x, double y);
