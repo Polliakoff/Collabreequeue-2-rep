@@ -40,7 +40,7 @@ pair<double, double> ship::get_position()
     return position;
 }
 
-void ship::move_by(const double &delta_x, const double &delta_y)
+void ship::move_by_coords(const double &delta_x, const double &delta_y)
 {
     position.first+=delta_x;
     position.second+=delta_y;
@@ -53,6 +53,24 @@ void ship::move_by(const double &delta_x, const double &delta_y)
     for(auto &j: eyes){
         j.move_by(delta_x,delta_y);
     }
+}
+
+void ship::move_by_distance(const double &distance)
+{
+    pair<double, double> moving_vector;
+    moving_vector.first = body.vertexes[2].first - position.first;
+    moving_vector.second = body.vertexes[2].second - position.second;
+    if(distance < 0){
+        moving_vector.first*=-1;
+        moving_vector.second*=-1;
+    }
+
+    double old_x = moving_vector.first;
+    double old_y = moving_vector.second;
+    moving_vector.first *= distance/sqrt(pow(old_x,2)+pow(old_y,2));
+    moving_vector.second *= distance/sqrt(pow(old_x,2)+pow(old_y,2));
+
+    move_by_coords(moving_vector.first,moving_vector.second);
 }
 
 double ship::get_angle()

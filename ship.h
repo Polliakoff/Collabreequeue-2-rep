@@ -21,7 +21,8 @@ public:
 
     pair<double, double> convert_to_ship(const pair<double, double>& point);
     pair<double, double> get_position();
-    void move_by(const double& new_pos_x,const double& new_pos_y);
+    void move_by_coords(const double& new_pos_x,const double& new_pos_y);
+    void move_by_distance(const double& distance);
     double get_angle();
     void rotate_by(const double& new_angle);
 };

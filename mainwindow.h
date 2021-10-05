@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    //void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
 
 private slots:
     void on_pushButton_clicked();
