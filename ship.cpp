@@ -44,12 +44,12 @@ pair<double, double> ship::get_position()
 
 void ship::move_by(const double &delta_x, const double &delta_y)
 {
-    for(auto i: body.vertexes){
+    for(auto &i: body.vertexes){
         i.first+=delta_x;
         i.second+=delta_y;
     }
 
-    for(auto j: eyes){
+    for(auto &j: eyes){
         j.move_by(delta_x,delta_y);
     }
 }
@@ -61,12 +61,23 @@ double ship::get_angle()
 
 void ship::rotate_by(const double &delta_angle)
 {
-    for(auto i: body.vertexes){
-        i.first = i.first*cos(delta_angle) + i.second*sin(delta_angle);
-        i.second = -i.first*sin(delta_angle) + i.second*cos(delta_angle);
+    double cs = cos(delta_angle);
+    double sn = sin(delta_angle);
+
+    for(auto &i: body.vertexes){
+        i.first -= position.first;
+        i.second -= position.second;
+
+        double old_x = i.first;
+        double old_y = i.second;
+        i.first = old_x*cs + old_y*sn;
+        i.second = (-1)*old_x*sn + old_y*cs;
+
+        i.first += position.first;
+        i.second += position.second;
     }
 
-    for(auto j: eyes){
+    for(auto &j: eyes){
         j.rotate(delta_angle);
     }
 }

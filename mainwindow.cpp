@@ -27,6 +27,9 @@ void MainWindow::on_pushButton_clicked()
     QGraphicsScene* scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
 
+    scene->addLine(10,100,300,100);
+
+    test_ship.rotate_by(-M_PI/4);
 
     size_t i = 1;
     size_t i_dop = i-1;
