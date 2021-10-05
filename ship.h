@@ -24,11 +24,8 @@ public:
     void move_by(const double& new_pos_x,const double& new_pos_y);
     double get_angle();
     void rotate_by(const double& new_angle);
-
-
-
-
-
 };
+
+pair<double, double> point_rotation(const pair<double, double>& point, const pair<double, double>& axis, const double &delta_angle);
 
 #endif // SHIP_H

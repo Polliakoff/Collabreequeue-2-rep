@@ -29,11 +29,9 @@ pair<double, double> ship::convert_to_ship(const pair<double, double>& point)
     temp_point.first = point.first - position.first;
     temp_point.second = point.second - position.second;
 
-    temp_point.first = temp_point.first*cos(angle) + temp_point.second*sin(angle);
-    temp_point.second = -temp_point.first*sin(angle) + temp_point.second*cos(angle);
+    temp_point = point_rotation(temp_point, std::make_pair(0,0),-angle);
 
     return temp_point;
-
 }
 
 
@@ -44,6 +42,9 @@ pair<double, double> ship::get_position()
 
 void ship::move_by(const double &delta_x, const double &delta_y)
 {
+    position.first+=delta_x;
+    position.second+=delta_y;
+
     for(auto &i: body.vertexes){
         i.first+=delta_x;
         i.second+=delta_y;
@@ -61,23 +62,37 @@ double ship::get_angle()
 
 void ship::rotate_by(const double &delta_angle)
 {
-    double cs = cos(delta_angle);
-    double sn = sin(delta_angle);
+    angle+=delta_angle;
+    if(angle>=2*M_PI) angle-=2*M_PI;
 
     for(auto &i: body.vertexes){
-        i.first -= position.first;
-        i.second -= position.second;
-
-        double old_x = i.first;
-        double old_y = i.second;
-        i.first = old_x*cs + old_y*sn;
-        i.second = (-1)*old_x*sn + old_y*cs;
-
-        i.first += position.first;
-        i.second += position.second;
+        i = point_rotation(i,position,delta_angle);
     }
 
     for(auto &j: eyes){
         j.rotate(delta_angle);
     }
+}
+
+pair<double, double> point_rotation(const pair<double, double> &point, const pair<double, double> &axis, const double &delta_angle)
+{
+    pair<double, double> result = point;
+
+    double cs = cos(delta_angle);
+    double sn = sin(delta_angle);
+
+        result.first -= axis.first;
+        result.second -= axis.second;
+
+        double old_x = result.first;
+        double old_y = result.second;
+
+        result.first = old_x*cs + old_y*sn;
+        result.second = (-1)*old_x*sn + old_y*cs;
+
+        result.first += axis.first;
+        result.second += axis.second;
+
+        return result;
+
 }
