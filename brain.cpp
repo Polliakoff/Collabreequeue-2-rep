@@ -69,11 +69,9 @@ QDataStream &operator<<(QDataStream &out, const brain &item){
     out.setFloatingPointPrecision(QDataStream::DoublePrecision);
     out << item.S;
     //https://eigen.tuxfamily.org/dox/group__TutorialSTL.html
+    for (auto &l_: item.l)
+        out << l_;
     for (auto &w: item.W){
-        int i = w.rows();
-        out << i; //12
-        i= w.cols();
-        out << i; //записываем последовательно количество столбцов
         for(auto &r : w.reshaped())
                 out << r;
     }
@@ -87,20 +85,22 @@ QDataStream &operator>>(QDataStream &in, brain &item){
     in >> item.S;
     item.W.clear();
     item.A.clear();
+    item.l.clear();
     item.W.reserve(item.S-1);
     item.A.reserve(item.S);
+    item.l.reserve(item.S);
     for (int k = 0; k < item.S; ++k){
-        int tempCol, tempRow;
-        in >> tempRow;
-        in >> tempCol;
-        item.A.emplace_back(tempRow);
-        item.W.push_back(Eigen::MatrixXd::Zero(tempRow,tempCol));
+        int temp;
+        in >> temp;
+        item.l.emplace_back(temp);
+    }
+    for (int k = 0; k < item.S - 1; ++k){
+        item.A.emplace_back(item.l[k]);
+        item.W.push_back(Eigen::MatrixXd::Zero(item.l[k],item.l[k+1]));
         for(auto &r : item.W[k].reshaped())
             in >> r;
-        //        for (int i = 0; i < tempRow; ++i){
-        //            for (int j = 0; j < tempCol; ++j)
-        //                in >> item.W[k].
     }
+    item.A.emplace_back(item.l[item.S-1]);
     in.setFloatingPointPrecision(prev);
     return in;
 }
