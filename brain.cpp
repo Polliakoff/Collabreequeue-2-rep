@@ -2,8 +2,7 @@
 
 using namespace std;
 
-double brain::sigmoid(const double &x)
-{
+double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
 
@@ -34,10 +33,51 @@ void brain::think(){
     cout << A[0] * W[0] << endl;
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
-        for(auto &a: A[i+1]){
+        for(auto &a: A[i + 1]){
             a = sigmoid(a);
         }
         ++i;
     }
     cout << "\nendl\n";
+}
+
+
+std::ofstream &operator<<(std::ofstream& fout, brain& b){
+    //fout << endl << b.S << endl;
+    for (auto &w: b.W){
+        fout << w << endl;
+    }
+    return fout;
+}
+
+std::ifstream &operator>>(std::ifstream& fin, Eigen::MatrixXd& b){
+    //fout << endl << b.S << endl;
+    //for (auto &w: b.W){
+        //fin >> b.W[0];
+    //}
+    return fin;
+}
+
+std::ifstream &operator>>(std::ifstream& fin, brain& b){
+    //fout << endl << b.S << endl;
+    //for (auto &w: b.W){
+        fin >> b.W[0];
+    //}
+    return fin;
+}
+
+QDataStream &operator<<(QDataStream &out, const brain &item){
+    QDataStream::FloatingPointPrecision prev = out.floatingPointPrecision();
+    out.setFloatingPointPrecision(QDataStream::DoublePrecision);
+    out << item.S;
+    out.setFloatingPointPrecision(prev);
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, brain &item){
+    QDataStream::FloatingPointPrecision prev = in.floatingPointPrecision();
+    in.setFloatingPointPrecision(QDataStream::DoublePrecision);
+    in >> item.S;
+    in.setFloatingPointPrecision(prev);
+    return in;
 }
