@@ -21,5 +21,6 @@ public:
 };
 
 double intersect(straight_line& line_1,straight_line& line_2);
+std::pair<double, double> perp_vect(std::pair<double, double> input_vector, const double& desired_length);
 
 #endif // STRAIGHT_LINE_H

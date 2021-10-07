@@ -17,7 +17,7 @@ public:
     vector <straight_line> faces;
 
     void add_point(double x, double y);
-    bool search_for_point(double x, double y);
+    //bool search_for_point(double x, double y);
 };
 
 #endif // POLYGON_H

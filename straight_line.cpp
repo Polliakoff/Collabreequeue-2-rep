@@ -94,3 +94,15 @@ double intersect(straight_line &line_1, straight_line &line_2)
         return((line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2));
     }
 }
+
+std::pair<double, double> perp_vect(std::pair<double, double> input_vector, const double& desired_length)
+{
+    std::pair<double,double> result;
+    result.second = 1;
+    result.first = -input_vector.second/input_vector.second;
+
+    double coeff = desired_length/sqrt(pow(result.second,2)+1);
+
+    result.first*=coeff;
+    result.second*=coeff;
+}

@@ -92,6 +92,44 @@ void ship::rotate_by(const double &delta_angle)
     }
 }
 
+bool ship::collision(polygon &pol)
+{
+    for(auto i:body.vertexes){
+        if(point_to_poly(i,pol) == false) return true;
+    }
+    return false;
+}
+
+bool point_to_poly(const pair<double,double>& point, polygon &pol)
+{
+    int intersections = 0;
+    auto input_vertexes = pol.vertexes;
+    straight_line rays(point.first, point.second, point.first+1,point.second+1);
+        for(auto j:pol.faces){
+            auto checkig_point = intersect(j,rays);
+            if(checkig_point != std::numeric_limits<double>::infinity()){
+                double checking_point_y = rays.get_y(checkig_point);
+                auto found{std::find(input_vertexes.begin(), input_vertexes.end(),
+                                      std::make_pair(checkig_point, checking_point_y))};
+                if(found != input_vertexes.end()){
+                    pair<double,double> fixing_vector = perp_vect(std::make_pair(rays.direction(0),rays.direction(1)),0.1);
+                    found->first+=fixing_vector.first;
+                    found->second+=fixing_vector.second;
+                    polygon new_poly;
+                    for(auto i:input_vertexes){
+                        new_poly.add_point(i.first,i.second);
+                    }
+                    return point_to_poly(point,new_poly);
+                }
+                else{
+                    intersections++;
+                }
+            }
+        }
+    if((intersections) % 2 == 0 && (intersections/2) % 2 != 0) return true;
+    else return false;
+}
+
 pair<double, double> point_rotation(const pair<double, double> &point, const pair<double, double> &axis, const double &delta_angle)
 {
     pair<double, double> result = point;

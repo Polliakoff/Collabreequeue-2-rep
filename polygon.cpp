@@ -22,16 +22,16 @@ void polygon::add_point(double x, double y)
     }
 }
 
-bool polygon::search_for_point(double x, double y)
-{
-     auto found{ std::find(vertexes.begin(), vertexes.end(), std::make_pair(x, y))};
+//bool polygon::search_for_point(double x, double y)
+//{
+//     auto found{ std::find(vertexes.begin(), vertexes.end(), std::make_pair(x, y))};
 
-     if (found == vertexes.end())
-     {
-       return false;
-     }
-     else
-     {
-       return true;
-     }
-}
+//     if (found == vertexes.end())
+//     {
+//       return false;
+//     }
+//     else
+//     {
+//       return true;
+//     }
+//}

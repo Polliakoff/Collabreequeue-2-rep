@@ -25,8 +25,10 @@ public:
     void move_by_distance(const double& distance);
     double get_angle();
     void rotate_by(const double& new_angle);
+    bool collision(polygon &pol);
+
 };
 
 pair<double, double> point_rotation(const pair<double, double>& point, const pair<double, double>& axis, const double &delta_angle);
-
+bool point_to_poly(const pair<double,double>& point, polygon &pol);
 #endif // SHIP_H

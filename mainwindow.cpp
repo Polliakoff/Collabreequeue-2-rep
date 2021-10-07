@@ -34,7 +34,9 @@ void MainWindow::on_pushButton_clicked()
 
     polygon test_poly;
     test_poly.add_point(250,250);
-    test_poly.add_point(250,150);
+    test_poly.add_point(250,100);
+    test_poly.add_point(100,100);
+    test_poly.add_point(100,150);
     test_poly.add_point(150,150);
     test_poly.add_point(150,250);
 
@@ -48,7 +50,7 @@ void MainWindow::on_pushButton_clicked()
 
     //auto test_convert = test_ship.convert_to_ship(test_ship.body.vertexes[2]);
 
-    test_ship.move_by_distance(100);
+    //test_ship.move_by_distance(100);
 
     size_t i = 1;
     size_t i_dop = i-1;
