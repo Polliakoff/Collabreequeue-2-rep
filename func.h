@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 double round_to(double inpValue, int inpCount);
 

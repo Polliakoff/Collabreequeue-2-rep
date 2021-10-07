@@ -16,8 +16,12 @@ public:
     ship(const double& pos_x,const double& pos_y); // задавать корабль исключительно этим конструктором с установленной позицией
     ~ship();
 
+    bool collided = false;
+
     polygon body;
     vector<straight_line> eyes;
+    vector<double> distances;
+    vector<pair<double,double>> point_seen;
 
     pair<double, double> convert_to_ship(const pair<double, double>& point);
     pair<double, double> get_position();
@@ -26,6 +30,9 @@ public:
     double get_angle();
     void rotate_by(const double& new_angle);
     bool collision(polygon &pol);
+    void eyesight(polygon &pol);
+public slots:
+    void update(polygon &map);
 
 };
 

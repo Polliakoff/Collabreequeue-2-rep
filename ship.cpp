@@ -14,8 +14,12 @@ ship::ship(const double &pos_x, const double &pos_y)
     body.add_point(position.first-10, position.second-10);
     body.add_point(position.first-10, position.second+10);
 
-    eyes.emplace_back(position.first, position.second, position.first+10, position.second-10);
-    eyes.emplace_back(position.first, position.second, position.first+10, position.second-10);
+    eyes.emplace_back(position.first, position.second, position.first+10, position.second+10);
+    eyes.emplace_back(position.first, position.second, position.first-10, position.second+10);
+    eyes.emplace_back(position.first, position.second, position.first, position.second+10);
+
+    distances.resize(6);
+    point_seen.resize(6);
 }
 
 ship::~ship()
@@ -98,6 +102,48 @@ bool ship::collision(polygon &pol)
         if(point_to_poly(i,pol) == false) return true;
     }
     return false;
+}
+
+void ship::eyesight(polygon &pol)
+{
+    for(size_t i = 0; i<eyes.size(); i++){
+        for(auto j:pol.faces){
+            double checking_point = intersect(eyes[i],j);
+            if(checking_point != std::numeric_limits<double>::infinity()){
+
+                double checking_point_y;
+                if(eyes[i].direction(0)!=0){
+                    checking_point_y = eyes[i].get_y(checking_point);
+                }
+                else{
+                   checking_point_y = j.get_y(checking_point);
+                }
+
+                auto cheching_poit_positon = convert_to_ship(std::make_pair(checking_point,checking_point_y));
+
+                double pos_in_mas;
+
+                if(cheching_poit_positon.first < 0){
+                    pos_in_mas = (i+1)*2-2;
+
+                }
+                else{
+                    pos_in_mas = (i+1)*2-1;
+                }
+
+                distances[pos_in_mas] = sqrt(pow(checking_point-position.first,2)+pow(checking_point_y-position.second,2));
+                point_seen[pos_in_mas].first = checking_point;
+                point_seen[pos_in_mas].second = checking_point_y;
+
+            }
+        }
+    }
+}
+
+void ship::update(polygon &map)
+{
+    eyesight(map);
+    collided = collision(map);
 }
 
 bool point_to_poly(const pair<double,double>& point, polygon &pol)

@@ -105,4 +105,6 @@ std::pair<double, double> perp_vect(std::pair<double, double> input_vector, cons
 
     result.first*=coeff;
     result.second*=coeff;
+
+    return result;
 }

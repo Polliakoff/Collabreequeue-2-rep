@@ -21,17 +21,3 @@ void polygon::add_point(double x, double y)
                 vertexes[0].first,vertexes[0].second));
     }
 }
-
-//bool polygon::search_for_point(double x, double y)
-//{
-//     auto found{ std::find(vertexes.begin(), vertexes.end(), std::make_pair(x, y))};
-
-//     if (found == vertexes.end())
-//     {
-//       return false;
-//     }
-//     else
-//     {
-//       return true;
-//     }
-//}
