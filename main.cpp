@@ -23,10 +23,11 @@ int main(int argc, char *argv[])
     writeStream << *m_sensors[0];
 
     m_dataStreamExports.append(content);
-    delete m_sensors[0];
 
     QDataStream readStream(&m_dataStreamExports[0], QIODevice::ReadOnly);
     brain sensorImport;
     readStream >> sensorImport;
+    delete m_sensors[0];
+
 
 }

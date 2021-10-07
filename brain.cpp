@@ -8,7 +8,7 @@ double brain::sigmoid(const double &x){
 
 brain::brain(){
     S = 2 + rand() % 6;//максимум пять внутренних слоёв
-    l.reserve(S + 2); //плюс один входной и выходной
+    l.reserve(S);
     l.emplace_back(12);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
         l.emplace_back(7 + rand() % 5); //внутренний слой размером в диапазоне от 11 до 7
@@ -25,12 +25,10 @@ brain::brain(){
         W.push_back(Eigen::MatrixXd::Random(l[i],l[i+1])); //на первое время и отрицательные веса тоже
     }
     A.emplace_back(l[S-1]);
-
 }
 
 void brain::think(){
     int i = 0;
-    cout << A[0] * W[0] << endl;
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
         for(auto &a: A[i + 1]){
@@ -70,6 +68,15 @@ QDataStream &operator<<(QDataStream &out, const brain &item){
     QDataStream::FloatingPointPrecision prev = out.floatingPointPrecision();
     out.setFloatingPointPrecision(QDataStream::DoublePrecision);
     out << item.S;
+    //https://eigen.tuxfamily.org/dox/group__TutorialSTL.html
+    for (auto &w: item.W){
+        int i = w.rows();
+        out << i; //12
+        i= w.cols();
+        out << i; //записываем последовательно количество столбцов
+        for(auto &r : w.reshaped())
+                out << r;
+    }
     out.setFloatingPointPrecision(prev);
     return out;
 }
@@ -78,6 +85,22 @@ QDataStream &operator>>(QDataStream &in, brain &item){
     QDataStream::FloatingPointPrecision prev = in.floatingPointPrecision();
     in.setFloatingPointPrecision(QDataStream::DoublePrecision);
     in >> item.S;
+    item.W.clear();
+    item.A.clear();
+    item.W.reserve(item.S-1);
+    item.A.reserve(item.S);
+    for (int k = 0; k < item.S; ++k){
+        int tempCol, tempRow;
+        in >> tempRow;
+        in >> tempCol;
+        item.A.emplace_back(tempRow);
+        item.W.push_back(Eigen::MatrixXd::Zero(tempRow,tempCol));
+        for(auto &r : item.W[k].reshaped())
+            in >> r;
+        //        for (int i = 0; i < tempRow; ++i){
+        //            for (int j = 0; j < tempCol; ++j)
+        //                in >> item.W[k].
+    }
     in.setFloatingPointPrecision(prev);
     return in;
 }
