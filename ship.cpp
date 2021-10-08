@@ -71,8 +71,8 @@ void ship::move_by_distance(const double &distance)
 
     double old_x = moving_vector.first;
     double old_y = moving_vector.second;
-    moving_vector.first *= distance/sqrt(pow(old_x,2)+pow(old_y,2));
-    moving_vector.second *= distance/sqrt(pow(old_x,2)+pow(old_y,2));
+    moving_vector.first *= abs(distance)/sqrt(pow(old_x,2)+pow(old_y,2));
+    moving_vector.second *= abs(distance)/sqrt(pow(old_x,2)+pow(old_y,2));
 
     move_by_coords(moving_vector.first,moving_vector.second);
 }

@@ -40,7 +40,7 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
-    korablik->rotate_by(-3*M_PI/4);
+   // korablik->rotate_by(-3*M_PI/4);
 
     connect(timer.get(), &QTimer::timeout,  [=](){korablik->update(*map);});
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
@@ -68,6 +68,34 @@ void MainWindow::painter()
     scene->addEllipse(korablik->point_seen[3].first-10,korablik->point_seen[3].second-10,20,20);
     scene->addEllipse(korablik->point_seen[4].first-10,korablik->point_seen[4].second-10,20,20);
     scene->addEllipse(korablik->point_seen[5].first-10,korablik->point_seen[5].second-10,20,20);
+
+    ui->lineEdit->setText(QString::number(korablik->get_angle()));
+    ui->lineEdit_2->setText(QString::number(korablik->get_position().first));
+    ui->lineEdit_3->setText(QString::number(korablik->get_position().second));
 }
 
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    korablik->move_by_distance(10);
+}
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    korablik->move_by_distance(-10);
+}
+
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    korablik->rotate_by(-M_PI/6);
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    korablik->rotate_by(M_PI/6);
+}
 

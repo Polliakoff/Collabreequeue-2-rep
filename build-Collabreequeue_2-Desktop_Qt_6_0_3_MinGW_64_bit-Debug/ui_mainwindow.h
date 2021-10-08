@@ -13,6 +13,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -26,12 +27,15 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QGridLayout *gridLayout;
-    QGraphicsView *graphicsView;
     QPushButton *pushButton;
     QPushButton *pushButton_4;
     QPushButton *pushButton_2;
     QPushButton *pushButton_5;
     QPushButton *pushButton_3;
+    QLineEdit *lineEdit;
+    QLineEdit *lineEdit_2;
+    QLineEdit *lineEdit_3;
+    QGraphicsView *graphicsView;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -44,35 +48,50 @@ public:
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         gridLayout = new QGridLayout(centralwidget);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        graphicsView = new QGraphicsView(centralwidget);
-        graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
-
-        gridLayout->addWidget(graphicsView, 0, 0, 1, 3);
-
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
 
-        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
+        gridLayout->addWidget(pushButton, 1, 2, 1, 1);
 
         pushButton_4 = new QPushButton(centralwidget);
         pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
 
-        gridLayout->addWidget(pushButton_4, 2, 0, 2, 1);
+        gridLayout->addWidget(pushButton_4, 2, 1, 1, 1);
 
         pushButton_2 = new QPushButton(centralwidget);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
 
-        gridLayout->addWidget(pushButton_2, 2, 1, 1, 1);
+        gridLayout->addWidget(pushButton_2, 2, 2, 1, 1);
 
         pushButton_5 = new QPushButton(centralwidget);
         pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
 
-        gridLayout->addWidget(pushButton_5, 2, 2, 2, 1);
+        gridLayout->addWidget(pushButton_5, 2, 3, 1, 1);
 
         pushButton_3 = new QPushButton(centralwidget);
         pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
 
-        gridLayout->addWidget(pushButton_3, 3, 1, 1, 1);
+        gridLayout->addWidget(pushButton_3, 3, 2, 1, 1);
+
+        lineEdit = new QLineEdit(centralwidget);
+        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+
+        gridLayout->addWidget(lineEdit, 4, 0, 2, 1);
+
+        lineEdit_2 = new QLineEdit(centralwidget);
+        lineEdit_2->setObjectName(QString::fromUtf8("lineEdit_2"));
+
+        gridLayout->addWidget(lineEdit_2, 4, 4, 1, 1);
+
+        lineEdit_3 = new QLineEdit(centralwidget);
+        lineEdit_3->setObjectName(QString::fromUtf8("lineEdit_3"));
+
+        gridLayout->addWidget(lineEdit_3, 5, 4, 1, 1);
+
+        graphicsView = new QGraphicsView(centralwidget);
+        graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
+
+        gridLayout->addWidget(graphicsView, 0, 0, 1, 5);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
