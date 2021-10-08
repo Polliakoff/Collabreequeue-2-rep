@@ -67,32 +67,76 @@ double straight_line::get_y(const double &x)
     }
 }
 
-
-
-
-double intersect(straight_line &line_1, straight_line &line_2)
+std::pair<double,double> intersect(straight_line &line_1, straight_line &line_2, std::pair<double,double> range_1, std::pair<double,double> range_2)
 {
+    std::pair<double,double> result;
     if(round_to(line_1.direction(0),5)==0){
         if(round_to(line_2.direction(0),5)==0){
-            return std::numeric_limits<double>::infinity();
+            return std::make_pair(std::numeric_limits<double>::infinity(),
+                                  std::numeric_limits<double>::infinity());
         }
         else{
-            return line_1.get_x(0);
+            result.first = line_1.get_x(0);
+            result.second = line_2.get_y(result.first);
         }
     }
     else if(round_to(line_2.direction(0),5)==0){
         if(round_to(line_1.direction(0),5)==0){
-            return std::numeric_limits<double>::infinity();
+            return std::make_pair(std::numeric_limits<double>::infinity(),
+                                  std::numeric_limits<double>::infinity());
         }
         else{
-            return line_2.get_x(0);
+            result.first = line_2.get_x(0);
+            result.second = line_1.get_y(result.first);
         }
     }
     else{
-        double q1p1 = line_1.direction(0)/line_1.direction(1);
-        double q2p2 = line_2.direction(0)/line_2.direction(1);
-        return((line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2));
+        double q1p1 = line_1.direction(1)/line_1.direction(0);
+        double q2p2 = line_2.direction(1)/line_2.direction(0);
+        result.first = (line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2);
+        result.second = line_1.get_y(result.first);
     }
+    if(result.first>=std::min(range_1.first,range_2.first) && result.first<=std::max(range_1.first,range_2.first)
+            && result.second>=std::min(range_1.second,range_2.second) && result.second<=std::max(range_1.second,range_2.second)){
+        return result;
+    }
+    else{
+        return std::make_pair(std::numeric_limits<double>::infinity(),
+                              std::numeric_limits<double>::infinity());
+    }
+}
+
+std::pair<double,double> intersect(straight_line &line_1, straight_line &line_2)
+{
+    std::pair<double,double> result;
+    if(round_to(line_1.direction(0),5)==0){
+        if(round_to(line_2.direction(0),5)==0){
+            return std::make_pair(std::numeric_limits<double>::infinity(),
+                                  std::numeric_limits<double>::infinity());
+        }
+        else{
+            result.first = line_1.get_x(0);
+            result.second = line_2.get_y(result.first);
+        }
+    }
+    else if(round_to(line_2.direction(0),5)==0){
+        if(round_to(line_1.direction(0),5)==0){
+            return std::make_pair(std::numeric_limits<double>::infinity(),
+                                  std::numeric_limits<double>::infinity());
+        }
+        else{
+            result.first = line_2.get_x(0);
+            result.second = line_1.get_y(result.first);
+        }
+    }
+    else{
+        double q1p1 = line_1.direction(1)/line_1.direction(0);
+        double q2p2 = line_2.direction(1)/line_2.direction(0);
+        result.first = (line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2);
+        result.second = line_1.get_y(result.first);
+    }
+
+    return result;
 }
 
 std::pair<double, double> perp_vect(std::pair<double, double> input_vector, const double& desired_length)

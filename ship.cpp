@@ -14,9 +14,9 @@ ship::ship(const double &pos_x, const double &pos_y)
     body.add_point(position.first-10, position.second-10);
     body.add_point(position.first-10, position.second+10);
 
-    eyes.emplace_back(position.first, position.second, position.first+10, position.second+10);
-    eyes.emplace_back(position.first, position.second, position.first-10, position.second+10);
-    eyes.emplace_back(position.first, position.second, position.first, position.second+10);
+    eyes.emplace_back(position.first, position.second, position.first+10, position.second-10);
+    eyes.emplace_back(position.first, position.second, position.first-10, position.second-10);
+    eyes.emplace_back(position.first, position.second, position.first, position.second-10);
 
     distances.resize(6);
     point_seen.resize(6);
@@ -107,33 +107,47 @@ bool ship::collision(polygon &pol)
 void ship::eyesight(polygon &pol)
 {
     for(size_t i = 0; i<eyes.size(); i++){
-        for(auto j:pol.faces){
-            double checking_point = intersect(eyes[i],j);
-            if(checking_point != std::numeric_limits<double>::infinity()){
+        for(size_t j = 0; j<pol.faces.size();j++){
+            pair<double,double> checking_point;
+            int range_1;
+            int range_2;
+            if(j!=pol.faces.size()-1){
+                range_1 = j;
+                range_2 = j+1;
+            }
+            else{
+                range_1 = j;
+                range_2 = 0;
+            }
+            checking_point = intersect(eyes[i],pol.faces[j],pol.vertexes[range_1],pol.vertexes[range_2]);
+            if(checking_point.first != std::numeric_limits<double>::infinity()){
 
-                double checking_point_y;
-                if(eyes[i].direction(0)!=0){
-                    checking_point_y = eyes[i].get_y(checking_point);
-                }
-                else{
-                   checking_point_y = j.get_y(checking_point);
-                }
-
-                auto cheching_poit_positon = convert_to_ship(std::make_pair(checking_point,checking_point_y));
+                auto cheching_poit_positon = convert_to_ship(checking_point);
 
                 double pos_in_mas;
 
-                if(cheching_poit_positon.first < 0){
-                    pos_in_mas = (i+1)*2-2;
+                if(i!=2){
+                    if(cheching_poit_positon.first < 0){
+                        pos_in_mas = (i+1)*2-2;
 
+                    }
+                    else{
+                        pos_in_mas = (i+1)*2-1;
+                    }
                 }
                 else{
-                    pos_in_mas = (i+1)*2-1;
+                    if(cheching_poit_positon.second > 0){
+                        pos_in_mas = (i+1)*2-2;
+
+                    }
+                    else{
+                        pos_in_mas = (i+1)*2-1;
+                    }
                 }
 
-                distances[pos_in_mas] = sqrt(pow(checking_point-position.first,2)+pow(checking_point_y-position.second,2));
-                point_seen[pos_in_mas].first = checking_point;
-                point_seen[pos_in_mas].second = checking_point_y;
+                distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
+                point_seen[pos_in_mas].first = checking_point.first;
+                point_seen[pos_in_mas].second = checking_point.second;
 
             }
         }
@@ -151,27 +165,36 @@ bool point_to_poly(const pair<double,double>& point, polygon &pol)
     int intersections = 0;
     auto input_vertexes = pol.vertexes;
     straight_line rays(point.first, point.second, point.first+1,point.second+1);
-        for(auto j:pol.faces){
-            auto checkig_point = intersect(j,rays);
-            if(checkig_point != std::numeric_limits<double>::infinity()){
-                double checking_point_y = rays.get_y(checkig_point);
-                auto found{std::find(input_vertexes.begin(), input_vertexes.end(),
-                                      std::make_pair(checkig_point, checking_point_y))};
-                if(found != input_vertexes.end()){
-                    pair<double,double> fixing_vector = perp_vect(std::make_pair(rays.direction(0),rays.direction(1)),0.1);
-                    found->first+=fixing_vector.first;
-                    found->second+=fixing_vector.second;
-                    polygon new_poly;
-                    for(auto i:input_vertexes){
-                        new_poly.add_point(i.first,i.second);
-                    }
-                    return point_to_poly(point,new_poly);
+    for(size_t j = 0; j<pol.faces.size();j++){
+        int range_1;
+        int range_2;
+        if(j!=pol.faces.size()-1){
+            range_1 = j;
+            range_2 = j+1;
+        }
+        else{
+            range_1 = j;
+            range_2 = 0;
+        }
+        auto checkig_point = intersect(pol.faces[j],rays,pol.vertexes[range_1],pol.vertexes[range_2]);
+        if(checkig_point.first != std::numeric_limits<double>::infinity()){
+            auto found{std::find(input_vertexes.begin(), input_vertexes.end(),
+                                 checkig_point)};
+            if(found != input_vertexes.end()){
+                pair<double,double> fixing_vector = perp_vect(std::make_pair(rays.direction(0),rays.direction(1)),0.1);
+                found->first+=fixing_vector.first;
+                found->second+=fixing_vector.second;
+                polygon new_poly;
+                for(auto i:input_vertexes){
+                    new_poly.add_point(i.first,i.second);
                 }
-                else{
-                    intersections++;
-                }
+                return point_to_poly(point,new_poly);
+            }
+            else{
+                intersections++;
             }
         }
+    }
     if((intersections) % 2 == 0 && (intersections/2) % 2 != 0) return true;
     else return false;
 }
@@ -183,18 +206,18 @@ pair<double, double> point_rotation(const pair<double, double> &point, const pai
     double cs = cos(delta_angle);
     double sn = sin(delta_angle);
 
-        result.first -= axis.first;
-        result.second -= axis.second;
+    result.first -= axis.first;
+    result.second -= axis.second;
 
-        double old_x = result.first;
-        double old_y = result.second;
+    double old_x = result.first;
+    double old_y = result.second;
 
-        result.first = old_x*cs + old_y*sn;
-        result.second = (-1)*old_x*sn + old_y*cs;
+    result.first = old_x*cs + old_y*sn;
+    result.second = (-1)*old_x*sn + old_y*cs;
 
-        result.first += axis.first;
-        result.second += axis.second;
+    result.first += axis.first;
+    result.second += axis.second;
 
-        return result;
+    return result;
 
 }

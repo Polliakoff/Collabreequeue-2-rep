@@ -25,8 +25,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
-    QGraphicsScene *scene;
-    ship *korablik;
-    polygon *map;
+    std::unique_ptr<QGraphicsScene> scene;
+    //QGraphicsScene *scene;
+    std::unique_ptr<ship> korablik;
+    std::unique_ptr<polygon> map;
+    std::unique_ptr<QTimer> timer;
 };
 #endif // MAINWINDOW_H

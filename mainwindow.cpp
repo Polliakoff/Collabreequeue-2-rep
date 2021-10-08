@@ -6,15 +6,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    scene = new QGraphicsScene;
-    korablik = new ship(200,200);
-    polygon map;
-    map.add_point(250,250);
-    map.add_point(250,100);
-    map.add_point(100,100);
-    map.add_point(100,150);
-    map.add_point(150,150);
-    map.add_point(150,250);
+    scene = std::make_unique<QGraphicsScene>();
+    korablik = std::make_unique<ship>(200,200);
+    timer = std::make_unique<QTimer>();
+
+    map = std::make_unique<polygon>();
+    map->add_point(250,400);
+    map->add_point(250,0);
+    map->add_point(150,0);
+    map->add_point(150,400);
 }
 
 MainWindow::~MainWindow()
@@ -39,36 +39,35 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 
 void MainWindow::on_pushButton_clicked()
 {
-//    ship test_ship(200,200);
+    ui->graphicsView->setScene(scene.get());
+    korablik->rotate_by(-3*M_PI/4);
 
-//    polygon test_poly;
-//    test_poly.add_point(250,250);
-//    test_poly.add_point(250,100);
-//    test_poly.add_point(100,100);
-//    test_poly.add_point(100,150);
-//    test_poly.add_point(150,150);
-//    test_poly.add_point(150,250);
+    connect(timer.get(), &QTimer::timeout,  [=](){korablik->update(*map);});
+    connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
 
-//    QGraphicsScene* scene = new QGraphicsScene;
-//    ui->graphicsView->setScene(scene);
+    timer->start(0);
 
-//    //scene->addLine(10,100,300,100);
-
-//    test_ship.rotate_by(-M_PI/4);
-//    //test_ship.move_by_coords(-100,-100);
-
-//    //auto test_convert = test_ship.convert_to_ship(test_ship.body.vertexes[2]);
-
-//    //test_ship.move_by_distance(100);
-
-//    qdraw_polygon(test_ship.body,scene);
-    //    qdraw_polygon(test_poly,scene);
 }
 
 void MainWindow::painter()
 {
     scene->clear();
-    qdraw_polygon(korablik->body,scene);
-    qdraw_polygon(*map,scene);
+    qdraw_polygon(korablik->body,scene.get());
+    qdraw_polygon(*map,scene.get());
+
+    scene->addLine(korablik->point_seen[0].first,korablik->point_seen[0].second,
+            korablik->point_seen[1].first,korablik->point_seen[1].second);
+    scene->addLine(korablik->point_seen[2].first,korablik->point_seen[2].second,
+            korablik->point_seen[3].first,korablik->point_seen[3].second);
+    scene->addLine(korablik->point_seen[4].first,korablik->point_seen[4].second,
+            korablik->point_seen[5].first,korablik->point_seen[5].second);
+
+    scene->addEllipse(korablik->point_seen[0].first-10,korablik->point_seen[0].second-10,20,20);
+    scene->addEllipse(korablik->point_seen[1].first-10,korablik->point_seen[1].second-10,20,20);
+    scene->addEllipse(korablik->point_seen[2].first-10,korablik->point_seen[2].second-10,20,20);
+    scene->addEllipse(korablik->point_seen[3].first-10,korablik->point_seen[3].second-10,20,20);
+    scene->addEllipse(korablik->point_seen[4].first-10,korablik->point_seen[4].second-10,20,20);
+    scene->addEllipse(korablik->point_seen[5].first-10,korablik->point_seen[5].second-10,20,20);
 }
+
 
