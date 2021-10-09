@@ -18,7 +18,9 @@ ship::ship(const double &pos_x, const double &pos_y)
     eyes.emplace_back(position.first, position.second, position.first-10, position.second-10);
     eyes.emplace_back(position.first, position.second, position.first, position.second-10);
 
-    distances.resize(6);
+    for(int i=0;i<6;i++){
+        distances.emplace_back(-1);
+    }
     point_seen.resize(6);
 }
 
@@ -106,6 +108,13 @@ bool ship::collision(polygon &pol)
 
 void ship::eyesight(polygon &pol)
 {
+    vector<double> temp_distances;
+    for(int i=0;i<6;i++){
+        temp_distances.emplace_back(-1);
+    }
+    vector<pair<double,double>> temp_point_seen;
+    temp_point_seen.resize(6);
+
     for(size_t i = 0; i<eyes.size(); i++){
         for(size_t j = 0; j<pol.faces.size();j++){
             pair<double,double> checking_point;
@@ -145,13 +154,23 @@ void ship::eyesight(polygon &pol)
                     }
                 }
 
-                distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
-                point_seen[pos_in_mas].first = checking_point.first;
-                point_seen[pos_in_mas].second = checking_point.second;
+                if(temp_distances[pos_in_mas] == -1){
+                    temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
+                    temp_point_seen[pos_in_mas].first = checking_point.first;
+                    temp_point_seen[pos_in_mas].second = checking_point.second;
+                }
 
+                else if(temp_distances[pos_in_mas]>=sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2))){
+                    temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
+                    temp_point_seen[pos_in_mas].first = checking_point.first;
+                    temp_point_seen[pos_in_mas].second = checking_point.second;
+                }
             }
         }
     }
+
+    distances = temp_distances;
+    point_seen = temp_point_seen;
 }
 
 void ship::update(polygon &map)

@@ -76,6 +76,7 @@ void MainWindow::painter()
     ui->lineEdit->setText(QString::number(korablik->get_angle()));
     ui->lineEdit_2->setText(QString::number(korablik->get_position().first));
     ui->lineEdit_3->setText(QString::number(korablik->get_position().second));
+    ui->lineEdit_4->setText(QString::number(korablik->collided));
 }
 
 
