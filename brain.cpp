@@ -27,6 +27,54 @@ brain::brain(){
     A.emplace_back(l[S-1]);
 }
 
+
+brain::brain(const brain &a, const brain &b, double dmnc){
+    this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;    //+0.5 для правильного окргуления дробных чисел
+                                            //тут влияние dmnc
+
+    l.clear();
+    l.reserve(S);
+    for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обоих сетях-родителях
+        this->l.emplace_back(a.l[i]*dmnc+b.l[i]*(1-dmnc)+0.5); //тут влияние dmnc
+    }
+    int missingLayersCnt = this->S - (a.S<b.S ? a.S : b.S); //количество недостающих слоёв в новой сети
+
+    int temp = (a.S > b.S ? a.S : b.S); //нужен для отсчета от последнего слоя большей сети
+
+    for (int i = missingLayersCnt+1; i > 0 && temp-i+1 < (a.S>b.S ? a.S : b.S); --i){ // добавляем недостающие слои копируя у бо'льшего родителя
+        this->l.emplace_back((a.S>b.S ? a.l : b.l)[temp-i]);
+        --missingLayersCnt; //уменьшаем кол-во недостающих слоев
+    }
+
+
+    //вариант, где случайный слой появляется на случайном месте
+    {
+//        int lRandDestination; //хранит позицию мутировавшего - нового слоя
+//        while (--missingLayersCnt>=0){ //this ранее использовались для наглядности, тут, очевидно, будет использоватья уже созданый l
+//            int temp = l.size();
+//            lRandDestination = 1 + rand() % (temp - 1); //новый слой может появиться в промежутках
+//            l.emplace_back(0); //временная пустышка
+//            for (int i = 0; i < temp-1; ++i) {
+//                if (lRandDestination>i)
+//                    l[i+1]=l[i]; //смещаем после места случайного
+//            }
+//            l[lRandDestination] = l[lRandDestination-1]+l[lRandDestination+1]/2; //среднее значение от боковых слоёв
+//        }
+    }
+
+
+    //вариант, где мы добавляем новое значение в конец перед выходным слоем
+    while (--missingLayersCnt>=0){
+        l.emplace_back(*l.end()); //равное предыдущему
+    }
+
+
+    l.emplace_back(6); //выходной всегда 6
+    //итого у нас информация о количестве нейронов в каждом слое
+
+
+}
+
 void brain::think(){
     int i = 0;
     for (auto &w: W) {
@@ -37,31 +85,6 @@ void brain::think(){
         ++i;
     }
     cout << "\nendl\n";
-}
-
-
-std::ofstream &operator<<(std::ofstream& fout, brain& b){
-    //fout << endl << b.S << endl;
-    for (auto &w: b.W){
-        fout << w << endl;
-    }
-    return fout;
-}
-
-std::ifstream &operator>>(std::ifstream& fin, Eigen::MatrixXd& b){
-    //fout << endl << b.S << endl;
-    //for (auto &w: b.W){
-        //fin >> b.W[0];
-    //}
-    return fin;
-}
-
-std::ifstream &operator>>(std::ifstream& fin, brain& b){
-    //fout << endl << b.S << endl;
-    //for (auto &w: b.W){
-        fin >> b.W[0];
-    //}
-    return fin;
 }
 
 QDataStream &operator<<(QDataStream &out, const brain &item){
@@ -86,14 +109,14 @@ QDataStream &operator>>(QDataStream &in, brain &item){
     item.W.clear();
     item.A.clear();
     item.l.clear();
-    item.W.reserve(item.S-1);
-    item.A.reserve(item.S);
     item.l.reserve(item.S);
     for (int k = 0; k < item.S; ++k){
         int temp;
         in >> temp;
         item.l.emplace_back(temp);
     }
+    item.W.reserve(item.S-1);
+    item.A.reserve(item.S);
     for (int k = 0; k < item.S - 1; ++k){
         item.A.emplace_back(item.l[k]);
         item.W.push_back(Eigen::MatrixXd::Zero(item.l[k],item.l[k+1]));
