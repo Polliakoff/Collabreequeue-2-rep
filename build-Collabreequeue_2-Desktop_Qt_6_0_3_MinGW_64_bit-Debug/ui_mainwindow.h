@@ -36,6 +36,8 @@ public:
     QLineEdit *lineEdit_2;
     QLineEdit *lineEdit_3;
     QGraphicsView *graphicsView;
+    QPushButton *pushButton_6;
+    QPushButton *pushButton_7;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -93,6 +95,16 @@ public:
 
         gridLayout->addWidget(graphicsView, 0, 0, 1, 5);
 
+        pushButton_6 = new QPushButton(centralwidget);
+        pushButton_6->setObjectName(QString::fromUtf8("pushButton_6"));
+
+        gridLayout->addWidget(pushButton_6, 5, 2, 1, 1);
+
+        pushButton_7 = new QPushButton(centralwidget);
+        pushButton_7->setObjectName(QString::fromUtf8("pushButton_7"));
+
+        gridLayout->addWidget(pushButton_7, 4, 2, 1, 1);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -115,6 +127,8 @@ public:
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "\320\222\320\277\320\265\321\200\320\265\320\264", nullptr));
         pushButton_5->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\277\321\200\320\260\320\262\320\276", nullptr));
         pushButton_3->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\267\320\260\320\264", nullptr));
+        pushButton_6->setText(QCoreApplication::translate("MainWindow", "painter", nullptr));
+        pushButton_7->setText(QCoreApplication::translate("MainWindow", "Update", nullptr));
     } // retranslateUi
 
 };

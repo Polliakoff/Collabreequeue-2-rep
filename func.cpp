@@ -21,6 +21,8 @@ double round_to(double inpValue, int inpCount)
 //    }
 //    return(outpValue);
 
+
     double result = std::floor(inpValue * pow(10,inpCount) + 0.5) / pow(10,inpCount);
+   // double result = double(int(inpValue * pow(10,inpCount)))/pow(10,inpCount);
     return result;
 }

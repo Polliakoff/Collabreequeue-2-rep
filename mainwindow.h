@@ -30,6 +30,10 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_pushButton_6_clicked();
+
+    void on_pushButton_7_clicked();
+
 private:
     Ui::MainWindow *ui;
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);

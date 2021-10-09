@@ -96,8 +96,10 @@ std::pair<double,double> intersect(straight_line &line_1, straight_line &line_2,
         result.first = (line_2.point(1)-line_1.point(1)-line_2.point(0)*q2p2+line_1.point(0)*q1p1)/(q1p1-q2p2);
         result.second = line_1.get_y(result.first);
     }
-    if(result.first>=std::min(range_1.first,range_2.first) && result.first<=std::max(range_1.first,range_2.first)
-            && result.second>=std::min(range_1.second,range_2.second) && result.second<=std::max(range_1.second,range_2.second)){
+    double r_1 = round_to(result.first,5);
+    double r_2 = round_to(result.second,5);
+    if(r_1>=std::min(range_1.first,range_2.first) && r_1<=std::max(range_1.first,range_2.first)
+            && r_2>=std::min(range_1.second,range_2.second) && r_2<=std::max(range_1.second,range_2.second)){
         return result;
     }
     else{

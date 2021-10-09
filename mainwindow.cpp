@@ -7,14 +7,19 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     scene = std::make_unique<QGraphicsScene>();
-    korablik = std::make_unique<ship>(200,200);
+    korablik = std::make_unique<ship>(200,200+50);
     timer = std::make_unique<QTimer>();
 
     map = std::make_unique<polygon>();
-    map->add_point(250,400);
-    map->add_point(250,0);
-    map->add_point(150,0);
-    map->add_point(150,400);
+    map->add_point(250,400+50);
+    map->add_point(250,0+50);
+    map->add_point(150,0+50);
+    map->add_point(150,400+50);
+
+    //    map->add_point(250,250);
+    //    map->add_point(250,150);
+    //    map->add_point(150,150);
+    //    map->add_point(150,250);
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +34,7 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
     int j = 0;
     while(j!=2){
         scene->addLine(pol.vertexes[i_dop].first,pol.vertexes[i_dop].second,
-                pol.vertexes[i].first,pol.vertexes[i].second);
+                       pol.vertexes[i].first,pol.vertexes[i].second);
         i++;
         i_dop = i-1;
         if(i>=pol.vertexes.size()){i=0;j++;}
@@ -40,7 +45,6 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
-   // korablik->rotate_by(-3*M_PI/4);
 
     connect(timer.get(), &QTimer::timeout,  [=](){korablik->update(*map);});
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
@@ -90,12 +94,26 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    korablik->rotate_by(-M_PI/6);
+    korablik->rotate_by(-M_PI/12);
 }
 
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    korablik->rotate_by(M_PI/6);
+    korablik->rotate_by(M_PI/12);
+}
+
+
+void MainWindow::on_pushButton_6_clicked()
+{
+//    korablik->move_by_distance(20);
+//    korablik->update(*map);
+    this->painter();
+}
+
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    korablik->update(*map);
 }
 
