@@ -31,21 +31,20 @@ brain::brain(){
 brain::brain(const brain &a, const brain &b, double dmnc){
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;    //+0.5 для правильного окргуления дробных чисел
                                             //тут влияние dmnc
-
+    S+=2;
     l.clear();
     l.reserve(S);
     for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обоих сетях-родителях
         this->l.emplace_back(a.l[i]*dmnc+b.l[i]*(1-dmnc)+0.5); //тут влияние dmnc
     }
-    int missingLayersCnt = this->S - (a.S<b.S ? a.S : b.S); //количество недостающих слоёв в новой сети
+    int missingLayersCnt = 1 + this->S - (a.S<b.S ? a.S : b.S); //количество недостающих слоёв в новой сети
 
     int temp = (a.S > b.S ? a.S : b.S); //нужен для отсчета от последнего слоя большей сети
 
-    for (int i = missingLayersCnt+1; i > 0 && temp-i+1 < (a.S>b.S ? a.S : b.S); --i){ // добавляем недостающие слои копируя у бо'льшего родителя
-        this->l.emplace_back((a.S>b.S ? a.l : b.l)[temp-i]);
+    for (int i = missingLayersCnt; i > 0 && temp-i+2 < (a.S>b.S ? a.S : b.S); --i){ // добавляем недостающие слои копируя у бо'льшего родителя
+        this->l.emplace_back((a.S>b.S ? a.l : b.l)[temp-i+1]);
         --missingLayersCnt; //уменьшаем кол-во недостающих слоев
     }
-
 
     //вариант, где случайный слой появляется на случайном месте
     {
@@ -64,8 +63,8 @@ brain::brain(const brain &a, const brain &b, double dmnc){
 
 
     //вариант, где мы добавляем новое значение в конец перед выходным слоем
-    while (--missingLayersCnt>=0){
-        l.emplace_back(*l.end()); //равное предыдущему
+    while (--missingLayersCnt>0){
+        l.emplace_back(l[l.size()-1]); //равное предыдущему
     }
 
 
