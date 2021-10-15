@@ -7,14 +7,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     scene = std::make_unique<QGraphicsScene>();
-    korablik = std::make_unique<ship>(200,200+50);
+    korablik = std::make_unique<ship>(200,200);
     timer = std::make_unique<QTimer>();
 
     map = std::make_unique<polygon>();
-    map->add_point(250,400+50);
-    map->add_point(250,0+50);
-    map->add_point(150,0+50);
-    map->add_point(150,400+50);
+    map->add_point(260,260);
+    map->add_point(260,160);
+    map->add_point(160,160);
+    map->add_point(160,260);
 
     //    map->add_point(250,250);
     //    map->add_point(250,150);

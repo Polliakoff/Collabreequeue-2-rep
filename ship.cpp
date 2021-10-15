@@ -181,7 +181,8 @@ void ship::update(polygon &map)
 
 bool point_to_poly(const pair<double,double>& point, polygon &pol)
 {
-    int intersections = 0;
+    int intersections_l = 0;
+    int intersections_r = 0;
     auto input_vertexes = pol.vertexes;
     straight_line rays(point.first, point.second, point.first+1,point.second+1);
     for(size_t j = 0; j<pol.faces.size();j++){
@@ -210,12 +211,16 @@ bool point_to_poly(const pair<double,double>& point, polygon &pol)
                 return point_to_poly(point,new_poly);
             }
             else{
-                intersections++;
+                if(checkig_point.first>point.first) intersections_r++;
+                else intersections_l++;
+
             }
         }
     }
-    if((intersections) % 2 == 0 && (intersections/2) % 2 != 0) return true;
-    else return false;
+    bool result;
+    if(intersections_l % 2 != 0 && intersections_r % 2 != 0) result = true;
+    else result = false;
+    return result;
 }
 
 pair<double, double> point_rotation(const pair<double, double> &point, const pair<double, double> &axis, const double &delta_angle)
