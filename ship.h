@@ -1,15 +1,16 @@
-#ifndef SHIP_H
-#define SHIP_H
+//#ifndef SHIP_H
+//#define SHIP_H
+#pragma once
 
 #include "func.h"
 #include "straight_line.h"
 #include "polygon.h"
 #include "brain.h"
 
+
 class ship
 {
 private:
-    double angle;
     pair<double, double> position;
 public:
     ship();//не использовать
@@ -18,6 +19,7 @@ public:
 
     bool collided = false;
 
+    double angle;
     polygon body;
     vector<straight_line> eyes;
     vector<double> distances;
@@ -38,4 +40,4 @@ public slots:
 
 pair<double, double> point_rotation(const pair<double, double>& point, const pair<double, double>& axis, const double &delta_angle);
 bool point_to_poly(const pair<double,double>& point, polygon &pol);
-#endif // SHIP_H
+//#endif // SHIP_H

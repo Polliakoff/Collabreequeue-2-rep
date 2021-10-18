@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     scene = std::make_unique<QGraphicsScene>();
-    korablik = std::make_unique<ship>(200,200);
+    korablik = std::make_unique<ship_physics>(200,200);
     timer = std::make_unique<QTimer>();
 
     map = std::make_unique<polygon>();
@@ -47,9 +47,10 @@ void MainWindow::on_pushButton_clicked()
     ui->graphicsView->setScene(scene.get());
 
     connect(timer.get(), &QTimer::timeout,  [=](){korablik->update(*map);});
+    connect(timer.get(), &QTimer::timeout,  [=](){korablik->apply_brain_command(neuron_1, neuron_2, neuron_3, neuron_4);});
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
 
-    timer->start(0);
+    timer->start(15);
 
 }
 
@@ -83,25 +84,33 @@ void MainWindow::painter()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    korablik->move_by_distance(10);
+    //korablik->move_by_distance(10);
+    tmblr_1 =! tmblr_1;
+    neuron_1 = int(tmblr_1);
 }
 
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    korablik->move_by_distance(-10);
+    //korablik->move_by_distance(-10);
+    tmblr_2 =! tmblr_2;
+    neuron_2 = int(tmblr_2);
 }
 
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    korablik->rotate_by(-M_PI/12);
+    //korablik->rotate_by(-M_PI/12);
+    tmblr_4 =! tmblr_4;
+    neuron_4 = int(tmblr_4);
 }
 
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    korablik->rotate_by(M_PI/12);
+  //korablik->rotate_by(M_PI/12);
+    tmblr_3 =! tmblr_3;
+    neuron_3 = int(tmblr_3);
 }
 
 

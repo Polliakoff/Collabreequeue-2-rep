@@ -15,6 +15,7 @@ SOURCES += \
     mainwindow.cpp \
     polygon.cpp \
     ship.cpp \
+    ship_physics.cpp \
     straight_line.cpp
 
 HEADERS += \
@@ -23,6 +24,7 @@ HEADERS += \
     mainwindow.h \
     polygon.h \
     ship.h \
+    ship_physics.h \
     straight_line.h
 
 

@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ship.h"
+#include "ship_physics.h"
 #include <QGraphicsScene>
 #include <QTimer>
 
@@ -39,8 +39,10 @@ private:
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
     //QGraphicsScene *scene;
-    std::unique_ptr<ship> korablik;
+    std::unique_ptr<ship_physics> korablik;
     std::unique_ptr<polygon> map;
     std::unique_ptr<QTimer> timer;
+    double neuron_1 = 0, neuron_2 = 0, neuron_3 = 0, neuron_4 = 0;
+    bool tmblr_1 = false, tmblr_2 = false, tmblr_3 = false, tmblr_4 = false;
 };
 #endif // MAINWINDOW_H

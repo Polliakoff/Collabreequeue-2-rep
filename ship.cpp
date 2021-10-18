@@ -245,3 +245,4 @@ pair<double, double> point_rotation(const pair<double, double> &point, const pai
     return result;
 
 }
+
