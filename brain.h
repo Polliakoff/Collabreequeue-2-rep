@@ -15,7 +15,7 @@ private:
     double sigmoid(const double&);
     int first=13;   //количество входных слоёв
     int last=4;     //количество выходных
-
+    void inheritWeights(brain &a, brain &b, double dmnc);
 public:
     int S;                              //внутренних слоёв
     std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам

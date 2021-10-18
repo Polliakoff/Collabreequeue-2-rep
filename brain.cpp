@@ -54,12 +54,19 @@ brain::brain(brain &a, brain &b, double dmnc){
 
     if (!viable()) return;
 
+
+    inheritWeights(a,b,dmnc);
+
+    mutate();
+}
+
+void brain::inheritWeights(brain &a, brain &b, double dmnc){
     this->A.clear();
     this->A.reserve(this->S);
 
     this->W.clear();
     this->W.reserve(this->S-1);
-    //int minL;
+
     auto lt = 0;
     //наследование пересекающихся матриц слева-направо зеленые + красные стекла
     for (; lt < a.S-2 && lt < b.S-2 && lt != this->S-2;){ //не берем последний слой (синее стекло)
@@ -67,7 +74,7 @@ brain::brain(brain &a, brain &b, double dmnc){
         this->W.emplace_back(l[lt],l[lt+1]);
         for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1]; ++j){
             for (int i = 0; i < a.l[lt] && i < b.l[lt]; ++i){
-                this->W[lt](i,j)=(a.W[lt](i,j)+b.W[lt](i,j))/2.0;
+                this->W[lt](i,j)=((a.W[lt](i,j)+b.W[lt](i,j))/2.0)*(95+(rand()%11))/100.0; ////вот тут шум
                 //cout << i << "\t" << j << "\n"; //11,6 проверка
             }
         }
@@ -79,7 +86,8 @@ brain::brain(brain &a, brain &b, double dmnc){
             for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
                  temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
-                    this->W[lt](i,temp) = abMax.W[lt](i,temp); //берем веса большей матрицы
+                    this->W[lt](i,temp) = abMax.W[lt](i,temp)*(95+(rand()%11))/100.0; ////вот тут шум
+                                                                                    //берем веса большей матрицы
                 }
             }
         }
@@ -91,7 +99,8 @@ brain::brain(brain &a, brain &b, double dmnc){
             for (int temp = abMin.l[lt]; //берем за начальную точку конец меньшей матрицы
                  temp < this->l[lt]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
-                    this->W[lt](temp,i) = abMax.W[lt](temp,i); //берем веса большей матрицы
+                    this->W[lt](temp,i) = abMax.W[lt](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум
+                    //берем веса большей матрицы
                 }
             }
         }
@@ -107,7 +116,8 @@ brain::brain(brain &a, brain &b, double dmnc){
         this->W.emplace_back(l[lt],l[lt+1]);
         for (int j = 0; j < abMax.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
-                this->W[lt](i,j) = abMax.W[lt](i,j); //просто берём
+                this->W[lt](i,j) = abMax.W[lt](i,j)*(95+(rand()%11))/100.0; ////вот тут шум
+                //просто берём
             }
         }
 
@@ -136,7 +146,7 @@ brain::brain(brain &a, brain &b, double dmnc){
 
     for (int j = 0; j < a.l[a.S-1] && j < b.l[b.S-1]; ++j){
         for (int i = 0; i < a.l[a.S-2] && i < b.l[b.S-2]; ++i){
-            this->W[S-2](i,j)=(a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0;
+            this->W[S-2](i,j)=((a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0)*(95+(rand()%11))/100.0; ////вот тут шум
         }
     }
 
@@ -148,19 +158,19 @@ brain::brain(brain &a, brain &b, double dmnc){
         for (int temp = abMin.l[abMin.S-2]; //берем за начальную точку конец меньшей матрицы
              temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
-                this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i); //берем веса большей матрицы
+                this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум;
+                                                            //берем веса большей матрицы
             }
         }
     }
-
-
-    mutate();
 }
 
 void brain::mutate(){
     //TBD
-    int missingLayersCnt = int(1 == rand()%10)*(rand()%2?1:-1); //в одном из 10-ти происходит мутация слоев на один
-    S+=missingLayersCnt;
+    int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
+    if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
+    mutatedLayers = -1;
+    S+=mutatedLayers;
 
     //вариант, где случайный слой появляется на случайном месте
     {
@@ -178,10 +188,29 @@ void brain::mutate(){
     }
 
 
-    //вариант, где мы добавляем новое значение в конец перед выходным слоем
-    while (--missingLayersCnt>-1){
-        this->l.emplace_back(l[l.size()-1]); //равное предыдущему
+    //вариант, где мы добавляем(убираем) новое значение в конец перед выходным слоем
+    l.pop_back(); //убрали последний
+    A.pop_back(); //убрали последний
+    auto w = W[W.size()-1]; //запомнили веса последней матрицы
+    W.pop_back();
+    if (mutatedLayers>0) {
+        l.emplace_back(l[l.size()-1]); //равное предыдущему
+        A.emplace_back(l[l.size()-1]); //создали новый
+        W.push_back(Eigen::MatrixXd::Random(l[l.size()-1],l[l.size()-1]));
+        W.push_back(w);
+    } else if(mutatedLayers<0) {
+        l.pop_back();           //убили предпоследний
+        A.pop_back();           //убили предпоследний
+        W.pop_back();           //убили предпоследний
+        W.push_back(Eigen::MatrixXd::Random(l[l.size()-1],last));
+        for(int c = 0; c < last && c < w.cols(); ++c)
+            for (int r = 0; r < l[S-2] && r < w.rows(); ++r){
+                W[S-2](r,c) = w(r,c);
+            }
     }
+    l.emplace_back(last);
+    A.emplace_back(last);
+
 }
 
 
