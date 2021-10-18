@@ -25,26 +25,108 @@ brain::brain(){
         W.push_back(Eigen::MatrixXd::Random(l[i],l[i+1])); //на первое время и отрицательные веса тоже
     }
     A.emplace_back(l[S-1]);
+//    for(auto &w: W)
+//        cout << w.norm() << endl;
 }
 
 
 brain::brain(const brain &a, const brain &b, double dmnc){
-    this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;    //+0.5 для правильного окргуления дробных чисел
+    this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
                                             //тут влияние dmnc
-    S+=4;
-    l.clear();
-    l.reserve(S);
-    for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обоих сетях-родителях
+    this->l.clear();
+    this->l.reserve(this->S);
+    //vector<vector<int>> specPos;
+    for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обеих сетях-родителях
         this->l.emplace_back(a.l[i]*dmnc+b.l[i]*(1-dmnc)+0.5); //тут влияние dmnc
     }
-    int missingLayersCnt = 1 + this->S - (a.S<b.S ? a.S : b.S); //количество недостающих слоёв в новой сети
+    int missingLayersCnt = this->S - (a.S<b.S ? a.S : b.S); //количество недостающих слоёв в новой сети
 
     int temp = (a.S < b.S ? a.S : b.S); //нужен для отсчета от последнего слоя меньшей сети
 
-    for (temp=temp-1; temp+1 < (a.S>b.S ? a.S : b.S); ++temp){ // добавляем недостающие слои копируя у бо'льшего родителя
+    for (temp=temp-1; temp+1 < (a.S>b.S ? a.S : b.S) && missingLayersCnt>0; ++temp){ // добавляем недостающие слои копируя у бо'льшего родителя
         this->l.emplace_back((a.S>b.S ? a.l : b.l)[temp]);
         --missingLayersCnt; //уменьшаем кол-во недостающих слоев
     }
+
+    this->l.emplace_back(6); //выходной всегда 6
+    //итого у нас информация о количестве нейронов в каждом слое
+
+    if (!viable()) return;
+
+    this->A.clear();
+    this->A.reserve(this->S);
+
+//    for(auto &lt: this->l){
+
+//    }
+
+    this->W.clear();
+    this->W.reserve(this->S-1);
+    //int minL;
+    auto lt = 0;
+    //наследование пересекающихся матриц слева-направо зеленые + красные стекла
+    for (; lt < a.S-2 && lt < b.S-2 && lt != this->S-2;){ //не берем последний слой (синее стекло)
+        this->A.emplace_back(l[lt]);
+        this->W.emplace_back(l[lt],l[lt+1]);
+        for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1]; ++j){
+            for (int i = 0; i < a.l[lt] && i < b.l[lt]; ++i){
+                this->W[lt](i,j)=(a.W[lt](i,j)+b.W[lt](i,j))/2.0;
+                //cout << i << "\t" << j << "\n"; //11,6 проверка
+            }
+        }
+
+        //восстанавливаем нехватающие столбцы
+        auto &abMax = (a.l[lt+1] >= b.l[lt+1]? a : b); //сравниваем по количеству столбцов
+        auto &abMin = (a.l[lt+1] <  b.l[lt+1]? a : b);
+        for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
+             temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+            for (int i = 0; i < abMax.l[lt]; ++i){
+                this->W[lt](i,temp) = abMax.W[lt](i,temp); //берем веса большей матрицы
+            }
+        }
+
+        //восстанавливаем потерянные строки
+        //TBD
+        ++lt;
+    }
+
+    //наследование матриц только от одного родителя
+    auto &abMax = (a.S > b.S? a : b); //ищем большего родителя
+    for (; lt < abMax.S-2 && lt != this->S-2; ){ //все еще не берём синее стекло
+        this->A.emplace_back(l[lt]);
+        this->W.emplace_back(l[lt],l[lt+1]);
+        for (int j = 0; j < abMax.l[lt+1]; ++j){
+            for (int i = 0; i < abMax.l[lt]; ++i){
+                this->W[lt](i,j) = abMax.W[lt](i,j); //просто берём
+            }
+        }
+        ++lt;
+    }
+
+
+    //наследование пересекающихся матриц синие стекла
+
+    this->A.emplace_back(l[lt]);
+    this->W.emplace_back(l[lt],l[lt+1]);
+    this->A.emplace_back(l[lt+1]);
+
+    for (int j = 0; j < a.l[a.S-1] && j < b.l[b.S-1]; ++j){
+        for (int i = 0; i < a.l[a.S-2] && i < b.l[b.S-2]; ++i){
+            this->W[S-2](i,j)=(a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0;
+        }
+    }
+
+    //потерянных столбоцов быть не может
+    //восстанавливаем потерянные строки
+    //TBD
+
+    mutate();
+}
+
+void brain::mutate(){
+    //TBD
+    int missingLayersCnt = int(1 == rand()%10)*(rand()%2?1:-1); //в одном из 10-ти происходит мутация слоев на один
+    S+=missingLayersCnt;
 
     //вариант, где случайный слой появляется на случайном месте
     {
@@ -63,16 +145,13 @@ brain::brain(const brain &a, const brain &b, double dmnc){
 
 
     //вариант, где мы добавляем новое значение в конец перед выходным слоем
-    while (--missingLayersCnt>0){
-        l.emplace_back(l[l.size()-1]); //равное предыдущему
+    while (--missingLayersCnt>-1){
+        this->l.emplace_back(l[l.size()-1]); //равное предыдущему
     }
-
-
-    l.emplace_back(6); //выходной всегда 6
-    //итого у нас информация о количестве нейронов в каждом слое
-
-
 }
+
+
+
 
 void brain::think(){
     int i = 0;
@@ -85,6 +164,24 @@ void brain::think(){
     }
     cout << "\nendl\n";
 }
+
+bool brain::viable(){
+    for (vector<int>::iterator it = l.begin(); it + 1 != l.end();) {
+        if(*it < *(it+1)) return false;
+        ++it;
+    }
+    return true;
+}
+
+
+
+
+
+
+
+
+//========================================================================
+
 
 QDataStream &operator<<(QDataStream &out, const brain &item){
     QDataStream::FloatingPointPrecision prev = out.floatingPointPrecision();

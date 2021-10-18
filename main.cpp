@@ -7,10 +7,10 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+//    QApplication a(argc, argv);
+//    MainWindow w;
+//    w.show();
+//    return a.exec();
 
     srand(4541);
     QVector<QByteArray> m_dataStreamExports;
@@ -18,6 +18,16 @@ int main(int argc, char *argv[])
     m_sensors.append(new brain);
     m_sensors.append(new brain);
     m_sensors[0]->think();
+
+
+    for (auto &m: m_sensors){
+        for (auto &w: m->W){
+            int i = 0;
+            for (auto &wt: w.reshaped())
+                wt=++i;
+        }
+    }
+
     m_sensors.append(new brain(*m_sensors[0],*m_sensors[1],0.8));
     //brain b(*m_sensors[0],*m_sensors[1],80);
 //    QByteArray content;
