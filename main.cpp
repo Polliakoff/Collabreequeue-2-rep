@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
         }
     }
 
+
     m_sensors.append(new brain(*m_sensors[0],*m_sensors[1],0.8));
     //brain b(*m_sensors[0],*m_sensors[1],80);
 //    QByteArray content;

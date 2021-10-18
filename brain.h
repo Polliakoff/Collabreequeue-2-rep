@@ -13,6 +13,8 @@ class brain
 {
 private:
     double sigmoid(const double&);
+    int first=13;   //количество входных слоёв
+    int last=4;     //количество выходных
 
 public:
     int S;                              //внутренних слоёв
@@ -23,13 +25,13 @@ public:
 
 
     brain();
-    brain(const brain &a, const brain &b, double dominance);    //новая нейросеть на основе старых,
+    brain(brain &a, brain &b, double dominance);                //новая нейросеть на основе старых,
                                                                 //параметр dmnc отвечает за превосходство первого над вторым
                                                                 //и должна принимать значение от 0.00(копирование второй сети)
                                                                 //до 1.00(копирование первой сети)
-    bool viable();
-    void think();
-    void mutate();
+    bool viable();      //проверяет сеть на вменяемость
+    void think();       //пересчитывает значения
+    void mutate();      //мутирует с некоторой вероятностью
 };
 
 

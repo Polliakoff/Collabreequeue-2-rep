@@ -9,11 +9,11 @@ double brain::sigmoid(const double &x){
 brain::brain(){
     S = 2 + rand() % 6;//максимум пять внутренних слоёв
     l.reserve(S);
-    l.emplace_back(12);
+    l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
-        l.emplace_back(7 + rand() % 5); //внутренний слой размером в диапазоне от 11 до 7
+        l.emplace_back(last + 1 + rand() % (first-last)); //внутренний слой размером в диапазоне от last+1 до first-1
     }
-    l.emplace_back(6);
+    l.emplace_back(last);
     sort(l.begin(), l.end(), greater<int>()); //количество вершин не растет
 
     A.reserve(S);
@@ -30,12 +30,13 @@ brain::brain(){
 }
 
 
-brain::brain(const brain &a, const brain &b, double dmnc){
+brain::brain(brain &a, brain &b, double dmnc){
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
                                             //тут влияние dmnc
     this->l.clear();
     this->l.reserve(this->S);
     //vector<vector<int>> specPos;
+
     for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обеих сетях-родителях
         this->l.emplace_back(a.l[i]*dmnc+b.l[i]*(1-dmnc)+0.5); //тут влияние dmnc
     }
@@ -48,17 +49,13 @@ brain::brain(const brain &a, const brain &b, double dmnc){
         --missingLayersCnt; //уменьшаем кол-во недостающих слоев
     }
 
-    this->l.emplace_back(6); //выходной всегда 6
+    this->l.emplace_back(last); //выходной всегда last
     //итого у нас информация о количестве нейронов в каждом слое
 
     if (!viable()) return;
 
     this->A.clear();
     this->A.reserve(this->S);
-
-//    for(auto &lt: this->l){
-
-//    }
 
     this->W.clear();
     this->W.reserve(this->S-1);
@@ -75,37 +72,64 @@ brain::brain(const brain &a, const brain &b, double dmnc){
             }
         }
 
-        //восстанавливаем нехватающие столбцы
-        auto &abMax = (a.l[lt+1] >= b.l[lt+1]? a : b); //сравниваем по количеству столбцов
-        auto &abMin = (a.l[lt+1] <  b.l[lt+1]? a : b);
-        for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
-             temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
-            for (int i = 0; i < abMax.l[lt]; ++i){
-                this->W[lt](i,temp) = abMax.W[lt](i,temp); //берем веса большей матрицы
+        //восстанавливаем потерянные столбцы
+        {
+            auto &abMax = (a.l[lt+1] >= b.l[lt+1]? a : b); //сравниваем по количеству столбцов
+            auto &abMin = (a.l[lt+1] <  b.l[lt+1]? a : b);
+            for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
+                 temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+                for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
+                    this->W[lt](i,temp) = abMax.W[lt](i,temp); //берем веса большей матрицы
+                }
             }
         }
 
         //восстанавливаем потерянные строки
-        //TBD
+        {
+            auto &abMax = (a.l[lt] >= b.l[lt]? a : b); //сравниваем по количеству строк
+            auto &abMin = (a.l[lt] <  b.l[lt]? a : b);
+            for (int temp = abMin.l[lt]; //берем за начальную точку конец меньшей матрицы
+                 temp < this->l[lt]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+                for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
+                    this->W[lt](temp,i) = abMax.W[lt](temp,i); //берем веса большей матрицы
+                }
+            }
+        }
+
         ++lt;
     }
 
-    //наследование матриц только от одного родителя
+    //наследование матриц только от одного родителя без стекл
     auto &abMax = (a.S > b.S? a : b); //ищем большего родителя
+    ///bool first_special_layer = true;
     for (; lt < abMax.S-2 && lt != this->S-2; ){ //все еще не берём синее стекло
         this->A.emplace_back(l[lt]);
         this->W.emplace_back(l[lt],l[lt+1]);
-        for (int j = 0; j < abMax.l[lt+1]; ++j){
-            for (int i = 0; i < abMax.l[lt]; ++i){
+        for (int j = 0; j < abMax.l[lt+1] && j < l[lt+1]; ++j){
+            for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
                 this->W[lt](i,j) = abMax.W[lt](i,j); //просто берём
             }
+        }
+
+        //в начале можно потерять одну строку ?
+        {       //восстанавливаем потерянные строки
+//        if (first_special_layer){
+//            auto &abMax = (a.l[lt-1] >= b.l[lt-1]? a : b); //сравниваем по количеству строк
+//            auto &abMin = (a.l[lt-1] <  b.l[lt-1]? a : b);
+//            for (int temp = abMin.l[lt-1]; //берем за начальную точку конец меньшей матрицы
+//                 temp < this->l[lt-1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+//                for (int i = 0; i < abMax.l[lt]; ++i){
+//                    this->W[lt](temp,i) = abMax.W[lt-1](temp,i); //берем веса большей матрицы
+//                }
+//            }
+//            first_special_layer=false;
+//        }
         }
         ++lt;
     }
 
-
+    ////b.l[2]=6; экстремальная проверка
     //наследование пересекающихся матриц синие стекла
-
     this->A.emplace_back(l[lt]);
     this->W.emplace_back(l[lt],l[lt+1]);
     this->A.emplace_back(l[lt+1]);
@@ -116,9 +140,19 @@ brain::brain(const brain &a, const brain &b, double dmnc){
         }
     }
 
-    //потерянных столбоцов быть не может
+    //потерянных столбоцов быть не может, так как выходных нейронов всегда last
     //восстанавливаем потерянные строки
-    //TBD
+    {
+        auto &abMax = (a.l[a.S-2] >= b.l[a.S-2]? a : b); //сравниваем по количеству строк
+        auto &abMin = (a.l[a.S-2] <  b.l[a.S-2]? a : b);
+        for (int temp = abMin.l[abMin.S-2]; //берем за начальную точку конец меньшей матрицы
+             temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+            for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
+                this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i); //берем веса большей матрицы
+            }
+        }
+    }
+
 
     mutate();
 }
