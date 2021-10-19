@@ -88,6 +88,7 @@ void ship::rotate_by(const double &delta_angle)
 {
     angle+=delta_angle;
     if(angle>=2*M_PI) angle-=2*M_PI;
+    if(angle<=-2*M_PI) angle+=2*M_PI;
 
     for(auto &i: body.vertexes){
         i = point_rotation(i,position,delta_angle);

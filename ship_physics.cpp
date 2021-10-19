@@ -32,13 +32,14 @@ void ship_physics::apply_brain_command(double neuron_1, double neuron_2, double 
     if (rounded_neuron_3 == 0 && rounded_neuron_4 == 1) helm(3);
     if (rounded_neuron_3 == 0 && rounded_neuron_4 == 0) helm(4);
 
+    friction();
     move_by_coords(velocity_x, velocity_y);
     rotate_by(angular_velocity);
 }
 
 void ship_physics::engine (int mode)
 {
-    double thrust = 0.01;  //Базовый параметр тяги, от которого зависят остальные. Дёргай для изменения ускорения.
+    double thrust = 0.02;  //Базовый параметр тяги, от которого зависят остальные. Дёргай для изменения ускорения.
 
     if (mode == 1)
     {
@@ -61,9 +62,12 @@ void ship_physics::engine (int mode)
         //velocity_y -= cos(angle)*thrust/5;
     }
 
-    //--------------------------------------Захардкоженный лимит скорости. Можно будет убрать после добавления трения
+    //--------------------------------------Деревянное трение. Убрать после прописывания friction()
 
-    //тут ничего нет
+    abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
+    velocity_x -= velocity_x/50;
+    velocity_y -= velocity_y/50;
+
     //--------------------------------------
 }
 
@@ -75,6 +79,7 @@ void ship_physics::helm (int mode2)
     {
         if (angular_velocity > 0) angular_velocity -= agility;
         else if (angular_velocity < 0) angular_velocity += agility;
+        if (angular_velocity <= 0.1 && angular_velocity >= -0.1) angular_velocity = 0;
     }
     if (mode2 == 2) angular_velocity += agility;
     if (mode2 == 3) angular_velocity -= agility;
@@ -87,5 +92,29 @@ void ship_physics::helm (int mode2)
     {
         angular_velocity = -0.015;
     }
+
+}
+
+void ship_physics::friction()
+{
+//    if(velocity_x != 0 and velocity_y != 0)
+//    {
+//        double actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
+
+//        double ship_and_velocity_angle = abs(actual_angle - acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y))));
+
+//        double friction_value = -0.3242*ship_and_velocity_angle*ship_and_velocity_angle + 1.2223*ship_and_velocity_angle + 0.32;
+//        //double friction_value = 0.1156*ship_and_velocity_angle*ship_and_velocity_angle - 0.842*ship_and_velocity_angle + 1.6717;
+//        //double friction_value = 0.052*ship_and_velocity_angle*ship_and_velocity_angle - 0.3717*ship_and_velocity_angle + 0.8709;
+//        velocity_x -= sin(angle)*friction_value*velocity_x*0.3;
+//        velocity_y -= cos(angle)*friction_value*velocity_y*0.3;
+//    }
+   // double right_side_angle = angle - M_PI/2, left_side_angle = angle + M_PI/2, back_angle = angle - M_PI;
+   //double abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
+
+    //левая сторона
+    //правая сторона
+    //перед
+    //зад
 
 }

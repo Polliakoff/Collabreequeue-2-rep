@@ -74,7 +74,7 @@ void MainWindow::painter()
     scene->addEllipse(korablik->point_seen[4].first-10,korablik->point_seen[4].second-10,20,20);
     scene->addEllipse(korablik->point_seen[5].first-10,korablik->point_seen[5].second-10,20,20);
 
-    ui->lineEdit->setText(QString::number(korablik->get_angle()));
+    ui->lineEdit->setText(QString::number(korablik->abs_velocity));
     ui->lineEdit_2->setText(QString::number(korablik->get_position().first));
     ui->lineEdit_3->setText(QString::number(korablik->get_position().second));
     ui->lineEdit_4->setText(QString::number(korablik->collided));
