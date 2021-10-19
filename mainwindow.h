@@ -5,6 +5,8 @@
 #include "ship_physics.h"
 #include <QGraphicsScene>
 #include <QTimer>
+#include <vector>
+#include <cstdlib>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,10 +41,10 @@ private:
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
     //QGraphicsScene *scene;
-    std::unique_ptr<ship_physics> korablik;
+    vector <std::unique_ptr<ship_physics>> korablik;
     std::unique_ptr<polygon> map;
     std::unique_ptr<QTimer> timer;
-    double neuron_1 = 0, neuron_2 = 0, neuron_3 = 0, neuron_4 = 0;
+    vector <double> neuron_1, neuron_2, neuron_3, neuron_4;
     bool tmblr_1 = false, tmblr_2 = false, tmblr_3 = false, tmblr_4 = false;
 };
 #endif // MAINWINDOW_H

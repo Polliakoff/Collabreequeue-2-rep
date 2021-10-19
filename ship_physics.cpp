@@ -61,14 +61,6 @@ void ship_physics::engine (int mode)
         //velocity_x += sin(angle)*thrust/5; //to do: движение без ускорения, то есть сравнять с лобовым трением
         //velocity_y -= cos(angle)*thrust/5;
     }
-
-    //--------------------------------------Деревянное трение. Убрать после прописывания friction()
-
-    abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
-    velocity_x -= velocity_x/50;
-    velocity_y -= velocity_y/50;
-
-    //--------------------------------------
 }
 
 void ship_physics::helm (int mode2)
@@ -97,6 +89,14 @@ void ship_physics::helm (int mode2)
 
 void ship_physics::friction()
 {
+    //--------------------------------------Деревянное трение. Убрать после прописывания friction()
+
+    abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
+    velocity_x -= velocity_x/50;
+    velocity_y -= velocity_y/50;
+
+    //--------------------------------------
+
 //    if(velocity_x != 0 and velocity_y != 0)
 //    {
 //        double actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
