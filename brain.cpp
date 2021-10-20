@@ -172,33 +172,18 @@ void brain::mutate(){
     mutatedLayers = -1;
     S+=mutatedLayers;
 
-    //вариант, где случайный слой появляется на случайном месте
-    {
-//        int lRandDestination; //хранит позицию мутировавшего - нового слоя
-//        while (--missingLayersCnt>=0){ //this ранее использовались для наглядности, тут, очевидно, будет использоватья уже созданый l
-//            int temp = l.size();
-//            lRandDestination = 1 + rand() % (temp - 1); //новый слой может появиться в промежутках
-//            l.emplace_back(0); //временная пустышка
-//            for (int i = 0; i < temp-1; ++i) {
-//                if (lRandDestination>i)
-//                    l[i+1]=l[i]; //смещаем после места случайного
-//            }
-//            l[lRandDestination] = l[lRandDestination-1]+l[lRandDestination+1]/2; //среднее значение от боковых слоёв
-//        }
-    }
-
-
-    //вариант, где мы добавляем(убираем) новое значение в конец перед выходным слоем
+    //мутирует количество слоёв
     l.pop_back(); //убрали последний
     A.pop_back(); //убрали последний
-    auto w = W[W.size()-1]; //запомнили веса последней матрицы
-    W.pop_back();
+    auto w = W[W.size()-1];//запомнили веса последней матрицы
     if (mutatedLayers>0) {
-        l.emplace_back(l[l.size()-1]); //равное предыдущему
+        W.pop_back();
+        l.emplace_back(l[l.size()-1]); //количество нейронов равное предыдущему слою
         A.emplace_back(l[l.size()-1]); //создали новый
         W.push_back(Eigen::MatrixXd::Random(l[l.size()-1],l[l.size()-1]));
         W.push_back(w);
     } else if(mutatedLayers<0) {
+        W.pop_back();
         l.pop_back();           //убили предпоследний
         A.pop_back();           //убили предпоследний
         W.pop_back();           //убили предпоследний
@@ -210,6 +195,56 @@ void brain::mutate(){
     }
     l.emplace_back(last);
     A.emplace_back(last);
+
+
+    //мутирует кол-во нейронов в слоях
+    vector<int> vec(S);
+    for (auto &v: vec){
+        v = int(1 == rand()%6)*(rand()%2? 1 : -1); //в одном из десяти мутация на один
+    }
+    vec[0]=0;
+    vec[S-1]=0;
+    int i = 0;
+
+    for (auto v = vec.begin(); v+1!=vec.end(); ++v){
+        if (*v < 0) {
+            int r = W[i-1].rows();
+            int c = W[i-1].cols();
+            int tempnum = rand() % c;
+            for(int tmp = tempnum; tmp < c; ++tmp){ //пузырьком всплывает столбец весов
+                W[i-1].col(tmp-1)=W[i-1].col(tmp)+W[i-1].col(tmp-1);
+                W[i-1].col(tmp)=W[i-1].col(tmp-1)-W[i-1].col(tmp);
+            }
+            W[i-1].conservativeResize(r, *v+c); //отрубили последний столбец
+            c = W[i].cols();
+            r = W[i].rows();
+            for(int tmp = tempnum; tmp < r; ++tmp){ //пузырьком всплывает строка весов
+                W[i].row(tmp-1)=W[i].row(tmp)+W[i].row(tmp-1);
+                W[i].row(tmp)=W[i].row(tmp-1)-W[i].row(tmp);
+            }
+            W[i].conservativeResize(r+*v, c); //отрубили последнюю строку
+        }
+        if (*v > 0){
+            int r = W[i-1].rows();
+            int c = W[i-1].cols();
+            W[i-1].conservativeResize(r, *v+c); //добавили столбец в конец
+            //for (int n = c; n < W[i-1].cols(); ++n){
+            for (int tr = 0; tr < r; ++tr) {
+                W[i-1](tr,c)=(-100+rand()%201)/100.0; //заполнили
+            }
+            r = W[i].rows();
+            c = W[i].cols();
+            W[i].conservativeResize(r+*v, c);
+            for (int tc = 0; tc < c; ++tc) {
+                W[i](r,tc)=(-100+rand()%201)/100.0; //заполнили
+            }
+
+        }
+
+        l[i]+=*v;
+        A[i].resize(A[i].cols()+*v);
+        ++i;
+    }
 
 }
 
