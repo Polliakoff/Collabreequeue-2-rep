@@ -10,27 +10,52 @@ ship_physics::ship_physics(const double &pos_x, const double &pos_y):ship(pos_x,
 
 }
 
-void ship_physics::apply_brain_command(double &neuron_1, double &neuron_2, double &neuron_3, double &neuron_4)
+void ship_physics::apply_brain_command()
 {
-    double rounded_neuron_1, rounded_neuron_2, rounded_neuron_3, rounded_neuron_4;
-    if (neuron_1 > 0.8) rounded_neuron_1 = 1;
-    else rounded_neuron_1 = 0;
-    if (neuron_2 > 0.8) rounded_neuron_2 = 1;
-    else rounded_neuron_2 = 0;
-    if (neuron_3 > 0.8) rounded_neuron_3 = 1;
-    else rounded_neuron_3 = 0;
-    if (neuron_4 > 0.8) rounded_neuron_4 = 1;
-    else rounded_neuron_4 = 0;
+    brainstorm();
 
-    if (rounded_neuron_1 == 1 && rounded_neuron_2 == 1) engine(1);
-    if (rounded_neuron_1 == 1 && rounded_neuron_2 == 0) engine(2);
-    if (rounded_neuron_1 == 0 && rounded_neuron_2 == 1) engine(3);
-    if (rounded_neuron_1 == 0 && rounded_neuron_2 == 0) engine(4);
+    //добавить газу
+    if (net.A.back()(0) > 0.8 && net.A.back()(1) > 0.8)
+        engine(1);
+    //макс скорость
+    else if (net.A.back()(0) > 0.8)
+        engine(2);
+    //обратный ход
+    else if (net.A.back()(1) > 0.8)
+        engine(3);
+    //назад
+    else engine(4);
 
-    if (rounded_neuron_3 == 1 && rounded_neuron_4 == 1) helm(1);
-    if (rounded_neuron_3 == 1 && rounded_neuron_4 == 0) helm(2);
-    if (rounded_neuron_3 == 0 && rounded_neuron_4 == 1) helm(3);
-    if (rounded_neuron_3 == 0 && rounded_neuron_4 == 0) helm(4);
+    //поворот туда
+    if (net.A.back()(2) > 0.8)
+        helm(2);
+    //поворот НЕ ТУДА
+    if (net.A.back()(3) > 0.8)
+        helm(3);
+
+    //убить угловую скорость
+    if (net.A.back()(2) > 0.8 && net.A.back()(3) > 0.8)
+        helm(1);
+    else if(!(net.A.back()(2) > 0.8 || net.A.back()(3) > 0.8))
+        helm(1);
+
+
+//    //добавить газу
+//    if (net.A.back()(0) > 0.8)
+//        engine(2); //просто вдавить вперед
+//    //стоп машина
+//    if (net.A.back()(1) > 0.8)
+//        engine(3); //должно быть вдавить назад
+
+//    11 медленнее ехать(больше топлива?) 00 убивать скорость об трение
+//    //поворот туда
+//    if (net.A.back()(2) > 0.8)
+//        helm(2); //просто налево
+//    //поворот НЕ ТУДА
+//    if (net.A.back()(3) > 0.8)
+//        helm(3); //просто направо
+//    пусть сам ищет путь 11 - без изменений(но больше топлива?) 00 без изменений
+
 
     friction();
     move_by_coords(velocity_x, velocity_y);
@@ -85,6 +110,20 @@ void ship_physics::helm(const int &mode2)
         angular_velocity = -0.015;
     }
 
+}
+
+void ship_physics::brainstorm()
+{
+    net.A[0](0)=distances[0];
+    net.A[0](1)=distances[1];
+    net.A[0](2)=distances[2];
+    net.A[0](3)=distances[3];
+    net.A[0](4)=distances[4];
+    net.A[0](5)=distances[5];
+    net.A[0](6)=angle;
+    net.A[0](7)=abs_velocity;
+    net.A[0](8)=velocity_x; //должно быть в проекции на вектор правильного направления
+    net.think();
 }
 
 void ship_physics::friction()

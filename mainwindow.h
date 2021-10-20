@@ -44,7 +44,5 @@ private:
     vector <std::unique_ptr<ship_physics>> korablik;
     std::unique_ptr<polygon> map;
     std::unique_ptr<QTimer> timer;
-    vector <double> neuron_1, neuron_2, neuron_3, neuron_4;
-    bool tmblr_1 = false, tmblr_2 = false, tmblr_3 = false, tmblr_4 = false;
 };
 #endif // MAINWINDOW_H

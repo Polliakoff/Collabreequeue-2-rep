@@ -4,9 +4,11 @@
 
 #include "ship.h"
 #include <cmath>
+#include "brain.h"
 
 class ship_physics : public ship
 {
+    brain net;
 public:
     ship_physics();
     ship_physics(const double& pos_x,const double& pos_y); // задавать корабль исключительно этим конструктором с установленной позицией
@@ -14,7 +16,8 @@ public:
     double angular_velocity = 0;
     void engine(const int &mode);
     void helm(const int &mode2);
-    void apply_brain_command(double &neuron_1, double &neuron_2, double &neuron_3, double &neuron_4);
+    void apply_brain_command();
+    void brainstorm();
     void friction();
 };
 

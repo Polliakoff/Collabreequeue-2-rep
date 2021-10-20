@@ -258,7 +258,11 @@ void brain::think(){
         }
         ++i;
     }
-    cout << "\nendl\n";
+    i = 0;
+    for (auto &a: A[S-1]) {
+        A[0](first-last+i)=a;
+        ++i;
+    }
 }
 
 bool brain::viable(){

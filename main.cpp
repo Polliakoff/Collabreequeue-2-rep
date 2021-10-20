@@ -1,18 +1,18 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include "brain.h"
 #include <QIODevice>
 
 
 int main(int argc, char *argv[])
 {
+    srand(4541);
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
     return a.exec();
 
-    srand(4541);
+
     QVector<QByteArray> m_dataStreamExports;
     QVector<brain*> m_sensors;
     m_sensors.append(new brain);
