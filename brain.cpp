@@ -54,7 +54,6 @@ brain::brain(brain &a, brain &b, double dmnc){
 
     if (!viable()) return;
 
-
     inheritWeights(a,b,dmnc);
 
     mutate();
@@ -169,7 +168,6 @@ void brain::mutate(){
     //TBD
     int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
     if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
-    mutatedLayers = -1;
     S+=mutatedLayers;
 
     //мутирует количество слоёв

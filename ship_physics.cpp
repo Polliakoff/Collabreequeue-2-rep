@@ -10,7 +10,7 @@ ship_physics::ship_physics(const double &pos_x, const double &pos_y):ship(pos_x,
 
 }
 
-void ship_physics::apply_brain_command(double neuron_1, double neuron_2, double neuron_3, double neuron_4)
+void ship_physics::apply_brain_command(double &neuron_1, double &neuron_2, double &neuron_3, double &neuron_4)
 {
     double rounded_neuron_1, rounded_neuron_2, rounded_neuron_3, rounded_neuron_4;
     if (neuron_1 > 0.8) rounded_neuron_1 = 1;
@@ -37,7 +37,7 @@ void ship_physics::apply_brain_command(double neuron_1, double neuron_2, double 
     rotate_by(angular_velocity);
 }
 
-void ship_physics::engine (int mode)
+void ship_physics::engine(const int &mode)
 {
     double thrust = 0.02;  //Базовый параметр тяги, от которого зависят остальные. Дёргай для изменения ускорения.
 
@@ -63,7 +63,7 @@ void ship_physics::engine (int mode)
     }
 }
 
-void ship_physics::helm (int mode2)
+void ship_physics::helm(const int &mode2)
 {
     double agility = 0.001;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
 

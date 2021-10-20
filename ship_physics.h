@@ -12,9 +12,9 @@ public:
     ship_physics(const double& pos_x,const double& pos_y); // задавать корабль исключительно этим конструктором с установленной позицией
     double velocity_x = 0, velocity_y = 0, abs_velocity;
     double angular_velocity = 0;
-    void engine(int mode);
-    void helm(int mode2);
-    void apply_brain_command(double neuron_1, double neuron_2, double neuron_3, double neuron_4);
+    void engine(const int &mode);
+    void helm(const int &mode2);
+    void apply_brain_command(double &neuron_1, double &neuron_2, double &neuron_3, double &neuron_4);
     void friction();
 };
 
