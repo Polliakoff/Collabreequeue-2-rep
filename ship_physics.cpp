@@ -69,6 +69,8 @@ void ship_physics::engine(const int &mode)
     {
         //velocity_x += sin(angle)*thrust/5; //to do: движение без ускорения, то есть сравнять с лобовым трением
         //velocity_y -= cos(angle)*thrust/5;
+        velocity_x -= sin(angle)*abs_velocity/50;
+        velocity_y -= cos(angle)*abs_velocity/50;
     }
 }
 
