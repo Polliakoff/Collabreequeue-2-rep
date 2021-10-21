@@ -74,7 +74,7 @@ void ship_physics::engine(const int &mode)
 
 void ship_physics::helm(const int &mode2)
 {
-    double agility = 0.001;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
+    double agility = 0.0002;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
 
     if (mode2 == 1 || mode2 == 4)
     {
@@ -169,3 +169,21 @@ void ship_physics::update(polygon &map)
     ship::update(map);
     modify_path();
 }
+
+///-----------------------------Функция для дебага, управляющая 61-ым кораблём--------------------------------------
+void ship_physics::dumb_n_do(double neuron1, double neuron2, double neuron3, double neuron4)
+{
+    if (neuron1 > 0.8 && neuron2 > 0.8) engine(1);   //добавить газу
+    else if (neuron1 > 0.8) engine(2);                       //макс скорость
+    else if (neuron2 > 0.8) engine(3);                       //обратный ход
+    else engine(4);                                                  //глушим двигатель
+
+    if (neuron3 > 0.8 && neuron4 <= 0.8) helm(2);    //поворот туда
+    if (neuron4 > 0.8 && neuron3 <= 0.8) helm(3);    //поворот НЕ ТУДА
+    if(!(neuron3 > 0.8 || neuron4 > 0.8)) helm(1);   //убить угловую скорость
+
+    friction();
+    move_by_coords(velocity_x, velocity_y);
+    rotate_by(angular_velocity);
+}
+///--------------------------------------------------------------------------------------------------------------------

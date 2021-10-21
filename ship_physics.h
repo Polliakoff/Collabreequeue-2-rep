@@ -20,7 +20,6 @@ public:
     double avg_velocity = 0;
     void engine(const int &mode);
     void helm(const int &mode2);
-    void think_n_do();
     void brainstorm();
     void friction();
     void change_destination(const double& dest_x,const double& dest_y);
@@ -30,7 +29,8 @@ public:
 
 public slots:
     virtual void update(polygon &map);
-
+    void think_n_do();
+    void dumb_n_do(double neuron1, double neuron2, double neuron3, double neuron4);
 };
 
 //#endif // SHIP_PHYSICS_H

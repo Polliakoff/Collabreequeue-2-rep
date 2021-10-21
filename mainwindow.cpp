@@ -59,6 +59,7 @@ void MainWindow::on_pushButton_clicked()
     }
 //===========тестомразь
     connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->update(*map);});
+    connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
 //===========тестомразь
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
     //disconnect(timer.get(), &QTimer::timeout,)
@@ -103,6 +104,7 @@ void MainWindow::painter()
     ui->lineEdit_3->setText(QString::number(korablik[60]->abs_velocity));
     ui->lineEdit_4->setText(QString::number(korablik[60]->velocity_projection));
     ui->lineEdit_5->setText(QString::number(korablik[60]->to_turn_to));
+    scene->addEllipse(korablik[60]->get_position().first-10,korablik[60]->get_position().second-10,20,20, QPen(Qt::red));
 //===========тестомразь
 }
 
@@ -110,29 +112,32 @@ void MainWindow::painter()
 //===========тестомразь
 void MainWindow::on_pushButton_2_clicked()
 {
-    korablik[60]->engine(2);
+    tmblr_1 =! tmblr_1;
+    neuron1 = int(tmblr_1);
+
 
 }
 
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    korablik[60]->engine(3);
+    tmblr_2 =! tmblr_2;
+    neuron2 = int(tmblr_2);
 
 }
 
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    korablik[60]->helm(2);
-
+    tmblr_4 =! tmblr_4;
+    neuron4 = int(tmblr_4);
 }
 
 
 void MainWindow::on_pushButton_4_clicked()
-{
-    korablik[60]->helm(3);
-
+{ 
+    tmblr_3 =! tmblr_3;
+    neuron3 = int(tmblr_3);
 }
 
 
