@@ -2,6 +2,8 @@
 #define STRAIGHT_LINE_H
 
 #include "func.h"
+#include <Eigen/Dense>
+
 
 class straight_line
 {

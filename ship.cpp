@@ -2,7 +2,7 @@
 
 ship::ship(){}
 
-ship::ship(const double &pos_x, const double &pos_y)
+ship::ship(const double& pos_x,const double& pos_y)
 {
     position.first = pos_x;
     position.second = pos_y;

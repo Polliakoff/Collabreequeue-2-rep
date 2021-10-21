@@ -11,9 +11,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     for(int i = 0; i < 60; i++)
     {
-        korablik.emplace_back(std::make_unique<ship_physics>(2000,2000));
+        korablik.emplace_back(std::make_unique<ship_physics>(2000,2000,0,0));
     }
-
+//===========тестомразь
+    korablik.emplace_back(std::make_unique<ship_physics>(2000,2000,0,0));
+//===========тестомразь
     timer = std::make_unique<QTimer>();
 
     map = std::make_unique<polygon>();
@@ -45,7 +47,8 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
                        pol.vertexes[i].second);
         i++;
         i_dop = i-1;
-        if(i>=pol.vertexes.size()){i=0;j++;}
+        if(j==1) j = 2;
+        if(i==pol.vertexes.size()){i=0;j=1;}
     }
 }
 
@@ -54,13 +57,16 @@ void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
 
-    int t = korablik.size();
-    for(int i = 0; i < t; i++){
+    int t = 60;
+    for(int i = 0; i < t; i++){      
         connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);});
         connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();});
     }
-
+//===========тестомразь
+    connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->update(*map);});
+//===========тестомразь
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+    //disconnect(timer.get(), &QTimer::timeout,)
 
     timer->start(0);
 
@@ -88,44 +94,49 @@ void MainWindow::painter()
         scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20);
         scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20);
 
-        ui->lineEdit->setText(QString::number(shp->get()->abs_velocity));
-        ui->lineEdit_2->setText(QString::number(shp->get()->get_position().first));
-        ui->lineEdit_3->setText(QString::number(shp->get()->get_position().second));
-        ui->lineEdit_4->setText(QString::number(shp->get()->collided));
+
 //        if(shp->get()->collided) {
 //            korablik.erase(shp);
 //            //korablik.shrink_to_fit();
 //        }
         ++shp;
     }
+
+//===========тестомразь
+    ui->lineEdit->setText(QString::number(korablik[60]->get_position().first));
+    ui->lineEdit_2->setText(QString::number(korablik[60]->get_position().second));
+    ui->lineEdit_3->setText(QString::number(korablik[60]->abs_velocity));
+    ui->lineEdit_4->setText(QString::number(korablik[60]->velocity_projection));
+    ui->lineEdit_5->setText(QString::number(korablik[60]->to_turn_to));
+//===========тестомразь
 }
 
 
-
+//===========тестомразь
 void MainWindow::on_pushButton_2_clicked()
 {
-    //korablik->move_by_distance(10);
+    korablik[60]->engine(2);
 
 }
 
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    //korablik->move_by_distance(-10);
+    korablik[60]->engine(3);
 
 }
 
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    //korablik->rotate_by(-M_PI/12);
+    korablik[60]->helm(2);
 
 }
 
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    //korablik->rotate_by(M_PI/12);
+    korablik[60]->helm(3);
 
 }
 
@@ -144,4 +155,4 @@ void MainWindow::on_pushButton_7_clicked()
         shp->update(*map);
     }
 }
-
+//===========тестомразь

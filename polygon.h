@@ -3,6 +3,7 @@
 
 #include "func.h"
 #include "straight_line.h"
+#include <vector>
 
 using std::vector;
 using std::pair;

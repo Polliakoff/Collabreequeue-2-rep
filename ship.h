@@ -2,7 +2,7 @@
 //#define SHIP_H
 #pragma once
 
-#include "func.h"
+#include <vector>
 #include "straight_line.h"
 #include "polygon.h"
 #include "brain.h"
@@ -10,7 +10,7 @@
 
 class ship
 {
-private:
+protected:
     pair<double, double> position;
 public:
     ship();//не использовать
@@ -34,7 +34,7 @@ public:
     bool collision(polygon &pol);
     void eyesight(polygon &pol);
 public slots:
-    void update(polygon &map);
+    virtual void update(polygon &map);
 
 };
 

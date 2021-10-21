@@ -3,15 +3,9 @@
 #pragma once
 
 #include <cmath>
-#include <Eigen/Dense>
-#include <limits>
-#include <utility>
-#include <vector>
-#include <algorithm>
-#include <cstdlib>
-#include <iostream>
-#include <memory>
 
 double round_to(double inpValue, int inpCount);
+double vector_module(const double &x,const double &y);
+double skalar_multipl(const double &x1,const double &y1,const double &x2,const double &y2);
 
 //#endif // FUNC_H
