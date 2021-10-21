@@ -118,6 +118,11 @@ void ship_physics::friction()
     abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
     velocity_x -= velocity_x/50;
     velocity_y -= velocity_y/50;
+    if (velocity_x < 0.0001 && velocity_x > -0.0001 && velocity_y < 0.0001 && velocity_y > -0.0001)
+    {
+        velocity_x = 0;
+        velocity_y = 0;
+    }
 
     //--------------------------------------
 
