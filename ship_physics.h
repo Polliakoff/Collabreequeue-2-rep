@@ -17,6 +17,7 @@ public:
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y); // задавать корабль исключительно этим конструктором с установленной позицией
     double velocity_x = 0, velocity_y = 0, abs_velocity;
     double angular_velocity = 0;
+    double avg_velocity = 0;
     void engine(const int &mode);
     void helm(const int &mode2);
     void think_n_do();

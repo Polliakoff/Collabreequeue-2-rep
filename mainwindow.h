@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "ship_physics.h"
+#include "pathway.h"
 #include <QGraphicsScene>
 #include <QTimer>
 #include <vector>
@@ -42,7 +43,7 @@ private:
     std::unique_ptr<QGraphicsScene> scene;
     //QGraphicsScene *scene;
     vector <std::unique_ptr<ship_physics>> korablik;
-    std::unique_ptr<polygon> map;
+    std::unique_ptr<pathway> map;
     std::unique_ptr<QTimer> timer;
 };
 #endif // MAINWINDOW_H
