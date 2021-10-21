@@ -74,24 +74,25 @@ void ship_physics::engine(const int &mode)
 
 void ship_physics::helm(const int &mode2)
 {
-    double agility = 0.0002;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
+    double agility = 0.0003;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
+    double max_maneuver = 0.010;
 
     if (mode2 == 1 || mode2 == 4)
     {
         if (angular_velocity > 0) angular_velocity -= agility;
         else if (angular_velocity < 0) angular_velocity += agility;
-        if (angular_velocity <= 0.1 && angular_velocity >= -0.1) angular_velocity = 0;
+        if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
     }
     if (mode2 == 2) angular_velocity += agility;
     if (mode2 == 3) angular_velocity -= agility;
 
-    if (angular_velocity > 0.015)
+    if (angular_velocity > max_maneuver)
     {
-        angular_velocity = 0.015;
+        angular_velocity = max_maneuver;
     }
-    if (angular_velocity < -0.015)
+    if (angular_velocity < -max_maneuver)
     {
-        angular_velocity = -0.015;
+        angular_velocity = -max_maneuver;
     }
 
 }
