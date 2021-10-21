@@ -14,30 +14,14 @@ void ship_physics::think_n_do()
 {
     brainstorm();
 
-    //добавить газу
-    if (net.A.back()(0) > 0.8 && net.A.back()(1) > 0.8)
-        engine(1);
-    //макс скорость
-    else if (net.A.back()(0) > 0.8)
-        engine(2);
-    //обратный ход
-    else if (net.A.back()(1) > 0.8)
-        engine(3);
-    //назад
-    else engine(4);
+    if (net.A.back()(0) > 0.8 && net.A.back()(1) > 0.8) engine(1);   //добавить газу
+    else if (net.A.back()(0) > 0.8) engine(2);                       //макс скорость
+    else if (net.A.back()(1) > 0.8) engine(3);                       //обратный ход
+    else engine(4);                                                  //глушим двигатель
 
-    //поворот туда
-    if (net.A.back()(2) > 0.8)
-        helm(2);
-    //поворот НЕ ТУДА
-    if (net.A.back()(3) > 0.8)
-        helm(3);
-
-    //убить угловую скорость
-    if (net.A.back()(2) > 0.8 && net.A.back()(3) > 0.8)
-        helm(1);
-    else if(!(net.A.back()(2) > 0.8 || net.A.back()(3) > 0.8))
-        helm(1);
+    if (net.A.back()(2) > 0.8 && net.A.back()(3) <= 0.8) helm(2);    //поворот туда
+    if (net.A.back()(3) > 0.8 && net.A.back()(2) <= 0.8) helm(3);    //поворот НЕ ТУДА
+    if(!(net.A.back()(2) > 0.8 || net.A.back()(3) > 0.8)) helm(1);   //убить угловую скорость
 
 
 //    //добавить газу

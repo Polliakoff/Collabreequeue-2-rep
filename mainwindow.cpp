@@ -57,7 +57,7 @@ void MainWindow::on_pushButton_clicked()
     int t = korablik.size();
     for(int i = 0; i < t; i++){
         connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);});
-        connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->apply_brain_command();});
+        connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();});
     }
 
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));

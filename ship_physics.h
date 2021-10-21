@@ -16,7 +16,7 @@ public:
     double angular_velocity = 0;
     void engine(const int &mode);
     void helm(const int &mode2);
-    void apply_brain_command();
+    void think_n_do();
     void brainstorm();
     void friction();
 };
