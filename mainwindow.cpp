@@ -11,17 +11,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     for(int i = 0; i < 60; i++)
     {
-        korablik.emplace_back(std::make_unique<ship_physics>(2000,2000));
+        korablik.emplace_back(std::make_unique<ship_physics>(575,650));
     }
 
     timer = std::make_unique<QTimer>();
 
-    map = std::make_unique<polygon>();
-    map->add_point(2600,2600);
-    map->add_point(2600,1600);
-    map->add_point(1600,1600);
-    map->add_point(1600,2600);
-
+    map = std::make_unique<pathway>();
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
@@ -45,7 +40,8 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
                        pol.vertexes[i].second);
         i++;
         i_dop = i-1;
-        if(i>=pol.vertexes.size()){i=0;j++;}
+        if(j==1) j = 2;
+        if(i==pol.vertexes.size()){i=0;j=1;}
     }
 }
 
@@ -75,18 +71,18 @@ void MainWindow::painter()
         qdraw_polygon(*map,scene.get());
 
         scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-                shp->get()->point_seen[1].first,shp->get()->point_seen[1].second);
+                shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::yellow));
         scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-                shp->get()->point_seen[3].first,shp->get()->point_seen[3].second);
+                shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::yellow));
         scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-                shp->get()->point_seen[5].first,shp->get()->point_seen[5].second);
+                shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::yellow));
 
-        scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20);
-        scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20);
-        scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20);
-        scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20);
-        scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20);
-        scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20);
+        scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::yellow));
 
         ui->lineEdit->setText(QString::number(shp->get()->abs_velocity));
         ui->lineEdit_2->setText(QString::number(shp->get()->get_position().first));
