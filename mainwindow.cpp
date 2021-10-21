@@ -11,10 +11,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     for(int i = 0; i < 60; i++)
     {
-        korablik.emplace_back(std::make_unique<ship_physics>(575,650));
+        korablik.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
     }
 //===========тестомразь
-    korablik.emplace_back(std::make_unique<ship_physics>(2000,2000,0,0));
+    korablik.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
 //===========тестомразь
     timer = std::make_unique<QTimer>();
 
