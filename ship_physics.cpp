@@ -10,7 +10,7 @@ ship_physics::ship_physics(const double &pos_x, const double &pos_y):ship(pos_x,
 
 }
 
-void ship_physics::apply_brain_command()
+void ship_physics::think_n_do()
 {
     brainstorm();
 
