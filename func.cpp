@@ -8,7 +8,7 @@ double round_to(double inpValue, int inpCount)
 
 double vector_module(const double &x, const double &y)
 {
- return pow(pow(x,2)+pow(y,2),0.5);
+ return sqrt(pow(x,2)+pow(y,2));
 }
 
 double skalar_multipl(const double &x1, const double &y1, const double &x2, const double &y2)

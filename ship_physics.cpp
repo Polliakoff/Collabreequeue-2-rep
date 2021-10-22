@@ -67,8 +67,6 @@ void ship_physics::engine(const int &mode)
     }
     if (mode == 4)
     {
-        //velocity_x += sin(angle)*thrust/5; //to do: движение без ускорения, то есть сравнять с лобовым трением
-        //velocity_y -= cos(angle)*thrust/5;
         velocity_x -= sin(angle)*abs_velocity/50;
         velocity_y -= cos(angle)*abs_velocity/50;
     }
@@ -163,10 +161,13 @@ void ship_physics::modify_path()
     path.second = final_destination.second - position.second;
 
     velocity_projection = skalar_multipl(path.first,path.second,velocity_x,velocity_y)/vector_module(path.first,path.second);
+
+
+
     to_turn_to = acos(skalar_multipl(path.first,path.second,eyes[2].direction[0],eyes[2].direction[1])
             /(vector_module(path.first,path.second)*vector_module(eyes[2].direction[0],eyes[2].direction[1])));
 
-    if(position.first + velocity_x > 0){
+    if(convert_to_ship(final_destination).first>0){
         to_turn_to *= -1;
     }
 }

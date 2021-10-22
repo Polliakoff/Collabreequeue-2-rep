@@ -10,7 +10,6 @@ class ship_physics : public ship
 {
 protected:
     pair<double, double> final_destination;
-    pair<double, double> path;
     brain net;
 public:
     ship_physics();
@@ -26,6 +25,7 @@ public:
     void modify_path();
     double to_turn_to;
     double velocity_projection;
+    pair<double, double> path;
 
 public slots:
     virtual void update(polygon &map);

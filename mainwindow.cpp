@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     {
         korablik.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
     }
-//===========тестомразь
+///===========тестовый
     korablik.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
-//===========тестомразь
+///===========тестовый
     timer = std::make_unique<QTimer>();
 
     map = std::make_unique<pathway>();
@@ -57,10 +57,10 @@ void MainWindow::on_pushButton_clicked()
         connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);});
         connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();});
     }
-//===========тестомразь
+///===========тестовый
     connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->update(*map);});
     connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
-//===========тестомразь
+///===========тестовый
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
     //disconnect(timer.get(), &QTimer::timeout,)
 
@@ -77,18 +77,18 @@ void MainWindow::painter()
         qdraw_polygon(*map,scene.get());
 
         scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-                shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::yellow));
+                shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
         scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-                shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::yellow));
+                shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
         scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-                shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::yellow));
+                shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
 
-        scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::yellow));
-        scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::yellow));
-        scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::yellow));
-        scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::yellow));
-        scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::yellow));
-        scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::yellow));
+        scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
 
 
 //        if(shp->get()->collided) {
@@ -98,18 +98,30 @@ void MainWindow::painter()
         ++shp;
     }
 
-//===========тестомразь
-    ui->lineEdit->setText(QString::number(korablik[60]->get_position().first));
-    ui->lineEdit_2->setText(QString::number(korablik[60]->get_position().second));
+///===========тестовый
+    ui->lineEdit->setText(QString::number(korablik[60]->path.first));
+    ui->lineEdit_2->setText(QString::number(korablik[60]->path.second));
     ui->lineEdit_3->setText(QString::number(korablik[60]->abs_velocity));
-    ui->lineEdit_4->setText(QString::number(korablik[60]->velocity_projection));
-    ui->lineEdit_5->setText(QString::number(korablik[60]->to_turn_to));
+    ui->lineEdit_4->setText(QString::number(korablik[60]->to_turn_to*180/M_PI));
+    ui->lineEdit_5->setText(QString::number(korablik[60]->velocity_projection));
+    ui->lineEdit_6->setText(QString::number(korablik[60]->velocity_x));
+    ui->lineEdit_7->setText(QString::number(korablik[60]->velocity_y));
+    ui->lineEdit_8->setText(QString::number(korablik[60]->eyes[2].direction[0]));
+    ui->lineEdit_9->setText(QString::number(korablik[60]->eyes[2].direction[1]));
     scene->addEllipse(korablik[60]->get_position().first-10,korablik[60]->get_position().second-10,20,20, QPen(Qt::red));
-//===========тестомразь
+    scene->addLine(korablik[60]->get_position().first,korablik[60]->get_position().second,
+            korablik[60]->get_position().first+korablik[60]->path.first,korablik[60]->get_position().second+korablik[60]->path.second, QPen(Qt::red));
+    scene->addLine(korablik[60]->get_position().first,korablik[60]->get_position().second,
+            korablik[60]->get_position().first+korablik[60]->velocity_x*50,korablik[60]->get_position().second+korablik[60]->velocity_y*50, QPen(Qt::blue));
+    scene->addLine(korablik[60]->get_position().first,korablik[60]->get_position().second,
+            korablik[60]->get_position().first+(korablik[60]->path.first*korablik[60]->velocity_projection/vector_module(korablik[60]->path.first,korablik[60]->path.second))*50,
+            korablik[60]->get_position().second+(korablik[60]->path.second*korablik[60]->velocity_projection/vector_module(korablik[60]->path.first,korablik[60]->path.second))*50,
+            QPen(Qt::green));
+///===========тестовый
 }
 
 
-//===========тестомразь
+///===========тестовый
 void MainWindow::on_pushButton_2_clicked()
 {
     tmblr_1 =! tmblr_1;
@@ -155,4 +167,4 @@ void MainWindow::on_pushButton_7_clicked()
         shp->update(*map);
     }
 }
-//===========тестомразь
+///===========тестовый
