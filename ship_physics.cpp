@@ -5,10 +5,20 @@ ship_physics::ship_physics()
 
 }
 
-ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):ship(pos_x, pos_y)
+ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
+    ship(pos_x, pos_y)
 {
     change_destination(dest_x,dest_y);
 }
+
+ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc):
+    ship(a.get_position().first,a.get_position().second),
+    net(a.net, b.net, dmnc)
+{
+    change_destination(a.get_position().first,a.get_position().second);
+}
+
+
 
 void ship_physics::think_n_do()
 {

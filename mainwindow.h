@@ -53,7 +53,7 @@ private:
     std::unique_ptr<QTimer> timer;
     double neuron1 = 0, neuron2 = 0, neuron3 = 0, neuron4 = 0;
     bool tmblr_1 = false, tmblr_2 = false, tmblr_3 = false, tmblr_4 = false, tmblr_time = false;
-    vector<QMetaObject::Connection> update_connections;
-    vector<QMetaObject::Connection> think_n_do_connections;
+
+
 };
 #endif // MAINWINDOW_H

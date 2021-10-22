@@ -50,13 +50,8 @@ void MainWindow::on_pushButton_clicked()
     ui->graphicsView->setScene(scene.get());
 
     connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
-    //connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolve();});
 
-    int t = ship_evolution->population.size();
-    for(int i = 0; i < t; i++){
-        update_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->population[i]->update(*map);}));
-        think_n_do_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->population[i]->think_n_do();}));
-    }
+    ship_evolution->cnnct(timer.get(), map.get());
     ///===========тестовый
     test_update_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
     test_think_n_do_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
@@ -94,15 +89,15 @@ void MainWindow::painter()
         }
 
 
-        if(!shp->get()->operational) {
-            disconnect(update_connections[ship_number]);
-            disconnect(think_n_do_connections[ship_number]);
-            //            korablik.erase(shp);
-            //            update_connections.erase(update_connections.begin() + ship_number);
-            //            think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
-        }
+//        if(!shp->get()->operational) {
+//            disconnect(ship_evolution.get()->update_connections[ship_number]);
+//            disconnect(ship_evolution.get()->think_n_do_connections[ship_number]);
+//            //            korablik.erase(shp);
+//            //            update_connections.erase(update_connections.begin() + ship_number);
+//            //            think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
+//        }
         ++shp;
-        ++ship_number;
+        //++ship_number;
     }
 
     ///===========тестовый
