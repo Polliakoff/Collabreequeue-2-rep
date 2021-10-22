@@ -93,11 +93,11 @@ void MainWindow::painter()
 
 
         if(shp->get()->collided) {
-            korablik.erase(shp);
+            //korablik.erase(shp);
             disconnect(update_connections[ship_number]);
-            update_connections.erase(update_connections.begin() + ship_number);
+            //update_connections.erase(update_connections.begin() + ship_number);
             disconnect(think_n_do_connections[ship_number]);
-            think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
+            //think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
             //korablik.shrink_to_fit();
         }
         ++shp;
@@ -143,7 +143,7 @@ void MainWindow::painter()
                    QPen(Qt::green));
 
     if(test_ship->collided) {
-        test_ship = std::make_unique<ship_physics>(700,700,0,0);
+        //test_ship = std::make_unique<ship_physics>(700,700,0,0);
         disconnect(test_update_connection);
         disconnect(test_think_n_do_connection);
     }
