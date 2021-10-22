@@ -72,9 +72,12 @@ void evolution::evolve()
             population.erase(temp);
         } else ++temp;
     }
-
+    for(auto &par: newGenParents){
+        //population.push_back(std::move(par));
+    }
     for (int i = population.size(); i < generation; ++i)
         population.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
+
     clock = 0;
     cnnct();
 }
@@ -83,10 +86,10 @@ void evolution::evolution_stat()
 {
     ++clock;
 
-    if(clock>=100){
+    if(clock>=700){
 
         for(auto &i: population){
-            if(i->velocity_sum<=min_speed-80){
+            if(i->velocity_sum<=min_speed-40){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
@@ -96,7 +99,7 @@ void evolution::evolution_stat()
     //возможно поменять
     dscnnct();
 
-    if(clock==1200){
+    if(clock==100){
         evolve();
     }
 }

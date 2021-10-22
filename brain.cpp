@@ -7,7 +7,7 @@ double brain::sigmoid(const double &x){
 }
 
 brain::brain(){
-    S = 2 + rand() % 6;//максимум пять внутренних слоёв
+    S = 2 + rand() % 5;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
@@ -102,6 +102,12 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                     //берем веса большей матрицы
                 }
             }
+            for(int temp = abMin.l[lt]; //разница между максимумом
+                temp < this->l[lt]; ++temp)
+                for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
+                    this->W[lt](temp,i) = abMax.W[lt](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум
+                    //берем веса большей матрицы
+                }
         }
 
         ++lt;
@@ -152,13 +158,20 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
     //потерянных столбоцов быть не может, так как выходных нейронов всегда last
     //восстанавливаем потерянные строки
     {
-        auto &abMax = (a.l[a.S-2] >= b.l[a.S-2]? a : b); //сравниваем по количеству строк
-        auto &abMin = (a.l[a.S-2] <  b.l[a.S-2]? a : b);
+        auto &abMax = (a.l[a.S-2] >= b.l[b.S-2]? a : b); //сравниваем по количеству строк
+        auto &abMin = (a.l[a.S-2] <  b.l[b.S-2]? a : b);
         for (int temp = abMin.l[abMin.S-2]; //берем за начальную точку конец меньшей матрицы
-             temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+             temp < this->l[S-2] && temp < abMax.l[abMax.S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
                 this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум;
                                                             //берем веса большей матрицы
+            }
+        }
+        //ебнутый вариант
+        for (int temp = abMax.l[abMax.S-2]; //берем за начальную точку конец БОЛЬШЕЙ матрицы
+             temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+            for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
+                this->W[S-2](temp,i) = (-100+rand()%201)/100.0;
             }
         }
     }
