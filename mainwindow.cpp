@@ -51,7 +51,7 @@ void MainWindow::on_pushButton_clicked()
 
     connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
 
-    ship_evolution->cnnct(timer.get(), map.get());
+    ship_evolution->cnnct(timer, map);
     ///===========тестовый
     test_update_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
     test_think_n_do_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});

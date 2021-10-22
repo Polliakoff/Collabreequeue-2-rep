@@ -12,7 +12,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
 }
 
 ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc):
-    ship(a.get_position().first,a.get_position().second),
+    ship(575,650),
     net(a.net, b.net, dmnc)
 {
     change_destination(a.get_position().first,a.get_position().second);
@@ -129,16 +129,16 @@ void ship_physics::helm(const int &mode2)
 
 void ship_physics::brainstorm()
 {
-    net.A[0](0)=distances[0];
-    net.A[0](1)=distances[1];
-    net.A[0](2)=distances[2];
-    net.A[0](3)=distances[3];
-    net.A[0](4)=distances[4];
-    net.A[0](5)=distances[5];
-    net.A[0](6)=to_turn_to;
-    net.A[0](7)=velocity_projection;
-    net.A[0](8)=abs_velocity; //должно быть в проекции на вектор правильного направления
-    net.A[0](9)=fuel;
+    net.A[0](0)=50/distances[0];
+    net.A[0](1)=50/distances[1];
+    net.A[0](2)=50/distances[2];
+    net.A[0](3)=50/distances[3];
+    net.A[0](4)=50/distances[4];
+    net.A[0](5)=50/distances[5];
+    net.A[0](6)=5*to_turn_to;
+    net.A[0](7)=10*velocity_projection;
+    net.A[0](8)=10*abs_velocity; //должно быть в проекции на вектор правильного направления
+    net.A[0](9)=220/fuel;
     net.think();
 }
 
@@ -185,6 +185,11 @@ void ship_physics::modify_path()
         to_turn_to *= -1;
     }
     distance_to_finish = vector_module(path.first,path.second);
+}
+
+bool ship_physics::viable()
+{
+    return net.viable();
 }
 
 

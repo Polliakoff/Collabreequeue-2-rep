@@ -41,6 +41,7 @@ public:
     void friction();
     void change_destination(const double& dest_x,const double& dest_y);
     void modify_path();
+    bool viable();
 
 public slots:
     virtual void update(polygon &map);
