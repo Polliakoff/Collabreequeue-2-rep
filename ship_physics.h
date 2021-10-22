@@ -26,6 +26,8 @@ public:
     double to_turn_to;
     double velocity_projection;
     pair<double, double> path;
+    double velocity_sum = 0;
+    double fuel = 1000;
 
 public slots:
     virtual void update(polygon &map);
