@@ -42,6 +42,11 @@ private:
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
     vector <std::unique_ptr<ship_physics>> korablik;
+///тестовый
+    std::unique_ptr<ship_physics> test_ship;
+    QMetaObject::Connection test_update_connection;
+    QMetaObject::Connection test_think_n_do_connection;
+///тестовый
     std::unique_ptr<pathway> map;
     std::unique_ptr<QTimer> timer;
     double neuron1 = 0, neuron2 = 0, neuron3 = 0, neuron4 = 0;
