@@ -28,6 +28,7 @@ public:
     pair<double, double> path;
     double fuel = 1000;
     double actual_angle;
+    double velocity_sum = 0;
 
 public slots:
     virtual void update(polygon &map);

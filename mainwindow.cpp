@@ -54,12 +54,12 @@ void MainWindow::on_pushButton_clicked()
 
     int t = 60;
     for(int i = 0; i < t; i++){      
-        connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);});
-        connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();});
+        update_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);}));
+        think_n_do_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();}));
     }
 ///===========тестовый
-    connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->update(*map);});
-    connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
+    update_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->update(*map);}));
+    think_n_do_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[t]->dumb_n_do(neuron1, neuron2, neuron3, neuron4);}));
 ///===========тестовый
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
     //disconnect(timer.get(), &QTimer::timeout,)
