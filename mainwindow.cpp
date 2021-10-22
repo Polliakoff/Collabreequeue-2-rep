@@ -125,7 +125,7 @@ void MainWindow::painter()
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
-    ui->lineEdit_4->setText(QString::number(test_ship->to_turn_to*180/M_PI));
+    ui->lineEdit_4->setText(QString::number(ship_evolution->clock));
     ui->lineEdit_5->setText(QString::number(test_ship->fuel_consumption));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
