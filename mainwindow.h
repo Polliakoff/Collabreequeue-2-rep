@@ -6,7 +6,7 @@
 #include "pathway.h"
 #include <QGraphicsScene>
 #include <QTimer>
-#include <vector>
+//#include <vector>
 #include <cstdlib>
 #include "evolution.h"
 

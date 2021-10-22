@@ -125,9 +125,10 @@ void ship_physics::brainstorm()
     net.A[0](3)=distances[3];
     net.A[0](4)=distances[4];
     net.A[0](5)=distances[5];
-    net.A[0](6)=angle;
-    net.A[0](7)=abs_velocity;
-    net.A[0](8)=velocity_x; //должно быть в проекции на вектор правильного направления
+    net.A[0](6)=to_turn_to;
+    net.A[0](7)=velocity_projection;
+    net.A[0](8)=abs_velocity; //должно быть в проекции на вектор правильного направления
+    net.A[0](9)=fuel;
     net.think();
 }
 

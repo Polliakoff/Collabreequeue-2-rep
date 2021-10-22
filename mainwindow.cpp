@@ -50,6 +50,7 @@ void MainWindow::on_pushButton_clicked()
     ui->graphicsView->setScene(scene.get());
 
     connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
+    //connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolve();});
 
     int t = ship_evolution->population.size();
     for(int i = 0; i < t; i++){

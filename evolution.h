@@ -2,8 +2,8 @@
 #define EVOLUTION_H
 
 #include "ship_physics.h"
-#include "func.h"
-#include <vector>
+//#include "func.h"
+//#include <vector>
 #include <memory>
 
 class evolution
@@ -15,6 +15,7 @@ public:
     vector <std::unique_ptr<ship_physics>> population;
     int generation;
     int clock;
+    int min_speed = 100;
 
     void evolve();
 public slots:

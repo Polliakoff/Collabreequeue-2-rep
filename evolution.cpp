@@ -21,13 +21,17 @@ void evolution::evolve()
 
 void evolution::evolution_stat()
 {
-    clock++;
+    ++clock;
+
     if(clock>=3000){
-        for(auto &i:population){
-            if(i->velocity_sum<=100){
+        for(auto &i: population){
+            if(i->velocity_sum<=min_speed){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
         }
+    }
+    if(clock>=5000){
+        evolve();
     }
 }

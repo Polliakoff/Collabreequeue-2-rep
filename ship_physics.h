@@ -32,6 +32,7 @@ public:
     double velocity_sum = 0;
     double ship_and_velocity_angle;
     double friction_value;
+    double distance_to_finish;
     bool operational = true;
     bool can_be_parrent = true;
 

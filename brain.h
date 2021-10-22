@@ -13,7 +13,7 @@ class brain
 {
 private:
     double sigmoid(const double&);
-    int first=13;   //количество входных слоёв
+    int first=14;   //количество входных слоёв
     int last=4;     //количество выходных
     void inheritWeights(brain &a, brain &b, double dmnc);
 public:
