@@ -54,21 +54,25 @@ void ship_physics::engine(const int &mode)
     {
         velocity_x -= sin(angle)*thrust/2;
         velocity_y -= cos(angle)*thrust/2;
+        fuel -= 0.5;
     }
     if (mode == 2)
     {
         velocity_x -= sin(angle)*thrust;
         velocity_y -= cos(angle)*thrust;
+        fuel -= 1;
     }
     if (mode == 3)
     {
         velocity_x += sin(angle)*thrust;
         velocity_y += cos(angle)*thrust;
+        fuel -= 1;
     }
     if (mode == 4)
     {
         velocity_x -= sin(angle)*abs_velocity/50;
         velocity_y -= cos(angle)*abs_velocity/50;
+        fuel -= 0.02;
     }
 }
 

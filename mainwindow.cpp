@@ -108,6 +108,7 @@ void MainWindow::painter()
     ui->lineEdit_7->setText(QString::number(korablik[60]->velocity_y));
     ui->lineEdit_8->setText(QString::number(korablik[60]->eyes[2].direction[0]));
     ui->lineEdit_9->setText(QString::number(korablik[60]->eyes[2].direction[1]));
+    ui->lineEdit_10->setText(QString::number(korablik[60]->fuel));
     scene->addEllipse(korablik[60]->get_position().first-10,korablik[60]->get_position().second-10,20,20, QPen(Qt::red));
     scene->addLine(korablik[60]->get_position().first,korablik[60]->get_position().second,
             korablik[60]->get_position().first+korablik[60]->path.first,korablik[60]->get_position().second+korablik[60]->path.second, QPen(Qt::red));

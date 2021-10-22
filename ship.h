@@ -20,6 +20,7 @@ public:
     bool collided = false;
 
     double angle;
+    double fuel = 1000;
     polygon body;
     vector<straight_line> eyes;
     vector<double> distances;
