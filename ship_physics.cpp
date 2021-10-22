@@ -167,6 +167,9 @@ void ship_physics::update(polygon &map)
     ship::update(map);
     modify_path();
     velocity_sum+=abs_velocity;
+    if(fuel == 0 || collided){
+        operational = false;
+    }
 }
 
 ///-----------------------------Функция для дебага, управляющая 61-ым кораблём--------------------------------------

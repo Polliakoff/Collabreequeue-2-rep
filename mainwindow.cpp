@@ -71,57 +71,58 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::painter()
 {
     scene->clear();
+    qdraw_polygon(*map,scene.get());
     int ship_number = 0;
     for(auto shp = korablik.begin(); shp!=korablik.end(); ){
 
-        qdraw_polygon(shp->get()->body,scene.get());
-        qdraw_polygon(*map,scene.get());
+        if(shp->get()->operational){
+            qdraw_polygon(shp->get()->body,scene.get());
 
-        scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-                shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
-        scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-                shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
-        scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-                shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
+            scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
+                    shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
+            scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
+                    shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
+            scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
+                    shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
 
-        scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+        }
 
 
-        if(shp->get()->collided) {
-            //korablik.erase(shp);
+        if(!shp->get()->operational) {
             disconnect(update_connections[ship_number]);
-            //update_connections.erase(update_connections.begin() + ship_number);
             disconnect(think_n_do_connections[ship_number]);
-            //think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
-            //korablik.shrink_to_fit();
+            //            korablik.erase(shp);
+            //            update_connections.erase(update_connections.begin() + ship_number);
+            //            think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
         }
         ++shp;
         ++ship_number;
     }
 
     ///===========тестовый
-    qdraw_polygon(test_ship->body,scene.get());
-    qdraw_polygon(*map,scene.get());
+    if(test_ship->operational){
+        qdraw_polygon(test_ship->body,scene.get());
 
-    scene->addLine(test_ship->point_seen[0].first,test_ship->point_seen[0].second,
-            test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
-    scene->addLine(test_ship->point_seen[2].first,test_ship->point_seen[2].second,
-            test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
-    scene->addLine(test_ship->point_seen[4].first,test_ship->point_seen[4].second,
-            test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
+        scene->addLine(test_ship->point_seen[0].first,test_ship->point_seen[0].second,
+                test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
+        scene->addLine(test_ship->point_seen[2].first,test_ship->point_seen[2].second,
+                test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
+        scene->addLine(test_ship->point_seen[4].first,test_ship->point_seen[4].second,
+                test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
 
-    scene->addEllipse(test_ship->point_seen[0].first-10,test_ship->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-    scene->addEllipse(test_ship->point_seen[1].first-10,test_ship->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-    scene->addEllipse(test_ship->point_seen[2].first-10,test_ship->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-    scene->addEllipse(test_ship->point_seen[3].first-10,test_ship->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-    scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-    scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
-
+        scene->addEllipse(test_ship->point_seen[0].first-10,test_ship->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(test_ship->point_seen[1].first-10,test_ship->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(test_ship->point_seen[2].first-10,test_ship->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(test_ship->point_seen[3].first-10,test_ship->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+        scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+    }
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
@@ -142,7 +143,7 @@ void MainWindow::painter()
                    test_ship->get_position().second+(test_ship->path.second*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
                    QPen(Qt::green));
 
-    if(test_ship->collided) {
+    if(!test_ship->operational) {
         //test_ship = std::make_unique<ship_physics>(700,700,0,0);
         disconnect(test_update_connection);
         disconnect(test_think_n_do_connection);

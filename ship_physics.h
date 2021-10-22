@@ -31,6 +31,7 @@ public:
     double velocity_sum = 0;
     double ship_and_velocity_angle;
     double friction_value;
+    bool operational = true;
 
 public slots:
     virtual void update(polygon &map);
