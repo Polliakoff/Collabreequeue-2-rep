@@ -9,6 +9,7 @@ INCLUDEPATH += "$$PWD/eigen-3.4.0"
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    evolution.cpp \
     func.cpp \
     brain.cpp \
     main.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     straight_line.cpp
 
 HEADERS += \
+    evolution.h \
     func.h \
     brain.h \
     mainwindow.h \

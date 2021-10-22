@@ -26,12 +26,13 @@ public:
     double to_turn_to;
     double velocity_projection;
     pair<double, double> path;
-    double fuel = 1000;
+    double fuel = 2200;
     double actual_angle;
     double velocity_sum = 0;
     double ship_and_velocity_angle;
     double friction_value;
     bool operational = true;
+    bool can_be_parrent = true;
 
 public slots:
     virtual void update(polygon &map);

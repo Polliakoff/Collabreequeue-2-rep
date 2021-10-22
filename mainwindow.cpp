@@ -6,13 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     scene = std::make_unique<QGraphicsScene>();
 
-
-    for(int i = 0; i < 60; i++)
-    {
-        korablik.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
-    }
+    ship_evolution = std::make_unique<evolution>(60,575,650,0,0);
     ///===========тестовый
     test_ship = std::make_unique<ship_physics>(575,650,0,0);
     ///===========тестовый
@@ -52,10 +49,12 @@ void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
 
-    int t = korablik.size();
+    connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
+
+    int t = ship_evolution->population.size();
     for(int i = 0; i < t; i++){
-        update_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->update(*map);}));
-        think_n_do_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){korablik[i]->think_n_do();}));
+        update_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->population[i]->update(*map);}));
+        think_n_do_connections.emplace_back(connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->population[i]->think_n_do();}));
     }
     ///===========тестовый
     test_update_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
@@ -64,7 +63,7 @@ void MainWindow::on_pushButton_clicked()
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
     //disconnect(timer.get(), &QTimer::timeout,)
 
-    timer->start(0);
+    timer->start(20);
 
 }
 
@@ -73,7 +72,7 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
     int ship_number = 0;
-    for(auto shp = korablik.begin(); shp!=korablik.end(); ){
+    for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
 
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());
@@ -130,7 +129,7 @@ void MainWindow::painter()
     ui->lineEdit_5->setText(QString::number(test_ship->velocity_projection));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
-    ui->lineEdit_8->setText(QString::number(test_ship->friction_value));
+    ui->lineEdit_8->setText(QString::number(test_ship->velocity_sum));
     ui->lineEdit_9->setText(QString::number(test_ship->ship_and_velocity_angle));
     ui->lineEdit_10->setText(QString::number(test_ship->fuel));
     scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
@@ -196,7 +195,7 @@ void MainWindow::on_pushButton_7_clicked()
 {
     tmblr_time =! tmblr_time;
     if (tmblr_time == true) timer->stop();
-    else timer->start(0);
+    else timer->start(20);
 
 }
 ///===========тестовый
