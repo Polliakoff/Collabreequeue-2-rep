@@ -27,6 +27,7 @@ public:
     double velocity_projection;
     pair<double, double> path;
     double fuel = 1000;
+    double fuel_consumption;
     double actual_angle;
     double velocity_sum = 0;
     double ship_and_velocity_angle;

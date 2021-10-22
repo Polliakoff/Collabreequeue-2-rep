@@ -70,7 +70,7 @@
      <item row="4" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>vel_proj</string>
+        <string>fuel cons</string>
        </property>
       </widget>
      </item>

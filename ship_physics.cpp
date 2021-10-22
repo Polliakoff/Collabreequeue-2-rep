@@ -54,27 +54,40 @@ void ship_physics::engine(const int &mode)
     {
         velocity_x -= sin(angle)*thrust/2;
         velocity_y -= cos(angle)*thrust/2;
-        fuel -= 0.5;
+        fuel_consumption = 0.5;
+        fuel -= fuel_consumption;
     }
     if (mode == 2)
     {
         velocity_x -= sin(angle)*thrust;
         velocity_y -= cos(angle)*thrust;
-        fuel -= 1;
+        fuel_consumption = 1;
+        fuel -= fuel_consumption;
     }
     if (mode == 3)
     {
         velocity_x += sin(angle)*thrust;
         velocity_y += cos(angle)*thrust;
-        fuel -= 1;
+        fuel_consumption = 1;
+        fuel -= fuel_consumption;
     }
     if (mode == 4)
     {
         if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
         {
-            velocity_x -= sin(angle)*abs_velocity*friction_value*0.1;
-            velocity_y -= cos(angle)*abs_velocity*friction_value*0.1;
-            fuel -= abs_velocity*friction_value*0.1/thrust;
+            if(abs_velocity*friction_value*0.1 < thrust)
+            {
+                velocity_x -= sin(angle)*abs_velocity*friction_value*0.1;
+                velocity_y -= cos(angle)*abs_velocity*friction_value*0.1;
+                fuel_consumption = abs_velocity*friction_value*0.1/thrust;
+            }else
+            {
+                velocity_x -= sin(angle)*thrust;
+                velocity_y -= cos(angle)*thrust;
+                fuel_consumption = 1;
+            }
+
+            fuel -= fuel_consumption;
         }
     }
 }
