@@ -63,7 +63,7 @@ void MainWindow::on_pushButton_clicked()
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
     //disconnect(timer.get(), &QTimer::timeout,)
 
-    timer->start(20);
+    timer->start(0);
 
 }
 
@@ -195,7 +195,7 @@ void MainWindow::on_pushButton_7_clicked()
 {
     tmblr_time =! tmblr_time;
     if (tmblr_time == true) timer->stop();
-    else timer->start(20);
+    else timer->start(0);
 
 }
 ///===========тестовый

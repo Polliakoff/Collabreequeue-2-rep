@@ -155,10 +155,11 @@ void ship_physics::friction()
 }
 
 void ship_physics::change_destination(const double &dest_x, const double &dest_y)
-{
+{    
     final_destination.first = dest_x;
     final_destination.second = dest_y;
     modify_path();
+    distance_to_finish = vector_module(path.first,path.second);
 }
 
 void ship_physics::modify_path()
@@ -172,6 +173,7 @@ void ship_physics::modify_path()
     if(convert_to_ship(final_destination).first>0){
         to_turn_to *= -1;
     }
+    distance_to_finish = vector_module(path.first,path.second);
 }
 
 
@@ -186,6 +188,7 @@ void ship_physics::update(polygon &map)
     if(fuel <= 0 || collided){
         operational = false;
     }
+    distance_to_finish = vector_module(path.first,path.second);
 }
 
 ///-----------------------------Функция для дебага, управляющая 61-ым кораблём--------------------------------------
