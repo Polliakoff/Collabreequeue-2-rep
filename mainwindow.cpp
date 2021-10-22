@@ -129,8 +129,8 @@ void MainWindow::painter()
     ui->lineEdit_5->setText(QString::number(test_ship->velocity_projection));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
-    ui->lineEdit_8->setText(QString::number(test_ship->eyes[2].direction[0]));
-    ui->lineEdit_9->setText(QString::number(test_ship->actual_angle));
+    ui->lineEdit_8->setText(QString::number(test_ship->friction_value));
+    ui->lineEdit_9->setText(QString::number(test_ship->ship_and_velocity_angle));
     ui->lineEdit_10->setText(QString::number(test_ship->fuel));
     scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
     scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
