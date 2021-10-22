@@ -15,3 +15,13 @@ double skalar_multipl(const double &x1, const double &y1, const double &x2, cons
 {
     return x1*x2 + y1*y2;
 }
+
+double vectors_projection(const double &x1, const double &y1, const double &x2, const double &y2)
+{
+    return skalar_multipl(x1,x2,y1,y2)/vector_module(x1,x2);
+}
+
+double vectors_angle(const double &x1, const double &y1, const double &x2, const double &y2)
+{
+    return acos(skalar_multipl(x1,y1,x2,y2)/(vector_module(x1,y1)*vector_module(x2,y2)));
+}

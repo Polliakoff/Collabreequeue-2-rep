@@ -145,6 +145,8 @@ void ship_physics::friction()
     // double right_side_angle = angle - M_PI/2, left_side_angle = angle + M_PI/2, back_angle = angle - M_PI;
     //double abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
 
+    actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
+
     //левая сторона
     //правая сторона
     //перед
@@ -164,13 +166,11 @@ void ship_physics::modify_path()
     path.first = final_destination.first - position.first;
     path.second = final_destination.second - position.second;
 
-    velocity_projection = skalar_multipl(path.first,path.second,velocity_x,velocity_y)/vector_module(path.first,path.second);
-
-
+    velocity_projection = vectors_projection(path.first,velocity_x,path.second,velocity_y);
 
     to_turn_to = acos(skalar_multipl(path.first,path.second,eyes[2].direction[0],eyes[2].direction[1])
-            /(vector_module(path.first,path.second)*vector_module(eyes[2].direction[0],eyes[2].direction[1])));
-
+           /(vector_module(path.first,path.second)*vector_module(eyes[2].direction[0],eyes[2].direction[1])));
+    //to_turn_to = vectors_angle(path.first,velocity_x,path.second,velocity_y);
     if(convert_to_ship(final_destination).first>0){
         to_turn_to *= -1;
     }

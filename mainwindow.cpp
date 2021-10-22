@@ -107,7 +107,7 @@ void MainWindow::painter()
     ui->lineEdit_6->setText(QString::number(korablik[60]->velocity_x));
     ui->lineEdit_7->setText(QString::number(korablik[60]->velocity_y));
     ui->lineEdit_8->setText(QString::number(korablik[60]->eyes[2].direction[0]));
-    ui->lineEdit_9->setText(QString::number(korablik[60]->eyes[2].direction[1]));
+    ui->lineEdit_9->setText(QString::number(korablik[60]->actual_angle));
     ui->lineEdit_10->setText(QString::number(korablik[60]->fuel));
     scene->addEllipse(korablik[60]->get_position().first-10,korablik[60]->get_position().second-10,20,20, QPen(Qt::red));
     scene->addLine(korablik[60]->get_position().first,korablik[60]->get_position().second,
@@ -164,8 +164,9 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::on_pushButton_7_clicked()
 {
-    for(auto &shp: korablik){
-        shp->update(*map);
-    }
+    tmblr_time =! tmblr_time;
+    if (tmblr_time == true) timer->stop();
+    else timer->start(0);
+
 }
 ///===========тестовый
