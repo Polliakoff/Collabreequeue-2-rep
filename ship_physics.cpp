@@ -70,9 +70,12 @@ void ship_physics::engine(const int &mode)
     }
     if (mode == 4)
     {
-        velocity_x -= sin(angle)*abs_velocity/50;
-        velocity_y -= cos(angle)*abs_velocity/50;
-        fuel -= 0.02;
+        if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
+        {
+            velocity_x -= sin(angle)*abs_velocity*friction_value*0.1;
+            velocity_y -= cos(angle)*abs_velocity*friction_value*0.1;
+            fuel -= abs_velocity*friction_value*0.1/thrust;
+        }
     }
 }
 
@@ -117,41 +120,25 @@ void ship_physics::brainstorm()
 
 void ship_physics::friction()
 {
-    //--------------------------------------Деревянное трение. Убрать после прописывания friction()
 
     abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
-    velocity_x -= velocity_x/50;
-    velocity_y -= velocity_y/50;
     if (velocity_x < 0.0001 && velocity_x > -0.0001 && velocity_y < 0.0001 && velocity_y > -0.0001)
     {
         velocity_x = 0;
         velocity_y = 0;
     }
 
-    //--------------------------------------
-
-    //    if(velocity_x != 0 and velocity_y != 0)
-    //    {
-    //        double actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
-
-    //        double ship_and_velocity_angle = abs(actual_angle - acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y))));
-
-    //        double friction_value = -0.3242*ship_and_velocity_angle*ship_and_velocity_angle + 1.2223*ship_and_velocity_angle + 0.32;
-    //        //double friction_value = 0.1156*ship_and_velocity_angle*ship_and_velocity_angle - 0.842*ship_and_velocity_angle + 1.6717;
-    //        //double friction_value = 0.052*ship_and_velocity_angle*ship_and_velocity_angle - 0.3717*ship_and_velocity_angle + 0.8709;
-    //        velocity_x -= sin(angle)*friction_value*velocity_x*0.3;
-    //        velocity_y -= cos(angle)*friction_value*velocity_y*0.3;
-    //    }
-    // double right_side_angle = angle - M_PI/2, left_side_angle = angle + M_PI/2, back_angle = angle - M_PI;
-    //double abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
-
     actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
 
-    //левая сторона
-    //правая сторона
-    //перед
-    //зад
+    ship_and_velocity_angle = vectors_angle(velocity_x,velocity_y,eyes[2].direction[0],eyes[2].direction[1]);
 
+    friction_value = -0.139*ship_and_velocity_angle*ship_and_velocity_angle + 0.5639*ship_and_velocity_angle + 0.1886;
+
+    if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
+    {
+        velocity_x -= friction_value*velocity_x*0.1;
+        velocity_y -= friction_value*velocity_y*0.1;
+    }
 }
 
 void ship_physics::change_destination(const double &dest_x, const double &dest_y)
@@ -168,9 +155,7 @@ void ship_physics::modify_path()
 
     velocity_projection = vectors_projection(path.first,velocity_x,path.second,velocity_y);
 
-    to_turn_to = acos(skalar_multipl(path.first,path.second,eyes[2].direction[0],eyes[2].direction[1])
-           /(vector_module(path.first,path.second)*vector_module(eyes[2].direction[0],eyes[2].direction[1])));
-    //to_turn_to = vectors_angle(path.first,velocity_x,path.second,velocity_y);
+    to_turn_to = vectors_angle(path.first,path.second,eyes[2].direction[0],eyes[2].direction[1]);
     if(convert_to_ship(final_destination).first>0){
         to_turn_to *= -1;
     }

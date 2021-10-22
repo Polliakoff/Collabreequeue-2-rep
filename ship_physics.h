@@ -29,6 +29,8 @@ public:
     double fuel = 1000;
     double actual_angle;
     double velocity_sum = 0;
+    double ship_and_velocity_angle;
+    double friction_value;
 
 public slots:
     virtual void update(polygon &map);
