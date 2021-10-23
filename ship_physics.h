@@ -5,10 +5,12 @@
 #include "ship.h"
 #include <cmath>
 #include "brain.h"
+#include <string>
 
 class ship_physics : public ship
 {
 protected:
+
     pair<double, double> final_destination;
     brain net;
 public:
@@ -20,6 +22,7 @@ public:
     pair<double, double> path;
     double angular_velocity = 0;
     double avg_velocity = 0;
+    std::string name;
 
     double fuel_consumption;
     double fuel = 2200;

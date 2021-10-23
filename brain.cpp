@@ -71,8 +71,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
     for (; lt < a.S-2 && lt < b.S-2 && lt != this->S-2;){ //не берем последний слой (синее стекло)
         this->A.emplace_back(l[lt]);
         this->W.emplace_back(l[lt],l[lt+1]);
-        for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1]; ++j){
-            for (int i = 0; i < a.l[lt] && i < b.l[lt]; ++i){
+        for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1] && j < l[lt+1]; ++j){
+            for (int i = 0; i < a.l[lt] && i < b.l[lt] && i < l[lt]; ++i){
                 this->W[lt](i,j)=((a.W[lt](i,j)+b.W[lt](i,j))/2.0)*(95+(rand()%11))/100.0; ////вот тут шум
                 //cout << i << "\t" << j << "\n"; //11,6 проверка
             }
