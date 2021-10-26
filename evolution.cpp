@@ -12,14 +12,27 @@ evolution::evolution(const int& generation_size, const double &start_x, const do
     for(int i = 0; i < generation_size; i++)
     {
         auto ptr = make_unique<ship_physics>(start_x,start_y,finish_x,finish_y);
-        population.emplace(ptr.get()->name,std::move(ptr));
+        population.emplace(genName + ptr.get()->name,std::move(ptr));
     }
     generation = generation_size;
+
+    fout.open("evolution.log");
+}
+
+evolution::~evolution()
+{
+    fout.close();
 }
 
 void evolution::evolve()
 {
     dscnnct();
+
+    if(genName[1]=='z') {
+        genName[0] = int(genName[0])+1;
+        genName[1] = 'a';
+    } else
+        genName[1]=char(genName[1])+1;
 
     for(auto &i: population){
         QObject::disconnect(update_connections[i.first]);
@@ -54,16 +67,24 @@ void evolution::evolve()
     update_connections.clear();
     double dmnc = 0.7;
     population.reserve(generation);
+
     if (newGenParents.size()>1)
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
+                fout << endl << temp->get()->name << "\n+\n" << inner_temp->get()->name << endl;
+
                 auto ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), dmnc);
-                population.emplace(ptr.get()->name,std::move(ptr));
+                population.emplace(genName + ptr.get()->name,std::move(ptr));
 
                 ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), 1-dmnc);
-                population.emplace(ptr.get()->name,std::move(ptr));
+                population.emplace(genName + ptr.get()->name,std::move(ptr));
             }
         }
+    //возвращаем родителей
+    for (auto &shp: newGenParents){
+        population.emplace(shp.get()->name,std::move(shp));
+    }
+
     //проверка на антихриста
     for(auto temp = population.begin(); temp!=population.end(); ){
         if(!temp->second->viable()){
@@ -75,7 +96,7 @@ void evolution::evolve()
     }
     for (int i = population.size(); i < generation; ++i){
         auto ptr = make_unique<ship_physics>(575,650,0,0);
-        population.emplace(ptr.get()->name,std::move(ptr));
+        population.emplace(genName + ptr.get()->name,std::move(ptr));
     }
     clock = 0;
     ++tst;
@@ -88,7 +109,7 @@ void evolution::evolution_stat()
 {
     ++clock;
 
-    if(clock==100){
+    if(clock==10){
         for(auto &i: population){
             if(i.second->velocity_sum<=10){
                 i.second->operational = false;
@@ -120,10 +141,10 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
     //int t = population.size();
     for(auto &i: population){
         auto temp = i.first;
-        update_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+        update_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                       [=](){population[temp]->update(*map.get());}));
 
-        think_n_do_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+        think_n_do_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                           [=](){population[temp]->think_n_do();}));
     }
 }
@@ -133,10 +154,10 @@ void evolution::cnnct()
     for(auto &i: population){
 
         auto temp = i.first;
-        update_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+        update_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                       [=](){population[temp]->update(*map.get());}));
 
-        think_n_do_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+        think_n_do_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                           [=](){population[temp]->think_n_do();}));
     }
 }

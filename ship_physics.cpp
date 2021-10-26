@@ -9,7 +9,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
     ship(pos_x, pos_y)
 {
     name = std::to_string(net.S);
-    name.push_back('x');
+    name.push_back('s');
     for (auto &i: net.l){
         name += std::to_string(i);
         name.push_back('.');

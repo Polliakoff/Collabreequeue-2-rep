@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QTimer>
 #include "pathway.h"
+#include <fstream>
 
 class evolution
 {
@@ -18,6 +19,11 @@ public:
     evolution();//не трогать
     evolution(const int& generation_size, const double& start_x,const double& start_y,const double& finish_x,const double& finish_y);
 
+    ~evolution();
+
+    std::string genName="0x";
+    std::ofstream fout;
+    char shpId = '0';
     int generation;
     int clock=0;
     int min_speed = 100;
