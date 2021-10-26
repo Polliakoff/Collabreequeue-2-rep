@@ -5,8 +5,7 @@
 #include "straight_line.h"
 #include <vector>
 
-using std::vector;
-using std::pair;
+
 
 class polygon
 {
@@ -14,8 +13,8 @@ public:
     polygon();
     ~polygon();
 
-    vector <pair<double, double>> vertexes;
-    vector <straight_line> faces;
+    std::vector <std::pair<double, double>> vertexes;
+    std::vector <straight_line> faces;
 
     void add_point(double x, double y);
 };

@@ -1,5 +1,7 @@
 #include "evolution.h"
 
+using namespace std;
+
 evolution::evolution()
 {
 
@@ -9,7 +11,8 @@ evolution::evolution(const int& generation_size, const double &start_x, const do
 {
     for(int i = 0; i < generation_size; i++)
     {
-        population.emplace_back(std::make_unique<ship_physics>(start_x,start_y,finish_x,finish_y));
+        auto ptr = make_unique<ship_physics>(start_x,start_y,finish_x,finish_y);
+        population.emplace(ptr.get()->name,std::move(ptr));
     }
     generation = generation_size;
 }
@@ -18,32 +21,25 @@ void evolution::evolve()
 {
     dscnnct();
 
-
-    int num = 0;
     for(auto &i: population){
-        //if(i.get()->operational){
-        QObject::disconnect(update_connections[num]);
-        QObject::disconnect(think_n_do_connections[num]);
-        //}
-        ++num;
+        QObject::disconnect(update_connections[i.first]);
+        QObject::disconnect(think_n_do_connections[i.first]);
     } //стоп машина
 
 
-    vector<int> index;
-    int i = 0;
+    vector<string> index;
     for (auto &shp: population){
-        if(shp.get()->can_be_parrent){
-            index.push_back(i);
+        if(shp.second.get()->can_be_parent){
+            index.emplace_back(shp.first);
         }
-        ++i;
     } //выбрали норм корабли
 
-    std::map<double, int> best;
+    std::map<double, string> best;
     for(auto &imp: index){
        best.emplace(population[imp].get()->distance_to_finish, imp);
     }
 
-    i=0;
+    int i = 0;
     vector <std::unique_ptr<ship_physics>> newGenParents;
     if(index.size()>0)
         for (auto &m: best){
@@ -58,25 +54,29 @@ void evolution::evolve()
     update_connections.clear();
     double dmnc = 0.7;
     population.reserve(generation);
-    if (newGenParents.size()>0)
+    if (newGenParents.size()>1)
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
-                population.emplace_back(std::make_unique<ship_physics>(*temp->get(), *inner_temp->get(), dmnc));
-                population.emplace_back(std::make_unique<ship_physics>(*temp->get(), *inner_temp->get(), 1-dmnc));
+                auto ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), dmnc);
+                population.emplace(ptr.get()->name,std::move(ptr));
+
+                ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), 1-dmnc);
+                population.emplace(ptr.get()->name,std::move(ptr));
             }
         }
     //проверка на антихриста
     for(auto temp = population.begin(); temp!=population.end(); ){
-        if(!temp->get()->viable()){
+        if(!temp->second->viable()){
             population.erase(temp);
         } else ++temp;
     }
     for(auto &par: newGenParents){
         //population.push_back(std::move(par));
     }
-    for (int i = population.size(); i < generation; ++i)
-        population.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
-
+    for (int i = population.size(); i < generation; ++i){
+        auto ptr = make_unique<ship_physics>(575,650,0,0);
+        population.emplace(ptr.get()->name,std::move(ptr));
+    }
     clock = 0;
     ++tst;
     if(tst>40)
@@ -90,17 +90,17 @@ void evolution::evolution_stat()
 
     if(clock==100){
         for(auto &i: population){
-            if(i->velocity_sum<=10){
-                i->operational = false;
-                i->can_be_parrent = false;
+            if(i.second->velocity_sum<=10){
+                i.second->operational = false;
+                i.second->can_be_parent = false;
             }
         }
     }
     if(clock==500){
         for(auto &i: population){
-            if(i->velocity_sum<=70){
-                i->operational = false;
-                i->can_be_parrent = false;
+            if(i.second->velocity_sum<=70){
+                i.second->operational = false;
+                i.second->can_be_parent = false;
             }
         }
     }
@@ -117,39 +117,39 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
 {
     this->timer=timer;
     this->map=map;
-    int t = population.size();
-    for(int i = 0; i < t; i++){
-        update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                                      [=](){population[i]->update(*map.get());}));
+    //int t = population.size();
+    for(auto &i: population){
+        auto temp = i.first;
+        update_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+                                                                      [=](){population[temp]->update(*map.get());}));
 
-        think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                                          [=](){population[i]->think_n_do();}));
+        think_n_do_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+                                                                          [=](){population[temp]->think_n_do();}));
     }
 }
 
 void evolution::cnnct()
 {
-    int t = population.size();
-    for(int i = 0; i < t; i++){
-        update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                                      [=](){population[i]->update(*map.get());}));
+    for(auto &i: population){
 
-        think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                                          [=](){population[i]->think_n_do();}));
+        auto temp = i.first;
+        update_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+                                                                      [=](){population[temp]->update(*map.get());}));
+
+        think_n_do_connections.emplace(temp,QObject::connect(timer.get(), &QTimer::timeout,
+                                                                          [=](){population[temp]->think_n_do();}));
     }
 }
 
 void evolution::dscnnct()
 {
-    int num=0;
     for(auto i = population.begin(); i!=population.end() ; ){
-        if(!i->get()->operational){
-            QObject::disconnect(update_connections[num]);
-            QObject::disconnect(think_n_do_connections[num]);
+        if(!i->second->operational){
+            QObject::disconnect(update_connections[i->first]);
+            QObject::disconnect(think_n_do_connections[i->first]);
             //population.erase(i);
             //--num;
         }
         ++i;
-        ++num;
     }
 }

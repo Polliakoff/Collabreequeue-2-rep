@@ -11,7 +11,7 @@ class ship_physics : public ship
 {
 protected:
 
-    pair<double, double> final_destination;
+    std::pair<double, double> final_destination;
     brain net;
 public:
     ship_physics();
@@ -19,7 +19,7 @@ public:
     ship_physics(ship_physics &a, ship_physics &b, const double &dmnc);
 
     double velocity_x = 0, velocity_y = 0, abs_velocity;
-    pair<double, double> path;
+    std::pair<double, double> path;
     double angular_velocity = 0;
     double avg_velocity = 0;
     std::string name;
@@ -32,7 +32,7 @@ public:
     double friction_value;
     double distance_to_finish;
     bool operational = true;
-    bool can_be_parrent = true;
+    bool can_be_parent = true;
 
     double to_turn_to;
     double velocity_projection;

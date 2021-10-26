@@ -1,5 +1,7 @@
 #include "ship.h"
 
+using namespace std;
+
 ship::ship(){}
 
 ship::ship(const double& pos_x,const double& pos_y)

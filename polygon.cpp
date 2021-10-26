@@ -1,5 +1,7 @@
 #include "polygon.h"
 
+using namespace std;
+
 polygon::polygon(){}
 
 polygon::~polygon(){}

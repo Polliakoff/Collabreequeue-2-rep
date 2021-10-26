@@ -7,6 +7,7 @@
 #include <memory>
 #include <algorithm>
 #include <map>
+#include <unordered_map>
 #include <QObject>
 #include <QTimer>
 #include "pathway.h"
@@ -21,15 +22,15 @@ public:
     int clock=0;
     int min_speed = 100;
     int tst=0;
-    vector <std::unique_ptr<ship_physics>> population;
-    vector<QMetaObject::Connection> update_connections;
-    vector<QMetaObject::Connection> think_n_do_connections;
+    std::unordered_map<std::string, std::unique_ptr<ship_physics>> population;
+    std::unordered_map<std::string, QMetaObject::Connection> update_connections;
+    std::unordered_map<std::string, QMetaObject::Connection> think_n_do_connections;
 
     void cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &map);
     void cnnct();
     void dscnnct();
     void evolve();
-    //void disconnect(std::vector<QMetaObject::Connection> a, std::vector<QMetaObject::Connection> b);
+
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
 public slots:

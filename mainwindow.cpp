@@ -70,22 +70,22 @@ void MainWindow::painter()
     int ship_number = 0;
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
 
-        if(shp->get()->operational){
-            qdraw_polygon(shp->get()->body,scene.get());
+        if(shp->second->operational){
+            qdraw_polygon(shp->second->body,scene.get());
 
-            scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-                    shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
-            scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-                    shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
-            scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-                    shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
+            scene->addLine(shp->second->point_seen[0].first,shp->second->point_seen[0].second,
+                    shp->second->point_seen[1].first,shp->second->point_seen[1].second, QPen(Qt::lightGray));
+            scene->addLine(shp->second->point_seen[2].first,shp->second->point_seen[2].second,
+                    shp->second->point_seen[3].first,shp->second->point_seen[3].second, QPen(Qt::lightGray));
+            scene->addLine(shp->second->point_seen[4].first,shp->second->point_seen[4].second,
+                    shp->second->point_seen[5].first,shp->second->point_seen[5].second, QPen(Qt::lightGray));
 
-            scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-            scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-            scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-            scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-            scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-            scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[0].first-10,shp->second->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[1].first-10,shp->second->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[2].first-10,shp->second->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[3].first-10,shp->second->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[4].first-10,shp->second->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+            scene->addEllipse(shp->second->point_seen[5].first-10,shp->second->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
         }
 
 
