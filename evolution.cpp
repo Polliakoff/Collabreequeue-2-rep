@@ -17,9 +17,8 @@ evolution::evolution(const int& generation_size, const double &start_x, const do
 void evolution::evolve()
 {
     dscnnct();
-    ++tst;
-    if(tst>5)
-        tst++;
+
+
     int num = 0;
     for(auto &i: population){
         //if(i.get()->operational){
@@ -79,27 +78,36 @@ void evolution::evolve()
         population.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
 
     clock = 0;
-    cnnct();
+    ++tst;
+    if(tst>40)
+        cnnct();
+    //cnnct();
 }
 
 void evolution::evolution_stat()
 {
     ++clock;
 
-    if(clock>=700){
-
+    if(clock==100){
         for(auto &i: population){
-            if(i->velocity_sum<=min_speed-40){
+            if(i->velocity_sum<=10){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
-
+        }
+    }
+    if(clock==500){
+        for(auto &i: population){
+            if(i->velocity_sum<=70){
+                i->operational = false;
+                i->can_be_parrent = false;
+            }
         }
     }
     //возможно поменять
     dscnnct();
 
-    if(clock==100){
+    if(clock==1200){
         evolve();
     }
 }

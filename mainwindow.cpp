@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     scene = std::make_unique<QGraphicsScene>();
 
-    ship_evolution = std::make_unique<evolution>(60,575,650,0,0);
+    ship_evolution = std::make_unique<evolution>(100,575,650,0,0);
     ///===========тестовый
     test_ship = std::make_unique<ship_physics>(575,650,0,0);
     ///===========тестовый
