@@ -21,10 +21,10 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc)
     ship(575,650),
     net(a.net, b.net, dmnc)
 {
-    name.push_back(net.S);
-    name.push_back('x');
+    name = std::to_string(net.S);
+    name.push_back('s');
     for (auto &i: net.l){
-        name.push_back(i);
+        name += std::to_string(i);
         name.push_back('.');
     }
     change_destination(a.get_position().first,a.get_position().second);

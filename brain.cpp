@@ -11,7 +11,7 @@ double brain::sigmoid_distance(const double &x){
 }
 
 brain::brain(){
-    S = 5 + rand() % 10;//максимум пять внутренних слоёв
+    S = 4 + rand() % 2;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
@@ -128,21 +128,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                 this->W[lt](i,j) = abMax.W[lt](i,j)*(95+(rand()%11))/100.0; ////вот тут шум
                 //просто берём
             }
-        }
-
-        //в начале можно потерять одну строку ?
-        {       //восстанавливаем потерянные строки
-//        if (first_special_layer){
-//            auto &abMax = (a.l[lt-1] >= b.l[lt-1]? a : b); //сравниваем по количеству строк
-//            auto &abMin = (a.l[lt-1] <  b.l[lt-1]? a : b);
-//            for (int temp = abMin.l[lt-1]; //берем за начальную точку конец меньшей матрицы
-//                 temp < this->l[lt-1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
-//                for (int i = 0; i < abMax.l[lt]; ++i){
-//                    this->W[lt](temp,i) = abMax.W[lt-1](temp,i); //берем веса большей матрицы
-//                }
-//            }
-//            first_special_layer=false;
-//        }
         }
         ++lt;
     }

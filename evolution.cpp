@@ -12,10 +12,10 @@ evolution::evolution(const int& generation_size, const double &start_x, const do
     for(int i = 0; i < generation_size; i++)
     {
         auto ptr = make_unique<ship_physics>(start_x,start_y,finish_x,finish_y);
-        population.emplace(genName + ptr.get()->name,std::move(ptr));
+        population.emplace(to_string(shpId++) + "_" + genName + ptr.get()->name, std::move(ptr));
     }
     generation = generation_size;
-
+    cnnct();
     fout.open("evolution.log");
 }
 
@@ -34,9 +34,11 @@ void evolution::evolve()
     } else
         genName[1]=char(genName[1])+1;
 
-    for(auto &i: population){
-        QObject::disconnect(update_connections[i.first]);
-        QObject::disconnect(think_n_do_connections[i.first]);
+    for(auto i = population.begin(); i!=population.end() ; ){
+        string temp = i->first;
+        QObject::disconnect(update_connections[temp]);
+        QObject::disconnect(think_n_do_connections[temp]);
+        ++i;
     } //стоп машина
 
 
@@ -66,7 +68,7 @@ void evolution::evolve()
     think_n_do_connections.clear();
     update_connections.clear();
     double dmnc = 0.7;
-    population.reserve(generation);
+    //population.reserve(generation);
 
     if (newGenParents.size()>1)
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
@@ -74,15 +76,15 @@ void evolution::evolve()
                 fout << endl << temp->get()->name << "\n+\n" << inner_temp->get()->name << endl;
 
                 auto ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), dmnc);
-                population.emplace(genName + ptr.get()->name,std::move(ptr));
+                population.emplace(to_string(shpId++) + "_" + genName + ptr.get()->name,std::move(ptr));
 
                 ptr = make_unique<ship_physics>(*temp->get(), *inner_temp->get(), 1-dmnc);
-                population.emplace(genName + ptr.get()->name,std::move(ptr));
+                population.emplace(to_string(shpId++) + "_" + genName + ptr.get()->name,std::move(ptr));
             }
         }
     //возвращаем родителей
     for (auto &shp: newGenParents){
-        population.emplace(shp.get()->name,std::move(shp));
+        population.emplace(to_string(shpId++) + "_" + genName + shp.get()->name, std::move(shp));
     }
 
     //проверка на антихриста
@@ -91,44 +93,41 @@ void evolution::evolve()
             population.erase(temp);
         } else ++temp;
     }
-    for(auto &par: newGenParents){
-        //population.push_back(std::move(par));
-    }
-    for (int i = population.size(); i < generation; ++i){
+    int v = population.size();
+    for (v; v < generation; ++v){
         auto ptr = make_unique<ship_physics>(575,650,0,0);
-        population.emplace(genName + ptr.get()->name,std::move(ptr));
+        population.emplace(to_string(shpId++) + "_" + genName + ptr.get()->name,std::move(ptr));
     }
     clock = 0;
     ++tst;
-    if(tst>40)
-        cnnct();
     //cnnct();
 }
 
 void evolution::evolution_stat()
 {
     ++clock;
+    cnnct();
 
-    if(clock==10){
-        for(auto &i: population){
-            if(i.second->velocity_sum<=10){
-                i.second->operational = false;
-                i.second->can_be_parent = false;
-            }
-        }
-    }
-    if(clock==500){
-        for(auto &i: population){
-            if(i.second->velocity_sum<=70){
-                i.second->operational = false;
-                i.second->can_be_parent = false;
-            }
-        }
-    }
-    //возможно поменять
+    //    if(clock==100){
+    //        for(auto &i: population){
+    //            if(i.second->velocity_sum<=2){
+    //                i.second->operational = false;
+    //                i.second->can_be_parent = false;
+    //            }
+    //        }
+    //    }
+    //    if(clock==500){
+    //        for(auto &i: population){
+    //            if(i.second->velocity_sum<=70){
+    //                i.second->operational = false;
+    //                i.second->can_be_parent = false;
+    //            }
+    //        }
+    //    }
+    //    //возможно поменять
     dscnnct();
 
-    if(clock==1200){
+    if(clock==1){
         evolve();
     }
 }
@@ -138,27 +137,21 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
 {
     this->timer=timer;
     this->map=map;
-    //int t = population.size();
-    for(auto &i: population){
-        auto temp = i.first;
-        update_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
-                                                                      [=](){population[temp]->update(*map.get());}));
-
-        think_n_do_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
-                                                                          [=](){population[temp]->think_n_do();}));
-    }
+    cnnct();
 }
 
 void evolution::cnnct()
 {
-    for(auto &i: population){
 
-        auto temp = i.first;
+    for(auto i = population.begin(); i!=population.end() ; ){
+
+        string temp = i->first;
         update_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                       [=](){population[temp]->update(*map.get());}));
 
         think_n_do_connections.emplace(temp, QObject::connect(timer.get(), &QTimer::timeout,
                                                                           [=](){population[temp]->think_n_do();}));
+        ++i;
     }
 }
 

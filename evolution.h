@@ -23,7 +23,7 @@ public:
 
     std::string genName="0x";
     std::ofstream fout;
-    char shpId = '0';
+    int shpId = 0;
     int generation;
     int clock=0;
     int min_speed = 100;
