@@ -58,9 +58,9 @@ void evolution::evolve()
     if(index.size()>0){
         for (auto &m: best){
             //auto par = population[i];
-            //newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
-            auto pal = std::make_unique<ship_physics>(575,650,0,0);
-            newGenParents.push_back(std::make_pair(std::move(pal), genName + pal.get()->name));
+            newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+//            auto pal = std::make_unique<ship_physics>(575,650,0,0);
+//            newGenParents.push_back(std::make_pair(std::move(pal), genName + pal.get()->name));
             ++i;
             if (i == 6)
                 break;
@@ -78,7 +78,6 @@ void evolution::evolve()
     if (newGenParents.size()>0){
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
-
                 fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
                 population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), dmnc));
                 fout << "first:\t\t" << genName + population.back().get()->name << "\n";
@@ -120,19 +119,17 @@ void evolution::evolution_stat()
     ++clock;
 
     if(clock>=700){
-
         for(auto &i: population){
             if(i->velocity_sum<=min_speed-40){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
-
         }
     }
     //возможно поменять
     dscnnct();
 
-    if(clock==1){
+    if(clock==900){
         evolve();
     }
 }
