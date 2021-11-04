@@ -6,7 +6,7 @@ ship_physics::ship_physics()
 }
 
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
-    ship(pos_x, pos_y)
+    ship(pos_x, pos_y), net()
 {
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -28,6 +28,19 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc)
         name.push_back('.');
     }
     change_destination(a.get_position().first,a.get_position().second);
+}
+
+ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain):
+    ship(pos_x, pos_y)
+{
+    net = newBrain;
+    name = '_'+std::to_string(net.S);
+    name.push_back('s');
+    for (auto &i: net.l){
+        name += std::to_string(i);
+        name.push_back('.');
+    }
+    change_destination(dest_x,dest_y);
 }
 
 
@@ -204,6 +217,10 @@ bool ship_physics::viable()
     return net.viable();
 }
 
+brain &ship_physics::getBrain()
+{
+    return net;
+}
 
 void ship_physics::update(polygon &map)
 {

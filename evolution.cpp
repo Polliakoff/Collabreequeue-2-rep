@@ -63,36 +63,43 @@ void evolution::evolve()
         } //отобрали пять лучших
     }
 
+
     population.clear();
     think_n_do_connections.clear();
     update_connections.clear();
 
     double dmnc = 0.7;
     population.reserve(generation);
-
-    if (newGenParents.size()>0)
+    fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
+    if (newGenParents.size()>0){
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
                 fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
                 population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), dmnc));
-                names.emplace_back(genName + population.back().get()->name);
-                fout << "first:\t\t" << names.back() << "\n";
+                fout << "first:\t\t" << genName + population.back().get()->name << "\n";
                 population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), 1-dmnc));
-                names.emplace_back(genName + population.back().get()->name);
-                fout << "second:\t\t" << names.back() << "\n\n";
+                fout << "second:\t\t" << genName + population.back().get()->name << "\n\n";
             }
         }
+    }
+
     //проверка на антихриста
     for(auto temp = population.begin(); temp!=population.end(); ){
         if(!temp->get()->viable()){
             population.erase(temp);
         } else ++temp;
     }
-    for(auto &par: newGenParents){
-        //population.push_back(std::move(par));
+    for(auto &shp: population){
+        names.emplace_back(genName + shp->name);
     }
-    for (int i = population.size(); i < generation; ++i)
+    for(auto &par: newGenParents){
+        population.emplace_back(std::make_unique<ship_physics>(575,650,0,0,par.first.get()->getBrain()));
+        names.emplace_back(par.second);
+    }
+    for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(575,650,0,0));
+        names.emplace_back(genName + population.back().get()->name);
+    }
 
     clock = 0;
     cnnct();
@@ -115,7 +122,7 @@ void evolution::evolution_stat()
     //возможно поменять
     dscnnct();
 
-    if(clock==100){
+    if(clock==800){
         evolve();
     }
 }

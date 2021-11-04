@@ -11,10 +11,11 @@ class ship_physics : public ship
 protected:
     pair<double, double> final_destination;
     brain net;
-public:
     ship_physics();
+public:
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y); // задавать корабль исключительно этим конструктором с установленной позицией
-    ship_physics(ship_physics &a, ship_physics &b, const double &dmnc);
+    ship_physics(ship_physics &a, ship_physics &b, const double &dmnc); //для наследования
+    ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain); //переносим мозг новому
 
     double velocity_x = 0, velocity_y = 0, abs_velocity;
     pair<double, double> path;
@@ -43,7 +44,7 @@ public:
     void change_destination(const double& dest_x,const double& dest_y);
     void modify_path();
     bool viable();
-
+    brain& getBrain();
 public slots:
     virtual void update(polygon &map);
     void think_n_do();
