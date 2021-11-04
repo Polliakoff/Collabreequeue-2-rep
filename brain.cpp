@@ -2,6 +2,8 @@
 
 using namespace std;
 
+int brain::ID = 0;
+
 double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
@@ -11,6 +13,7 @@ double brain::sigmoid_distance(const double &x){
 }
 
 brain::brain(){
+    ++ID;
     S = 2 + rand() % 5;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
@@ -35,6 +38,7 @@ brain::brain(){
 
 
 brain::brain(brain &a, brain &b, double dmnc){
+    ++ID;
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
                                             //тут влияние dmnc
     this->l.clear();
@@ -182,9 +186,11 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
 }
 
 void brain::mutate(){
-    //TBD
+    ofstream fout("mutate.log");
+    string fstr;
     int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
     if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
+    fstr = std::to_string(ID) + "\t S -> " + std::to_string(mutatedLayers) + "\n";
     S+=mutatedLayers;
 
     //мутирует количество слоёв
@@ -214,9 +220,12 @@ void brain::mutate(){
 
     //мутирует кол-во нейронов в слоях
     vector<int> vec(S);
+    fout << ID << "\t l -> ";
     for (auto &v: vec){
         v = int(1 == rand()%6)*(rand()%2? 1 : -1); //в одном из десяти мутация на один
+        fout << v << "\t";
     }
+    fout << "\n\n";
     vec[0]=0;
     vec[S-1]=0;
     int i = 0;

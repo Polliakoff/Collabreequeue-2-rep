@@ -37,13 +37,14 @@ void evolution::evolve()
     vector<int> index;
     int i = 0;
     for (auto &shp: population){
-        if(shp.get()->can_be_parrent){
+//        if(i < 6){
+            if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
         ++i;
     } //выбрали норм корабли //доработать
 
-    std::map<double, std::pair<std::string,int>> best;
+    std::multimap<double, std::pair<std::string,int>> best;
     for(auto &imp: index){
        best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
     }
@@ -57,9 +58,12 @@ void evolution::evolve()
     if(index.size()>0){
         for (auto &m: best){
             //auto par = population[i];
-            newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+            //newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+            auto pal = std::make_unique<ship_physics>(575,650,0,0);
+            newGenParents.push_back(std::make_pair(std::move(pal), genName + pal.get()->name));
             ++i;
-            if (i==5) break;
+            if (i == 6)
+                break;
         } //отобрали пять лучших
     }
 
@@ -74,6 +78,7 @@ void evolution::evolve()
     if (newGenParents.size()>0){
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
+
                 fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
                 population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), dmnc));
                 fout << "first:\t\t" << genName + population.back().get()->name << "\n";
@@ -127,7 +132,7 @@ void evolution::evolution_stat()
     //возможно поменять
     dscnnct();
 
-    if(clock==80){
+    if(clock==1){
         evolve();
     }
 }
