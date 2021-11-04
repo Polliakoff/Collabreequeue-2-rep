@@ -7,25 +7,29 @@ evolution::evolution()
 
 evolution::evolution(const int& generation_size, const double &start_x, const double &start_y, const double &finish_x, const double &finish_y)
 {
+    fout.open("evolution.log");
     for(int i = 0; i < generation_size; i++)
     {
         population.emplace_back(std::make_unique<ship_physics>(start_x,start_y,finish_x,finish_y));
+        names.emplace_back(genName + population.back().get()->name);
     }
     generation = generation_size;
 }
 
 void evolution::evolve()
 {
-    dscnnct();
-    ++tst;
-    if(tst>5)
-        tst++;
+    //dscnnct();
+
+    if(genName[1]=='z') {
+            genName[0] = int(genName[0])+1;
+            genName[1] = 'a';
+        } else
+            genName[1]=char(genName[1])+1;
+
     int num = 0;
-    for(auto &i: population){
-        //if(i.get()->operational){
+    for(auto &shp: population){
         QObject::disconnect(update_connections[num]);
         QObject::disconnect(think_n_do_connections[num]);
-        //}
         ++num;
     } //стоп машина
 
@@ -37,33 +41,45 @@ void evolution::evolve()
             index.push_back(i);
         }
         ++i;
-    } //выбрали норм корабли
+    } //выбрали норм корабли //доработать
 
-    std::map<double, int> best;
-    for(auto &imp: index){
-       best.emplace(population[imp].get()->distance_to_finish, imp);
+    std::map<double, std::pair<std::string,int>> best;
+    for(auto &imp: index){ 
+       best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
     }
 
     i=0;
-    vector <std::unique_ptr<ship_physics>> newGenParents;
-    if(index.size()>0)
+    vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
+
+    names.clear();
+    names.reserve(generation);
+
+    if(index.size()>0){
         for (auto &m: best){
             //auto par = population[i];
-            newGenParents.push_back(std::move(population[m.second]));
+            newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
             ++i;
             if (i==5) break;
         } //отобрали пять лучших
+    }
 
     population.clear();
     think_n_do_connections.clear();
     update_connections.clear();
+
     double dmnc = 0.7;
     population.reserve(generation);
+
     if (newGenParents.size()>0)
         for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
             for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
-                population.emplace_back(std::make_unique<ship_physics>(*temp->get(), *inner_temp->get(), dmnc));
-                population.emplace_back(std::make_unique<ship_physics>(*temp->get(), *inner_temp->get(), 1-dmnc));
+                fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
+                population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), dmnc));
+                names.emplace_back(genName + population.back().get()->name);
+                fout << "first:\t\t" << names.back() << "\n";
+                population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), 1-dmnc));
+                names.emplace_back(genName + population.back().get()->name);
+                fout << "second:\t\t" << names.back() << "\n\n";
             }
         }
     //проверка на антихриста

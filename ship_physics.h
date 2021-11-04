@@ -3,14 +3,12 @@
 #pragma once
 
 #include "ship.h"
-#include <cmath>
 #include "brain.h"
 #include <string>
 
 class ship_physics : public ship
 {
 protected:
-
     pair<double, double> final_destination;
     brain net;
 public:

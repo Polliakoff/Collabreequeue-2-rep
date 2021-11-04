@@ -5,7 +5,8 @@
 #include <vector>
 #include "straight_line.h"
 #include "polygon.h"
-#include "brain.h"
+//#include "brain.h"
+#include <QDataStream>
 
 
 class ship

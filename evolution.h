@@ -2,8 +2,6 @@
 #define EVOLUTION_H
 
 #include "ship_physics.h"
-//#include "func.h"
-//#include <vector>
 #include <memory>
 #include <algorithm>
 #include <map>
@@ -13,15 +11,19 @@
 
 class evolution
 {
-public:
+protected:
     evolution();//не трогать
+public:
+    std::ofstream fout;
+    std::string genName="0x";
     evolution(const int& generation_size, const double& start_x,const double& start_y,const double& finish_x,const double& finish_y);
 
     int generation;
     int clock=0;
     int min_speed = 100;
     int tst=0;
-    vector <std::unique_ptr<ship_physics>> population;
+    vector<std::unique_ptr<ship_physics>> population;
+    vector<std::string> names;
     vector<QMetaObject::Connection> update_connections;
     vector<QMetaObject::Connection> think_n_do_connections;
 

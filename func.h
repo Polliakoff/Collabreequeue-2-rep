@@ -1,5 +1,3 @@
-//#ifndef FUNC_H
-//#define FUNC_H
 #pragma once
 
 #include <cmath>
@@ -10,4 +8,4 @@ double skalar_multipl(const double &x1,const double &y1,const double &x2,const d
 double vectors_projection(const double &x1, const double &y1, const double &x2, const double &y2);
 double vectors_angle(const double &x1, const double &y1, const double &x2, const double &y2);
 
-//#endif // FUNC_H
+

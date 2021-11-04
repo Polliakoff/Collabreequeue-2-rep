@@ -11,8 +11,9 @@
 
 class brain
 {
-private:
+protected:
     double sigmoid(const double&);
+    double sigmoid_distance(const double&);
     int first=14;   //количество входных слоёв
     int last=4;     //количество выходных
     void inheritWeights(brain &a, brain &b, double dmnc);

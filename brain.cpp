@@ -6,6 +6,10 @@ double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
 
+double brain::sigmoid_distance(const double &x){
+    return 1/(1+exp(-x/2-15));
+}
+
 brain::brain(){
     S = 2 + rand() % 5;//максимум пять внутренних слоёв
     l.reserve(S);
@@ -264,6 +268,9 @@ void brain::mutate(){
 
 void brain::think(){
     int i = 0;
+    for (int k = 0; k<6; ++k){
+        A[0](k)=sigmoid_distance(A[0](k));
+    }
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
         for(auto &a: A[i + 1]){

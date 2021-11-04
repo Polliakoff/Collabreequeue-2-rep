@@ -2,11 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ship_physics.h"
-#include "pathway.h"
 #include <QGraphicsScene>
-#include <QTimer>
-//#include <vector>
 #include <cstdlib>
 #include "evolution.h"
 
