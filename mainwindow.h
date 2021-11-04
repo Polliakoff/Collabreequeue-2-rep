@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <cstdlib>
 #include "evolution.h"
-#include "evolution_obj.h"
+#include "evolution.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

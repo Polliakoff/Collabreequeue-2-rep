@@ -70,6 +70,7 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
     int ship_number = 0;
+    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution.genName));
     for(auto shp = ship_evolution.population.begin(); shp!=ship_evolution.population.end(); ){
 
         if(shp->get()->operational){

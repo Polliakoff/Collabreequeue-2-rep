@@ -10,7 +10,6 @@ INCLUDEPATH += "$$PWD/eigen-3.4.0"
 
 SOURCES += \
     evolution.cpp \
-    evolution_obj.cpp \
     func.cpp \
     brain.cpp \
     main.cpp \
@@ -23,7 +22,6 @@ SOURCES += \
 
 HEADERS += \
     evolution.h \
-    evolution_obj.h \
     func.h \
     brain.h \
     mainwindow.h \
