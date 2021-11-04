@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <cstdlib>
 #include "evolution.h"
+#include "evolution_obj.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,11 +35,13 @@ private slots:
 
     void on_pushButton_7_clicked();
 
+    void genNameSet(std::string name);
+
 private:
     Ui::MainWindow *ui;
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
-    std::unique_ptr<evolution> ship_evolution;
+    evolution ship_evolution;
     //vector <std::unique_ptr<ship_physics>> korablik;
 ///тестовый
     std::unique_ptr<ship_physics> test_ship;

@@ -3,13 +3,13 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow),
+      ship_evolution(60,575,650,0,0)
 {
     ui->setupUi(this);
 
     scene = std::make_unique<QGraphicsScene>();
 
-    ship_evolution = std::make_unique<evolution>(60,575,650,0,0);
     ///===========тестовый
     test_ship = std::make_unique<ship_physics>(575,650,0,0);
     ///===========тестовый
@@ -49,9 +49,11 @@ void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
 
-    connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
+    connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution.evolution_stat();});
 
-    ship_evolution->cnnct(timer, map);
+    connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
+
+    ship_evolution.cnnct(timer, map);
     ///===========тестовый
     test_update_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
     test_think_n_do_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
@@ -68,7 +70,7 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
     int ship_number = 0;
-    for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
+    for(auto shp = ship_evolution.population.begin(); shp!=ship_evolution.population.end(); ){
 
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());
@@ -121,7 +123,7 @@ void MainWindow::painter()
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
-    ui->lineEdit_4->setText(QString::number(ship_evolution->clock));
+    ui->lineEdit_4->setText(QString::number(ship_evolution.clock));
     ui->lineEdit_5->setText(QString::number(test_ship->fuel_consumption));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
@@ -193,5 +195,10 @@ void MainWindow::on_pushButton_7_clicked()
     if (tmblr_time == true) timer->stop();
     else timer->start(0);
 
+}
+
+void MainWindow::genNameSet(std::string name)
+{
+    ui->lineEdit_11->setText(QString::fromStdString(name));
 }
 ///===========тестовый
