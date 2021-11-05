@@ -244,6 +244,9 @@ void ship_physics::update(polygon &map)
     if(collided){
         can_be_parrent = false;
     }
+    if(get_position().second >= 325){
+        can_be_parrent = false;
+    }
     if(fuel <= 0 || collided){
         operational = false;
     }
