@@ -13,7 +13,7 @@ double brain::sigmoid_distance(const double &x){
 }
 
 brain::brain(){
-    S = 2 + rand() % 5;//максимум пять внутренних слоёв
+    S = 3 + rand() % 5;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
@@ -184,18 +184,18 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
 }
 
 void brain::mutate(){
-    ofstream fout("mutate" + std::to_string(++ID) + ".log");
-    string name;
-    name = '_'+std::to_string(S);
-    name.push_back('s');
-    for (auto &i: l){
-        name += std::to_string(i);
-        name.push_back('.');
-    }
+//    ofstream fout("mutate" + std::to_string(++ID) + ".log");
+//    string name;
+//    name = '_'+std::to_string(S);
+//    name.push_back('s');
+//    for (auto &i: l){
+//        name += std::to_string(i);
+//        name.push_back('.');
+//    }
 
     int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
     if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
-    fout << name << "\n" << std::to_string(ID) + "\t S -> " + std::to_string(mutatedLayers) + "\n";
+//    fout << name << "\n" << std::to_string(ID) + "\t S -> " + std::to_string(mutatedLayers) + "\n";
     S+=mutatedLayers;
 
     //мутирует количество слоёв
@@ -225,17 +225,17 @@ void brain::mutate(){
 
     //мутирует кол-во нейронов в слоях
     vector<int> vec(S);
-    fout << ID << "\t l -> ";
+//    fout << ID << "\t l -> ";
     for (auto &v: vec){
         v = int(1 == rand()%6)*(rand()%2? 1 : 1); //в одном из десяти мутация на один
     }
 
     vec[0]=0;
     vec[S-1]=0;
-    for (auto &v: vec){
-        fout << v << "\t";
-    }
-    fout << "\n\n";
+//    for (auto &v: vec){
+//        fout << v << "\t";
+//    }
+//    fout << "\n\n";
     int i = 0;
 
     for (auto v = vec.begin(); v+1!=vec.end(); ++v){
@@ -286,7 +286,7 @@ void brain::mutate(){
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
-        A[0](k)=sigmoid_distance(A[0](k));
+        A[0](k)=1-sigmoid_distance(A[0](k));
     }
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
