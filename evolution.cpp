@@ -59,6 +59,7 @@ void evolution::evolve()
         for (auto &m: best){
             //auto par = population[i];
             newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+            ////не убирать, для проверки скрещивания
 //            auto pal = std::make_unique<ship_physics>(575,650,0,0);
 //            newGenParents.push_back(std::make_pair(std::move(pal), genName + pal.get()->name));
             ++i;
@@ -72,7 +73,7 @@ void evolution::evolve()
     think_n_do_connections.clear();
     update_connections.clear();
 
-    double dmnc = 0.7;
+    double dmnc = 0.6;
     population.reserve(generation);
     fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
     if (newGenParents.size()>0){
@@ -129,7 +130,7 @@ void evolution::evolution_stat()
     //возможно поменять
     dscnnct();
 
-    if(clock==900){
+    if(clock==1500){
         evolve();
     }
 }
