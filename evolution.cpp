@@ -1,10 +1,10 @@
 #include "evolution.h"
 
-evolution::evolution(QObject *parent) : QObject(parent)
+/*evolution::evolution(QObject *parent) : QObject(parent)
 {
 
 }
-
+*/
 evolution::evolution(const int& generation_size, const double &start_x, const double &start_y, const double &finish_x, const double &finish_y)
 {
     fout.open("evolution_obj.log");
@@ -107,7 +107,7 @@ void evolution::evolve()
     }
 
     clock = 0;
-    emit evolution::valueChanged(genName);
+    //emit evolution::valueChanged(genName);
     cnnct();
 }
 

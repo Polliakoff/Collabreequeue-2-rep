@@ -51,7 +51,7 @@ void MainWindow::on_pushButton_clicked()
 
     connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution.evolution_stat();});
 
-    connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
+    //connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
 
     ship_evolution.cnnct(timer, map);
     ///===========тестовый

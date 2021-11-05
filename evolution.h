@@ -1,7 +1,7 @@
 #ifndef EVOLUTIONH_H
 #define EVOLUTIONH_H
 
-#include <QObject>
+//#include <QObject>
 #include "ship_physics.h"
 #include <memory>
 #include <algorithm>
@@ -10,11 +10,11 @@
 #include "pathway.h"
 
 
-class evolution : public QObject
+class evolution /*: public QObject*/
 {
-    Q_OBJECT
-public:
-    explicit evolution(QObject *parent = nullptr);
+    //Q_OBJECT
+/*public:
+    explicit evolution(QObject *parent = nullptr);*/
 protected:
 
     std::ofstream fout;
@@ -42,8 +42,8 @@ public:
     std::shared_ptr<QTimer> timer;
 public slots:
     void evolution_stat();
-signals:
-    void valueChanged(std::string newName);
+//signals:
+    //void valueChanged(std::string newName);
 
 };
 
