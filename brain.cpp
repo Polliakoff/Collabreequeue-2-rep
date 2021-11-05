@@ -13,7 +13,7 @@ double brain::sigmoid_distance(const double &x){
 }
 
 brain::brain(){
-    S = 3 + rand() % 5;//максимум пять внутренних слоёв
+    S = 5 + rand() % 6;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин

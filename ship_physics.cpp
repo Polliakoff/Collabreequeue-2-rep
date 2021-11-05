@@ -18,7 +18,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
 }
 
 ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc):
-    ship(575,650),
+    ship(575,550),
     net(a.net, b.net, dmnc)
 {
     name = '_'+std::to_string(net.S);

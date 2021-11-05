@@ -4,16 +4,17 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-      ship_evolution(60,575,650,0,0)
+      ship_evolution(600,575,550,0,0)
 {
     ui->setupUi(this);
 
     scene = std::make_unique<QGraphicsScene>();
 
     ///===========тестовый
-    test_ship = std::make_unique<ship_physics>(575,650,0,0);
+    test_ship = std::make_unique<ship_physics>(575,550,0,0);
     ///===========тестовый
-    timer = std::make_unique<QTimer>();
+    update_timer = std::make_unique<QTimer>();
+    painter_timer = std::make_unique<QTimer>();
 
     map = std::make_unique<pathway>();
     //    map->add_point(250,250);
@@ -49,19 +50,21 @@ void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
 
-    connect(timer.get(), &QTimer::timeout,  [=](){ship_evolution.evolution_stat();});
+    connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution.evolution_stat();});
 
     //connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
 
-    ship_evolution.cnnct(timer, map);
+    ship_evolution.cnnct(update_timer, map);
     ///===========тестовый
-    test_update_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
-    test_think_n_do_connection = connect(timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
+    test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
+    test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
     ///===========тестовый
-    connect(timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+    connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+    connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
     //disconnect(timer.get(), &QTimer::timeout,)
 
-    timer->start(0);
+    update_timer->start(1);
+    painter_timer->start(100);
 
 }
 
@@ -69,10 +72,7 @@ void MainWindow::painter()
 {
     scene->clear();
     qdraw_polygon(*map,scene.get());
-    int ship_number = 0;
-    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution.genName));
     for(auto shp = ship_evolution.population.begin(); shp!=ship_evolution.population.end(); ){
-
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());
 
@@ -90,17 +90,7 @@ void MainWindow::painter()
             scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
             scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
         }
-
-
-//        if(!shp->get()->operational) {
-//            disconnect(ship_evolution.get()->update_connections[ship_number]);
-//            disconnect(ship_evolution.get()->think_n_do_connections[ship_number]);
-//            //            korablik.erase(shp);
-//            //            update_connections.erase(update_connections.begin() + ship_number);
-//            //            think_n_do_connections.erase(think_n_do_connections.begin() + ship_number);
-//        }
         ++shp;
-        //++ship_number;
     }
 
     ///===========тестовый
@@ -121,6 +111,24 @@ void MainWindow::painter()
         scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
         scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
     }
+
+    scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
+    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
+                   test_ship->get_position().first+test_ship->path.first,test_ship->get_position().second+test_ship->path.second, QPen(Qt::red));
+    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
+                   test_ship->get_position().first+test_ship->velocity_x*50,test_ship->get_position().second+test_ship->velocity_y*50, QPen(Qt::blue));
+    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
+                   test_ship->get_position().first+(test_ship->path.first*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
+                   test_ship->get_position().second+(test_ship->path.second*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
+                   QPen(Qt::green));
+    ///===========тестовый
+}
+
+void MainWindow::gauges()
+{
+    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution.genName));
+
+    ///===========тестовый
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
@@ -131,18 +139,8 @@ void MainWindow::painter()
     ui->lineEdit_8->setText(QString::number(test_ship->velocity_sum));
     ui->lineEdit_9->setText(QString::number(test_ship->ship_and_velocity_angle));
     ui->lineEdit_10->setText(QString::number(test_ship->fuel));
-    scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
-    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
-                   test_ship->get_position().first+test_ship->path.first,test_ship->get_position().second+test_ship->path.second, QPen(Qt::red));
-    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
-                   test_ship->get_position().first+test_ship->velocity_x*50,test_ship->get_position().second+test_ship->velocity_y*50, QPen(Qt::blue));
-    scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
-                   test_ship->get_position().first+(test_ship->path.first*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
-                   test_ship->get_position().second+(test_ship->path.second*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
-                   QPen(Qt::green));
 
     if(!test_ship->operational) {
-        //test_ship = std::make_unique<ship_physics>(700,700,0,0);
         disconnect(test_update_connection);
         disconnect(test_think_n_do_connection);
     }
@@ -193,8 +191,14 @@ void MainWindow::on_pushButton_6_clicked()
 void MainWindow::on_pushButton_7_clicked()
 {
     tmblr_time =! tmblr_time;
-    if (tmblr_time == true) timer->stop();
-    else timer->start(0);
+    if (tmblr_time == true) {
+        update_timer->stop();
+        painter_timer->stop();
+    }
+    else {
+        update_timer->start(1);
+        painter_timer->start(200);
+    }
 
 }
 

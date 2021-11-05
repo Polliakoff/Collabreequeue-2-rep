@@ -21,7 +21,10 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+
     void painter();
+
+    void gauges();
 
     void on_pushButton_2_clicked();
 
@@ -49,7 +52,8 @@ private:
     QMetaObject::Connection test_think_n_do_connection;
 ///тестовый
     std::shared_ptr<pathway> map;
-    std::shared_ptr<QTimer> timer;
+    std::shared_ptr<QTimer> update_timer;
+    std::shared_ptr<QTimer> painter_timer;
     double neuron1 = 0, neuron2 = 0, neuron3 = 0, neuron4 = 0;
     bool tmblr_1 = false, tmblr_2 = false, tmblr_3 = false, tmblr_4 = false, tmblr_time = false;
 
