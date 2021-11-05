@@ -28,6 +28,10 @@ void evolution::evolve()
 
     int num = 0;
     for(auto &shp: population){
+        if(shp->get_position().second >= 325)
+        {
+            shp->can_be_parrent = false;
+        }
         QObject::disconnect(update_connections[num]);
         QObject::disconnect(think_n_do_connections[num]);
         ++num;
