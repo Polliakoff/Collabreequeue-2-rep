@@ -157,6 +157,13 @@ void evolution::evolution_stat()
         }
     }
     if(ready_to_evolve){
+        for(auto &i: population){
+            if(i->get_position().second>300){
+                i->can_be_parrent = false;
+            } else if(i->distance_to_finish < 350){
+                i->can_be_parrent = true;
+            }
+        }
         evolve();
     }
 

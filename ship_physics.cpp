@@ -1,5 +1,7 @@
 #include "ship_physics.h"
 
+int ship_physics::test = 0;
+
 ship_physics::ship_physics()
 {
 
@@ -163,6 +165,9 @@ void ship_physics::helm(const int &mode2)
 
 void ship_physics::brainstorm()
 {
+    ++test;
+    if (test == 8000)
+        --test;
     net.A[0](0)=distances[0];
     net.A[0](1)=distances[1];
     net.A[0](2)=distances[2];

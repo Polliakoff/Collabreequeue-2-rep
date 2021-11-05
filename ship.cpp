@@ -23,7 +23,8 @@ ship::ship(const double& pos_x,const double& pos_y)
     }
     point_seen.resize(6);
 
-    rotate_by(-180+rand()%360);
+    //rotate_by(((rand()%50)/100.0)*M_PI/2);
+    //rotate_by(M_PI/6);
 }
 
 ship::~ship()

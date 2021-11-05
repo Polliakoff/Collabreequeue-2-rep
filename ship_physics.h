@@ -45,6 +45,7 @@ public:
     void modify_path();
     bool viable();
     brain& getBrain();
+    static int test;
 public slots:
     virtual void update(polygon &map);
     void think_n_do();

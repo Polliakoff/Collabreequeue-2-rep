@@ -9,11 +9,11 @@ double brain::sigmoid(const double &x){
 }
 
 double brain::sigmoid_distance(const double &x){
-    return 1/(1+exp(-x/2-15));
+    return 1/(1+exp((-x-30)/2));
 }
 
 brain::brain(){
-    S = 5 + rand() % 6;//максимум пять внутренних слоёв
+    S = 4 + rand() % 7;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
@@ -286,7 +286,7 @@ void brain::mutate(){
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
-        A[0](k)=1-sigmoid_distance(A[0](k));
+        A[0](k)=sigmoid_distance(A[0](k));
     }
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
