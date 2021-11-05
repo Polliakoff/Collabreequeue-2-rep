@@ -138,9 +138,18 @@ void ship_physics::helm(const int &mode2)
         else if (angular_velocity < 0) angular_velocity += agility;
         if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
     }
-    if (mode2 == 2) angular_velocity += agility;
-    if (mode2 == 3) angular_velocity -= agility;
-
+    if (mode2 == 2)
+    {
+        angular_velocity += agility;
+        fuel_consumption += 0.5;
+        fuel -= fuel_consumption;
+    }
+    if (mode2 == 3)
+    {
+        angular_velocity -= agility;
+        fuel_consumption += 0.5;
+        fuel -= fuel_consumption;
+    }
     if (angular_velocity > max_maneuver)
     {
         angular_velocity = max_maneuver;
