@@ -81,6 +81,9 @@ void evolution::evolve()
     double dmnc = 0.6;
     population.reserve(generation);
     fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
+    if(newGenParents.size()==1){
+         fout << "single parrent:\t" << newGenParents[0].second << "\n";
+    }
     for(int t = 2; t>0; --t){
         if (newGenParents.size()>0){
             for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
@@ -171,9 +174,9 @@ void evolution::evolution_stat()
         for(auto &i: population){
             if(i->get_position().second>300){
                 i->can_be_parrent = false;
-            } else if(i->distance_to_finish <= 450){
+            } /*else if(i->distance_to_finish <= 450){
                 i->can_be_parrent = true;
-            }
+            }*/
         }
         evolve();
     }

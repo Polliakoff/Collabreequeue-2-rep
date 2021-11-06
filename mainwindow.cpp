@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     scene = std::make_unique<QGraphicsScene>();
 
     ///===========тестовый
-    test_ship = std::make_unique<ship_physics>(575,550,0,0);
+    test_ship = std::make_unique<ship_physics>(575,550,0,125);
     ///===========тестовый
     update_timer = std::make_unique<QTimer>();
     painter_timer = std::make_unique<QTimer>();
