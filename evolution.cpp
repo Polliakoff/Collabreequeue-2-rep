@@ -20,11 +20,16 @@ void evolution::evolve()
     //dscnnct();
     fout.open("evolution_obj.log", std::ios::app);
 
-    if(genName[1]=='z') {
-        genName[0] = int(genName[0])+1;
-        genName[1] = 'a';
-    } else
-        genName[1]=char(genName[1])+1;
+    if(genName[3]=='z') {
+        if (genName[2]=='9'){
+            genName[2] = '0';
+            if (genName[1]=='9'){
+                genName[1] = '0';
+                genName[0] = int(genName[0])+1;
+            } else genName[1] = int(genName[1])+1; //меняет цифру
+        } else genName[2] = int(genName[2])+1; //меняет цифру
+        genName[3] = 'a';
+    } else genName[3]=char(genName[3])+1; //меняет букву
 
     int num = 0;
     for(auto &shp: population){

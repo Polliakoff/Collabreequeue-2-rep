@@ -79,7 +79,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         this->W.emplace_back(l[lt],l[lt+1]);
         for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < a.l[lt] && i < b.l[lt] && i < l[lt]; ++i){
-                this->W[lt](i,j)=((a.W[lt](i,j)+b.W[lt](i,j))/2.0)*(95+(rand()%11))/100.0; ////вот тут шум
+                this->W[lt](i,j) = (a.W[lt](i,j)+b.W[lt](i,j))/2.0;
+                this->W[lt](i,j)*= (2/(exp(this->W[lt](i,j)*10))+1)*(95+(rand()%11)/100.0); ////вот тут шум
                 //cout << i << "\t" << j << "\n"; //11,6 проверка
             }
         }
@@ -91,7 +92,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
             for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
                  temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
-                    this->W[lt](i,temp) = abMax.W[lt](i,temp)*(95+(rand()%11))/100.0; ////вот тут шум
+                    this->W[lt](i,temp) = abMax.W[lt](i,temp);
+                    this->W[lt](i,temp)*= (2/(exp(this->W[lt](i,temp)*10))+1)*(95+(rand()%11)/100.0); ////вот тут шум
                                                                                     //берем веса большей матрицы
                 }
             }
@@ -104,14 +106,16 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
             for (int temp = abMin.l[lt]; //берем за начальную точку конец меньшей матрицы
                  temp < this->l[lt]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
-                    this->W[lt](temp,i) = abMax.W[lt](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум
+                    this->W[lt](temp,i) = abMax.W[lt](temp,i);
+                    this->W[lt](temp,i)*= (2/(exp(this->W[lt](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                     //берем веса большей матрицы
                 }
             }
             for(int temp = abMin.l[lt]; //разница между максимумом
                 temp < this->l[lt]; ++temp)
                 for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
-                    this->W[lt](temp,i) = abMax.W[lt](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум
+                    this->W[lt](temp,i) = abMax.W[lt](temp,i);
+                    this->W[lt](temp,i) *= (2/(exp(this->W[lt](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                     //берем веса большей матрицы
                 }
         }
@@ -127,7 +131,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         this->W.emplace_back(l[lt],l[lt+1]);
         for (int j = 0; j < abMax.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
-                this->W[lt](i,j) = abMax.W[lt](i,j)*(95+(rand()%11))/100.0; ////вот тут шум
+                this->W[lt](i,j) = abMax.W[lt](i,j);
+                this->W[lt](i,j) *= (2/(exp(this->W[lt](i,j)*10))+1)*(95+(rand()%11))/100.0;
                 //просто берём
             }
         }
@@ -157,7 +162,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
 
     for (int j = 0; j < a.l[a.S-1] && j < b.l[b.S-1]; ++j){
         for (int i = 0; i < a.l[a.S-2] && i < b.l[b.S-2]; ++i){
-            this->W[S-2](i,j)=((a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0)*(95+(rand()%11))/100.0; ////вот тут шум
+            this->W[S-2](i,j) = (a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0;
+            this->W[S-2](i,j)*= (2/(exp(this->W[S-2](i,j)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
         }
     }
 
@@ -169,7 +175,8 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int temp = abMin.l[abMin.S-2]; //берем за начальную точку конец меньшей матрицы
              temp < this->l[S-2] && temp < abMax.l[abMax.S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
-                this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i)*(95+(rand()%11))/100.0; ////вот тут шум;
+                this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i);
+                this->W[S-2](temp,i)*= (2/(exp(this->W[S-2](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                                                             //берем веса большей матрицы
             }
         }
@@ -177,7 +184,7 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int temp = abMax.l[abMax.S-2]; //берем за начальную точку конец БОЛЬШЕЙ матрицы
              temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
-                this->W[S-2](temp,i) = (-100+rand()%201)/100.0;
+                this->W[S-2](temp,i) = (-50+rand()%101)/100.0;
             }
         }
     }
