@@ -7,7 +7,7 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     for(int i = 0; i < generation_size; i++)
     {
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
-                                                               map->final_point.first,map->start_point.second));
+                                                               map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
     }
     generation = generation_size;
@@ -103,11 +103,13 @@ void evolution::evolve()
         names.emplace_back(genName + shp->name);
     }
     for(auto &par: newGenParents){
-        population.emplace_back(std::make_unique<ship_physics>(575,550,0,0,par.first.get()->getBrain()));
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
         names.emplace_back(par.second);
     }
     for (int i = population.size(); i < generation; ++i){
-        population.emplace_back(std::make_unique<ship_physics>(575,550,0,0));
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
     }
 
