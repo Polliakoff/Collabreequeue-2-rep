@@ -1,19 +1,22 @@
 #include "ship_physics.h"
 
+//int ship_physics::test = 0;
+
 ship_physics::ship_physics()
 {
-
 }
 
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
     ship(pos_x, pos_y), net()
 {
+//    id = ++test;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
         name += std::to_string(i);
         name.push_back('.');
     }
+
     change_destination(dest_x,dest_y);
 }
 
@@ -21,18 +24,21 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc)
     ship(575,550),
     net(a.net, b.net, dmnc)
 {
+//    id = ++test;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
         name += std::to_string(i);
         name.push_back('.');
     }
-    change_destination(a.get_position().first,a.get_position().second);
+
+    change_destination(a.final_destination.first,a.final_destination.second);
 }
 
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain):
     ship(pos_x, pos_y)
 {
+//    id = ++test;
     net = newBrain;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -40,6 +46,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
         name += std::to_string(i);
         name.push_back('.');
     }
+
     change_destination(dest_x,dest_y);
 }
 
@@ -162,7 +169,10 @@ void ship_physics::helm(const int &mode2)
 }
 
 void ship_physics::brainstorm()
-{
+{/*
+    //++test;
+    if (test == 8000)
+        --test;*/
     net.A[0](0)=distances[0];
     net.A[0](1)=distances[1];
     net.A[0](2)=distances[2];
@@ -237,11 +247,9 @@ void ship_physics::update(polygon &map)
     modify_path();
     velocity_sum+=abs_velocity;
     if(collided){
-        //can_be_parrent = false;
+        can_be_parrent = false;
     }
-
-    if(fuel <= 0 || collided)
-    {
+    if(fuel <= 0 || collided){
         operational = false;
     }
     distance_to_finish = vector_module(path.first,path.second);

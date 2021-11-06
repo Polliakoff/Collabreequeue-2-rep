@@ -15,6 +15,10 @@ class evolution /*: public QObject*/
     //Q_OBJECT
 /*public:
     explicit evolution(QObject *parent = nullptr);*/
+private:
+    void sanity_check(vector<std::unique_ptr<ship_physics>> population, vector<int> index,
+                      std::multimap<double, std::pair<std::string,int>> best,
+                      vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents);
 protected:
 
     std::ofstream fout;
