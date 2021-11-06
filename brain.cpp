@@ -9,7 +9,7 @@ double brain::sigmoid(const double &x){
 }
 
 double brain::sigmoid_distance(const double &x){
-    return 1/(1+exp((-x-30)/2));
+    return 1/(1+exp((-x-80)/5));
 }
 
 brain::brain(){
