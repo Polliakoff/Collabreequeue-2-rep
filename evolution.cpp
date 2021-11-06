@@ -1,10 +1,5 @@
 #include "evolution.h"
 
-/*evolution::evolution(QObject *parent) : QObject(parent)
-{
-
-}
-*/
 evolution::evolution(const int& generation_size, const double &start_x, const double &start_y, const double &finish_x, const double &finish_y)
 {
     fout.open("evolution_obj.log");
@@ -53,22 +48,8 @@ void evolution::evolve()
 
     i=0;
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
-//    bool check_champion = false;
     if(index.size()>0){
         for (auto &m: best){
-
-//            if(check_champion == false){
-//                if(population[m.second.second]->is_champion==false){
-//                    population[m.second.second]->is_champion=true;
-//                }
-//                check_champion = true;
-//            }
-//            if(check_champion){
-//                if(population[m.second.second]->is_champion){
-//                    population[m.second.second]->is_champion=false;
-//                }
-//            }
-
             //auto par = population[i];
             newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
             ////не убирать, для проверки скрещивания
@@ -80,11 +61,8 @@ void evolution::evolve()
         } //отобрали пять лучших
     }
 
-//    sanity_check(population, index, best, newGenParents);
-
     names.clear();
     names.reserve(generation);
-
 
     population.clear();
     think_n_do_connections.clear();

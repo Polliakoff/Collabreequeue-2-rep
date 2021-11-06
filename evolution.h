@@ -10,11 +10,9 @@
 #include "pathway.h"
 
 
-class evolution /*: public QObject*/
+class evolution
 {
-    //Q_OBJECT
-/*public:
-    explicit evolution(QObject *parent = nullptr);*/
+
 private:
     void sanity_check(vector<std::unique_ptr<ship_physics>> population, vector<int> index,
                       std::multimap<double, std::pair<std::string,int>> best,
@@ -41,13 +39,10 @@ public:
     void cnnct();
     void dscnnct();
     void evolve();
-    //void disconnect(std::vector<QMetaObject::Connection> a, std::vector<QMetaObject::Connection> b);
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
 public slots:
     void evolution_stat();
-//signals:
-    //void valueChanged(std::string newName);
 
 };
 
