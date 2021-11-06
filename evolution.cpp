@@ -9,11 +9,14 @@ evolution::evolution(const int& generation_size, const double &start_x, const do
         names.emplace_back(genName + population.back().get()->name);
     }
     generation = generation_size;
+    fout << "";
+    fout.close();
 }
 
 void evolution::evolve()
 {
     //dscnnct();
+    fout.open("evolution_obj.log", std::ios::app);
 
     if(genName[1]=='z') {
         genName[0] = int(genName[0])+1;
@@ -104,6 +107,7 @@ void evolution::evolve()
         names.emplace_back(genName + population.back().get()->name);
     }
 
+    fout.close();
     clock = 0;
     //emit evolution::valueChanged(genName);
     cnnct();
