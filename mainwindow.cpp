@@ -3,8 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow),
-      ship_evolution(600,575,550,0,0)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -16,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     update_timer = std::make_unique<QTimer>();
     painter_timer = std::make_unique<QTimer>();
 
-    map = std::make_unique<pathway>();
+    map = std::make_shared<pathway>();
+    ship_evolution = std::make_unique<evolution>(600,map);
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
@@ -50,11 +50,11 @@ void MainWindow::on_pushButton_clicked()
 {
     ui->graphicsView->setScene(scene.get());
 
-    connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution.evolution_stat();});
+    connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
 
     //connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
 
-    ship_evolution.cnnct(update_timer, map);
+    ship_evolution->cnnct(update_timer);
     ///===========тестовый
     test_ship->fuel+=10000;
     test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
@@ -73,7 +73,7 @@ void MainWindow::painter()
 {
     scene->clear();
     qdraw_polygon(*map,scene.get());
-    for(auto shp = ship_evolution.population.begin(); shp!=ship_evolution.population.end(); ){
+    for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());
 
@@ -127,13 +127,13 @@ void MainWindow::painter()
 
 void MainWindow::gauges()
 {
-    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution.genName));
+    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
 
     ///===========тестовый
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
-    ui->lineEdit_4->setText(QString::number(ship_evolution.clock));
+    ui->lineEdit_4->setText(QString::number(ship_evolution->clock));
     ui->lineEdit_5->setText(QString::number(test_ship->fuel_consumption));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));

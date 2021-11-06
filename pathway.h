@@ -6,6 +6,8 @@
 class pathway : public polygon
 {
 public:
+    pair<double, double> final_point;
+    pair<double, double> start_point;
     pathway();
     ~pathway();
     void make_my_way();

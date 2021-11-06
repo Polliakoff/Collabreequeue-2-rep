@@ -1,11 +1,13 @@
 #include "evolution.h"
 
-evolution::evolution(const int& generation_size, const double &start_x, const double &start_y, const double &finish_x, const double &finish_y)
+evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
+    map = pthw;
     for(int i = 0; i < generation_size; i++)
     {
-        population.emplace_back(std::make_unique<ship_physics>(start_x,start_y,finish_x,finish_y));
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->start_point.second));
         names.emplace_back(genName + population.back().get()->name);
     }
     generation = generation_size;
@@ -79,9 +81,11 @@ void evolution::evolve()
             for (auto temp = newGenParents.begin(); temp+1!=newGenParents.end(); ++temp){
                 for (auto inner_temp = temp+1; inner_temp!=newGenParents.end(); ++inner_temp){
                     fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
-                    population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), dmnc));
+                    population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
+                                                                           dmnc,map->start_point.first,map->start_point.second));
                     fout << "first:\t\t" << genName + population.back().get()->name << "\n";
-                    population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(), 1-dmnc));
+                    population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
+                                                                           1-dmnc,map->start_point.first,map->start_point.second));
                     fout << "second:\t\t" << genName + population.back().get()->name << "\n\n";
                 }
             }
@@ -109,7 +113,6 @@ void evolution::evolve()
 
     fout.close();
     clock = 0;
-    //emit evolution::valueChanged(genName);
     cnnct();
 }
 
@@ -170,10 +173,23 @@ void evolution::evolution_stat()
 }
 
 
-void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &map)
+void evolution::cnnct(std::shared_ptr<QTimer> &timer)
 {
     this->timer=timer;
-    this->map=map;
+    int t = population.size();
+    for(int i = 0; i < t; i++){
+        update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
+                                                         [=](){population[i]->update(*map.get());}));
+
+        think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
+                                                             [=](){population[i]->think_n_do();}));
+    }
+}
+
+void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw)
+{
+    map=pthw;
+    this->timer=timer;
     int t = population.size();
     for(int i = 0; i < t; i++){
         update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
@@ -210,12 +226,3 @@ void evolution::dscnnct()
         ++num;
     }
 }
-
-//void evolution::sanity_check(vector<std::unique_ptr<ship_physics> > population, vector<int> index,
-//                             std::multimap<double, std::pair<std::string, int> > best,
-//                             vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents)
-//{
-
-
-
-//}

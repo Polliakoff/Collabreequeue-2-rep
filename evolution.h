@@ -12,18 +12,13 @@
 
 class evolution
 {
-
-private:
-    void sanity_check(vector<std::unique_ptr<ship_physics>> population, vector<int> index,
-                      std::multimap<double, std::pair<std::string,int>> best,
-                      vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents);
 protected:
 
     std::ofstream fout;
 public:
     evolution()=default;//РЅРµ С‚СЂРѕРіР°С‚СЊ
     std::string genName="0x";
-    evolution(const int& generation_size, const double& start_x,const double& start_y,const double& finish_x,const double& finish_y);
+    evolution(const int& generation_size, std::shared_ptr<pathway> &pthw);
     virtual ~evolution();
 
     int generation;
@@ -35,7 +30,8 @@ public:
     vector<QMetaObject::Connection> update_connections;
     vector<QMetaObject::Connection> think_n_do_connections;
 
-    void cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &map);
+    void cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw);
+    void cnnct(std::shared_ptr<QTimer> &timer);
     void cnnct();
     void dscnnct();
     void evolve();

@@ -41,10 +41,11 @@ private slots:
     void genNameSet(std::string name);
 
 private:
+
     Ui::MainWindow *ui;
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
-    evolution ship_evolution;
+    std::unique_ptr<evolution> ship_evolution;
     //vector <std::unique_ptr<ship_physics>> korablik;
 ///тестовый
     std::unique_ptr<ship_physics> test_ship;

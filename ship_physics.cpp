@@ -20,8 +20,8 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
     change_destination(dest_x,dest_y);
 }
 
-ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc):
-    ship(575,550),
+ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,const double& pos_x,const double& pos_y):
+    ship(pos_x,pos_y),
     net(a.net, b.net, dmnc)
 {
 //    id = ++test;
