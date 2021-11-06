@@ -44,18 +44,31 @@ void evolution::evolve()
     } //выбрали норм корабли //доработать
 
     std::multimap<double, std::pair<std::string,int>> best;
+
     for(auto &imp: index){
         best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
     }
 
+
+
     i=0;
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
-
-    names.clear();
-    names.reserve(generation);
-
+//    bool check_champion = false;
     if(index.size()>0){
         for (auto &m: best){
+
+//            if(check_champion == false){
+//                if(population[m.second.second]->is_champion==false){
+//                    population[m.second.second]->is_champion=true;
+//                }
+//                check_champion = true;
+//            }
+//            if(check_champion){
+//                if(population[m.second.second]->is_champion){
+//                    population[m.second.second]->is_champion=false;
+//                }
+//            }
+
             //auto par = population[i];
             newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
             ////не убирать, для проверки скрещивания
@@ -66,6 +79,11 @@ void evolution::evolve()
                 break;
         } //отобрали пять лучших
     }
+
+//    sanity_check(population, index, best, newGenParents);
+
+    names.clear();
+    names.reserve(generation);
 
 
     population.clear();
@@ -156,18 +174,15 @@ void evolution::evolution_stat()
             ready_to_evolve = false;
         }
     }
-    if(ready_to_evolve){
+
+    if(ready_to_evolve || clock==4000){
         for(auto &i: population){
             if(i->get_position().second>300){
                 i->can_be_parrent = false;
-            } else if(i->distance_to_finish < 350){
+            } else if(i->distance_to_finish <= 450){
                 i->can_be_parrent = true;
             }
         }
-        evolve();
-    }
-
-    if(clock==4000){
         evolve();
     }
 }
@@ -213,3 +228,12 @@ void evolution::dscnnct()
         ++num;
     }
 }
+
+//void evolution::sanity_check(vector<std::unique_ptr<ship_physics> > population, vector<int> index,
+//                             std::multimap<double, std::pair<std::string, int> > best,
+//                             vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents)
+//{
+
+
+
+//}

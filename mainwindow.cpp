@@ -4,7 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-      ship_evolution(1000,575,550,0,0)
+      ship_evolution(600,575,550,0,0)
 {
     ui->setupUi(this);
 
@@ -56,6 +56,7 @@ void MainWindow::on_pushButton_clicked()
 
     ship_evolution.cnnct(update_timer, map);
     ///===========тестовый
+    test_ship->fuel+=10000;
     test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
     test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
     ///===========тестовый
@@ -137,7 +138,7 @@ void MainWindow::gauges()
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
     ui->lineEdit_8->setText(QString::number(test_ship->velocity_sum));
-    ui->lineEdit_9->setText(QString::number(test_ship->ship_and_velocity_angle));
+    ui->lineEdit_9->setText(QString::number(test_ship->distance_to_finish));
     ui->lineEdit_10->setText(QString::number(test_ship->fuel));
 
     if(!test_ship->operational) {

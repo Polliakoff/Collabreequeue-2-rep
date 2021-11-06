@@ -63,7 +63,7 @@
      <item row="8" column="0">
       <widget class="QLabel" name="label_9">
        <property name="text">
-        <string>s_v_ang</string>
+        <string>dist_to_fin</string>
        </property>
       </widget>
      </item>

@@ -17,6 +17,8 @@ public:
     ship_physics(ship_physics &a, ship_physics &b, const double &dmnc); //для наследования
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain); //переносим мозг новому
 
+    //bool is_champion = false;
+
     double velocity_x = 0, velocity_y = 0, abs_velocity;
     pair<double, double> path;
     double angular_velocity = 0;
@@ -45,7 +47,7 @@ public:
     void modify_path();
     bool viable();
     brain& getBrain();
-    static int test;
+    //static int test;
 public slots:
     virtual void update(polygon &map);
     void think_n_do();
