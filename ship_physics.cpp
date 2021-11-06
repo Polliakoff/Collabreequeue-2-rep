@@ -9,7 +9,7 @@ ship_physics::ship_physics()
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
     ship(pos_x, pos_y), net()
 {
-//    id = ++test;
+    //    id = ++test;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
@@ -24,7 +24,7 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,
     ship(pos_x,pos_y),
     net(a.net, b.net, dmnc)
 {
-//    id = ++test;
+    //    id = ++test;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
@@ -35,10 +35,11 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,
     change_destination(a.final_destination.first,a.final_destination.second);
 }
 
-ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain):
+ship_physics::ship_physics(const double& pos_x,const double& pos_y,
+                           const double& dest_x, const double& dest_y, brain& newBrain):
     ship(pos_x, pos_y)
 {
-//    id = ++test;
+    //    id = ++test;
     net = newBrain;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -48,6 +49,13 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double&
     }
 
     change_destination(dest_x,dest_y);
+}
+
+void ship_physics::initial_fix()
+{
+    for (int k = 1; k < net.last+1; ++k){
+        net.A[0](net.first-k) = 0;
+    }
 }
 
 
@@ -255,7 +263,7 @@ void ship_physics::update(polygon &map)
     distance_to_finish = vector_module(path.first,path.second);
 }
 
-///-----------------------------Функция для дебага, управляющая 61-ым кораблём--------------------------------------
+///-----------------------------Функция для дебага, управляющая тестовым кораблём--------------------------------------
 void ship_physics::dumb_n_do(double neuron1, double neuron2, double neuron3, double neuron4)
 {
     if (neuron1 > 0.8 && neuron2 > 0.8) engine(1);   //добавить газу

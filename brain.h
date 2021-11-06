@@ -14,8 +14,6 @@ class brain
 protected:
     double sigmoid(const double&);
     double sigmoid_distance(const double&);
-    int first=14;   //количество входных слоёв
-    int last=4;     //количество выходных
     void inheritWeights(brain &a, brain &b, double dmnc);
 public:
     int S;                              //внутренних слоёв
@@ -23,7 +21,8 @@ public:
     std::vector<Eigen::RowVectorXd> A;  //S+2 всего слоёв (размер 1хl[n])
     std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
 
-
+    int first=14;   //количество входных слоёв
+    int last=4;     //количество выходных
 
     brain();
     brain(brain &a, brain &b, double dominance);                //новая нейросеть на основе старых,

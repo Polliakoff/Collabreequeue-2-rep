@@ -15,7 +15,7 @@ protected:
 public:
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y); // задавать корабль исключительно этим конструктором с установленной позицией
     ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,const double& pos_x,const double& pos_y); //для наследования
-    ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain newBrain); //переносим мозг новому
+    ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain& newBrain); //переносим мозг новому
 
     //bool is_champion = false;
 
@@ -38,7 +38,7 @@ public:
     double to_turn_to;
     double velocity_projection;
 
-
+    void initial_fix();
     void engine(const int &mode);
     void helm(const int &mode2);
     void brainstorm();

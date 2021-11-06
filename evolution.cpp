@@ -120,6 +120,10 @@ void evolution::evolve()
                                                                map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
     }
+    //избавляемся от остаточных галлюцинаций
+    for(auto &ship:population){
+        ship->initial_fix();
+    }
 
     fout.close();
     clock = 0;
