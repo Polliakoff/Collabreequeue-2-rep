@@ -1,6 +1,6 @@
 #include "ship_physics.h"
 
-//int ship_physics::test = 0;
+int ship_physics::sId = 0;
 
 ship_physics::ship_physics()
 {
@@ -9,7 +9,7 @@ ship_physics::ship_physics()
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
     ship(pos_x, pos_y), net()
 {
-    //    id = ++test;
+    id = ++sId;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
@@ -24,7 +24,7 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,
     ship(pos_x,pos_y),
     net(a.net, b.net, dmnc)
 {
-    //    id = ++test;
+    id = ++sId;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
@@ -39,7 +39,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,
                            const double& dest_x, const double& dest_y, brain& newBrain):
     ship(pos_x, pos_y)
 {
-    //    id = ++test;
+    id = ++sId;
     net = newBrain;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -247,6 +247,11 @@ bool ship_physics::viable()
 brain &ship_physics::getBrain()
 {
     return net;
+}
+
+void ship_physics::set_id(const int& new_id)
+{
+    id = new_id;
 }
 
 void ship_physics::update(polygon &map)

@@ -20,6 +20,10 @@ void evolution::evolve()
     //dscnnct();
     fout.open("evolution_obj.log", std::ios::app);
 
+    ///отлов бага==========================
+    if(in_search) fout<<"BUG pin-down:\n";
+    ///отлов бага==========================
+
     if(genName[3]=='z') {
         if (genName[2]=='9'){
             genName[2] = '0';
@@ -42,6 +46,23 @@ void evolution::evolve()
     vector<int> index;
     int i = 0;
     for (auto &shp: population){
+        ///отлов бага==========================
+        if(in_search && shp->id == subject_id){
+            if(!shp->can_be_parrent){
+               fout<<"subject stopped being parrent\n";
+               in_search = false;
+            }
+            if(shp->get_position().first != death_position.first &&
+                    shp->get_position().second != death_position.second){
+               fout<<"death position has been changed\n";
+               in_search = false;
+            }
+            if(shp->fuel != final_fuel){
+               fout<<"final fuel ammount has been changed\n";
+               in_search = false;
+            }
+        }
+        ///отлов бага==========================
         if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
@@ -82,7 +103,14 @@ void evolution::evolve()
     population.reserve(generation);
     fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
     if(newGenParents.size()==1){
-         fout << "single parrent:\t" << newGenParents[0].second << "\n";
+        fout << "single parrent:\t" << newGenParents[0].second << "\n";
+        ///отлов бага==========================
+        in_search = true;
+        subject_id = newGenParents[0].first->id;
+        death_position.first = newGenParents[0].first->get_position().first;
+        death_position.second = newGenParents[0].first->get_position().second;
+        final_fuel = newGenParents[0].first->fuel;
+        ///отлов бага==========================
     }
     for(int t = 2; t>0; --t){
         if (newGenParents.size()>0){
@@ -107,14 +135,18 @@ void evolution::evolve()
             population.erase(temp);
         } else ++temp;
     }
+    //время менять имена
     for(auto &shp: population){
         names.emplace_back(genName + shp->name);
     }
+    //переезд родителей
     for(auto &par: newGenParents){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
+        population[population.size()-1]->set_id(par.first->id);
         names.emplace_back(par.second);
     }
+    //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));

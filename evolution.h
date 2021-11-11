@@ -37,6 +37,13 @@ public:
     void evolve();
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
+
+    ///отлов бага==========================
+    bool in_search;
+    int subject_id;
+    pair<double, double> death_position;
+    double final_fuel;
+    ///отлов бага==========================
 public slots:
     void evolution_stat();
 
