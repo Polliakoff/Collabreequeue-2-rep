@@ -9,18 +9,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     scene = std::make_unique<QGraphicsScene>();
 
-    ///===========тестовый
-    test_ship = std::make_unique<ship_physics>(575,550,0,125);
-    ///===========тестовый
+
     update_timer = std::make_unique<QTimer>();
     painter_timer = std::make_unique<QTimer>();
 
     map = std::make_shared<pathway>();
-    ship_evolution = std::make_unique<evolution>(600,map);
+    ship_evolution = std::make_unique<evolution>(600, map);
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
     //    map->add_point(150,250);
+
+    ///===========тестовый
+    test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+    ///===========тестовый
 }
 
 MainWindow::~MainWindow()
