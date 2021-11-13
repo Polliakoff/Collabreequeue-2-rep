@@ -455,27 +455,30 @@ void pathway::generator()
     vector <int> xr;
     vector <int> yl;
     vector <int> yr;
-
     int i;
     int a, b;
 
     // Стартовые координаты
 
-    xl.emplace_back(250);
+    xl.emplace_back(450);
     yl.emplace_back(600);
-    xr.emplace_back(450);
+    xr.emplace_back(250);
     yr.emplace_back(600);
-    xl.emplace_back(240);
-    yl.emplace_back(590);
-    xr.emplace_back(460);
-    yr.emplace_back(590);
+//    xl.emplace_back(240);
+//    yl.emplace_back(580);
+//    xr.emplace_back(460);
+//    yr.emplace_back(580);
+    xmain.emplace_back(350);
+    ymain.emplace_back(600);
+    xmain.emplace_back(350);
+    ymain.emplace_back(565);
 
-    l_count = 1;
-    r_count = 1;
+    l_count = 0;
+    r_count = 0;
     main_count = 1;
 
-    for (i = 2; i < 40; i++)
-    {
+//    for (i = 2; i < 40; i++)
+//    {
 //        l_count++;
 //        r_count++;
 //        // Основная неровность по Х и сдвиг по У
@@ -487,8 +490,39 @@ void pathway::generator()
 //        b = QRandomGenerator::global()->bounded(30);
 //        xr.emplace_back(xr[i-1] + a - b);
 //        yr.emplace_back(yr[i-1] - 22);
+//}
 
-          // Основной пусть, вокруг которого строется проход
+    for (i = 2; i < 30; i++)
+    {
+        // Основной путь, вокруг которого строется проход
+        a = QRandomGenerator::global()->bounded(15);
+        b = QRandomGenerator::global()->bounded(15);
+        xmain.emplace_back(xmain[i - 1] + xmain[i - 1] - xmain[i - 2] + a - b);
+        a = QRandomGenerator::global()->bounded(15);
+        b = QRandomGenerator::global()->bounded(15);
+        ymain.emplace_back(ymain[i - 1] + ymain[i - 1] - ymain[i - 2] + a - b);
+    }
+
+    for (i = 1; i < 30; i++)
+    {
+        // Основные стены прохода
+        // x вектора - (xmain[i] - xmain[i - 1])
+        // y вектора - (ymain[i] - ymain[i - 1])
+
+        l_count++;
+        r_count++;
+        a = QRandomGenerator::global()->bounded(25);
+        b = QRandomGenerator::global()->bounded(25);
+        xl.emplace_back(xmain[i] - 2*(ymain[i] - ymain[i - 1]) + a - b);
+        a = QRandomGenerator::global()->bounded(25);
+        b = QRandomGenerator::global()->bounded(25);
+        yl.emplace_back(ymain[i] + 2*(xmain[i] - xmain[i - 1]) + a - b);
+        a = QRandomGenerator::global()->bounded(25);
+        b = QRandomGenerator::global()->bounded(25);
+        xr.emplace_back(xmain[i] + 2*(ymain[i] - ymain[i - 1]) + a - b);
+        a = QRandomGenerator::global()->bounded(25);
+        b = QRandomGenerator::global()->bounded(25);
+        yr.emplace_back(ymain[i] - 2*(xmain[i] - xmain[i - 1]) + a - b);
     }
 
     // Перегоняем координаты для удобства в один вектор
@@ -504,5 +538,5 @@ void pathway::generator()
     }
 
     final_point = std::make_pair(((xl[l_count] + xr[r_count])/2), ((yl[l_count] + yr[r_count])/2));
-    start_point = std::make_pair(325,550);
+    start_point = std::make_pair(350,550);
 }
