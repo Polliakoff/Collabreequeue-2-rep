@@ -21,7 +21,7 @@ void evolution::evolve()
     fout.open("evolution_obj.log", std::ios::app);
 
     ///отлов бага==========================
-    if(in_search) fout<<"BUG pin-down:\n";
+    if(in_search) fout<<"BUG pin-down:::::::::::::::::::::::::::::::::::::::::::::::::::\n";
     ///отлов бага==========================
 
     if(genName[3]=='z') {

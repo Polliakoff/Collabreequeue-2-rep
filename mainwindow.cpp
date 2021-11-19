@@ -45,11 +45,11 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
         if(j==1) j = 2;
         if(i==pol.vertexes.size()){i=0;j=1;}
     }
-//    for(int i = 1; i < 30; i++)
-//    {
-//        scene->addLine(map->xmainout[i], map->ymainout[i],
-//                map->xmainout[i-1], map->ymainout[i-1], QPen(Qt::magenta));
-//    }
+    //    for(int i = 1; i < 30; i++)
+    //    {
+    //        scene->addLine(map->xmainout[i], map->ymainout[i],
+    //                map->xmainout[i-1], map->ymainout[i-1], QPen(Qt::magenta));
+    //    }
 }
 
 
@@ -80,6 +80,10 @@ void MainWindow::painter()
 {
     scene->clear();
     qdraw_polygon(*map,scene.get());
+
+    if(ship_evolution->in_deep_search){
+        scene->addEllipse(ship_evolution->death_position.first,ship_evolution->death_position.second,10,10, QPen(Qt::darkRed));
+    }
 
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
         if(shp->get()->operational){
