@@ -51,32 +51,32 @@ void evolution::evolve()
             if(!shp->can_be_parrent){
                 fout<<"=============\n";
                 fout<<"subject stopped being parrent\n";
-                in_search = false;
+//                if(!in_deep_search)
+//                    in_search = false;
             }
             if(shp->get_position().first != death_position.first &&
                     shp->get_position().second != death_position.second){
                 fout<<"death position has been changed\n";
-                in_search = false;
+//                if(!in_deep_search)
+//                    in_search = false;
             }
             if(shp->fuel != final_fuel){
                 fout<<"final fuel ammount has been changed\n";
                 fout<<"=============\n";
-                in_search = false;
+//                if(!in_deep_search)
+//                    in_search = false;
             }
 
             //комната одиночества=================
             if(!in_deep_search){
-                fout<< "deep search activated\n";
                 in_deep_search = true;
                 subject = std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                          map->final_point.first,map->final_point.second,shp->getBrain());
                 subject->set_id(shp->id);
                 subject->initial_fix();
+                fout<< "deep search activated\n";
             }
             if(in_deep_search){
-                fout<< "deep search active, search: "<<deep_search_counter<<"\n";
-                deep_search_counter++;
-
                 population.clear();
 
                 think_n_do_connections.clear();
@@ -87,9 +87,11 @@ void evolution::evolve()
                 population.back()->set_id(subject_id);
                 population.back()->initial_fix();
 
-                fout.close();
                 clock = 0;
                 cnnct();
+                fout<< "deep search active, search: "<<deep_search_counter<<"\n";
+                fout.close();
+                deep_search_counter++;
                 return;
             }
             //комната одиночества=================
