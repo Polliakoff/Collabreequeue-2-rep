@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     painter_timer = std::make_unique<QTimer>();
 
     map = std::make_shared<pathway>();
-    ship_evolution = std::make_unique<evolution>(600, map);
+    ship_evolution = std::make_unique<evolution>(60, map);
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
@@ -45,6 +45,11 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
         if(j==1) j = 2;
         if(i==pol.vertexes.size()){i=0;j=1;}
     }
+//    for(int i = 1; i < 30; i++)
+//    {
+//        scene->addLine(map->xmainout[i], map->ymainout[i],
+//                map->xmainout[i-1], map->ymainout[i-1], QPen(Qt::magenta));
+//    }
 }
 
 
@@ -75,6 +80,7 @@ void MainWindow::painter()
 {
     scene->clear();
     qdraw_polygon(*map,scene.get());
+
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());
@@ -95,6 +101,7 @@ void MainWindow::painter()
         }
         ++shp;
     }
+
 
     ///===========тестовый
     if(test_ship->operational){
@@ -210,3 +217,10 @@ void MainWindow::genNameSet(std::string name)
     ui->lineEdit_11->setText(QString::fromStdString(name));
 }
 ///===========тестовый
+
+void MainWindow::on_checkBox_stateChanged()
+{
+    tmblr_generator =! tmblr_generator;
+    map->switcher(tmblr_generator);
+}
+
