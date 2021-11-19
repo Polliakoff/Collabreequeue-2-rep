@@ -188,6 +188,13 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Генерировать карту</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -222,7 +229,7 @@
      <x>0</x>
      <y>0</y>
      <width>1368</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
