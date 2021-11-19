@@ -82,7 +82,7 @@ void MainWindow::painter()
     qdraw_polygon(*map,scene.get());
 
     if(ship_evolution->in_deep_search){
-        scene->addEllipse(ship_evolution->death_position.first,ship_evolution->death_position.second,10,10, QPen(Qt::darkRed));
+        scene->addEllipse(ship_evolution->death_position.first-5,ship_evolution->death_position.second-5,10,10, QPen(Qt::blue));
     }
 
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
@@ -196,9 +196,15 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_pushButton_6_clicked()
 {
-    //    korablik->move_by_distance(20);
-    //    korablik->update(*map);
-    this->painter();
+    tmblr_slow_time =! tmblr_slow_time;
+    if (tmblr_slow_time == true) {
+        update_timer->stop();
+        update_timer->start(40);
+    }
+    else {
+        update_timer->stop();
+        update_timer->start(1);
+    }
 }
 
 
