@@ -49,18 +49,50 @@ void evolution::evolve()
         ///отлов бага==========================
         if(in_search && shp->id == subject_id){
             if(!shp->can_be_parrent){
-               fout<<"subject stopped being parrent\n";
-               in_search = false;
+                fout<<"=============\n";
+                fout<<"subject stopped being parrent\n";
+                in_search = false;
             }
             if(shp->get_position().first != death_position.first &&
                     shp->get_position().second != death_position.second){
-               fout<<"death position has been changed\n";
-               in_search = false;
+                fout<<"death position has been changed\n";
+                in_search = false;
             }
             if(shp->fuel != final_fuel){
-               fout<<"final fuel ammount has been changed\n";
-               in_search = false;
+                fout<<"final fuel ammount has been changed\n";
+                fout<<"=============\n";
+                in_search = false;
             }
+
+            //комната одиночества=================
+            if(!in_deep_search){
+                fout<< "deep search activated\n";
+                in_deep_search = true;
+                subject = std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                         map->final_point.first,map->final_point.second,shp->getBrain());
+                subject->set_id(shp->id);
+                subject->initial_fix();
+            }
+            if(in_deep_search){
+                fout<< "deep search active, search: "<<deep_search_counter<<"\n";
+                deep_search_counter++;
+
+                population.clear();
+
+                think_n_do_connections.clear();
+                update_connections.clear();
+
+                population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                                       map->final_point.first,map->final_point.second,subject->getBrain()));
+                population.back()->set_id(subject_id);
+                population.back()->initial_fix();
+
+                fout.close();
+                clock = 0;
+                cnnct();
+                return;
+            }
+            //комната одиночества=================
         }
         ///отлов бага==========================
         if(shp.get()->can_be_parrent){
@@ -68,7 +100,9 @@ void evolution::evolve()
         }
         ++i;
     } //выбрали норм корабли //доработать
-
+    if(in_deep_search){
+        return;
+    }
     std::multimap<double, std::pair<std::string,int>> best;
 
     for(auto &imp: index){
