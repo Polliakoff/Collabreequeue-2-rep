@@ -206,14 +206,14 @@ void evolution::evolution_stat()
 {
     ++clock;
 
-//    if(clock==10){
-//        for(auto &i: population){
-//            if(i->fuel == 2200){
-//                i->operational = false;
-//                i->can_be_parrent = false;
-//            }
-//        }
-//    }
+    if(clock==10){
+        for(auto &i: population){
+            if(i->fuel == 2200){
+                i->operational = false;
+                i->can_be_parrent = false;
+            }
+        }
+    }
 
     if(clock==250){
         for(auto &i: population){

@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     painter_timer = std::make_unique<QTimer>();
 
     map = std::make_shared<pathway>();
-    ship_evolution = std::make_unique<evolution>(1, map);
+    ship_evolution = std::make_unique<evolution>(600, map);
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
