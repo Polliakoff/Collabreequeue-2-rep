@@ -9,11 +9,11 @@ double brain::sigmoid(const double &x){
 }
 
 double brain::sigmoid_distance(const double &x){
-    return 1/(1+exp((-x-80)/5));
+    return 1/(1+exp((-x+80)/5));
 }
 
-brain::brain(){
-    S = 4 + rand() % 7;//максимум пять внутренних слоёв
+brain::brain(): behavior(){
+    S = 5 + rand() % 7;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
     for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
@@ -31,17 +31,16 @@ brain::brain(){
         W.push_back(Eigen::MatrixXd::Random(l[i],l[i+1])); //на первое время и отрицательные веса тоже
     }
     A.emplace_back(l[S-1]);
-//    for(auto &w: W)
-//        cout << w.norm() << endl;
 }
 
 
-brain::brain(brain &a, brain &b, double dmnc){
+brain::brain(brain &a, brain &b, double dmnc):
+    behavior(a.behavior, b.behavior)
+{
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
                                             //тут влияние dmnc
     this->l.clear();
     this->l.reserve(this->S);
-    //vector<vector<int>> specPos;
 
     for (int i = 0; i < a.S-1 && i < b.S-1; ++i){ //используем существующие размерности в обеих сетях-родителях
         this->l.emplace_back(a.l[i]*dmnc+b.l[i]*(1-dmnc)+0.5); //тут влияние dmnc
@@ -61,7 +60,7 @@ brain::brain(brain &a, brain &b, double dmnc){
     if (!viable()) return;
 
     inheritWeights(a,b,dmnc);
-
+    noiseWeights();
     mutate();
 }
 
@@ -80,7 +79,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < a.l[lt] && i < b.l[lt] && i < l[lt]; ++i){
                 this->W[lt](i,j) = (a.W[lt](i,j)+b.W[lt](i,j))/2.0;
-                this->W[lt](i,j)*= (2/(exp(this->W[lt](i,j)*10))+1)*(95+(rand()%11)/100.0); ////вот тут шум
                 //cout << i << "\t" << j << "\n"; //11,6 проверка
             }
         }
@@ -92,9 +90,7 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
             for (int temp = abMin.l[lt+1]; //берем за начальную точку конец меньшей матрицы
                  temp < this->l[lt+1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
-                    this->W[lt](i,temp) = abMax.W[lt](i,temp);
-                    this->W[lt](i,temp)*= (2/(exp(this->W[lt](i,temp)*10))+1)*(95+(rand()%11)/100.0); ////вот тут шум
-                                                                                    //берем веса большей матрицы
+                    this->W[lt](i,temp) = abMax.W[lt](i,temp);//берем веса большей матрицы
                 }
             }
         }
@@ -107,7 +103,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                  temp < this->l[lt]; ++temp){ //пока точка не вышла за пределы текущей матрицы
                 for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
                     this->W[lt](temp,i) = abMax.W[lt](temp,i);
-                    this->W[lt](temp,i)*= (2/(exp(this->W[lt](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                     //берем веса большей матрицы
                 }
             }
@@ -115,7 +110,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                 temp < this->l[lt]; ++temp)
                 for (int i = 0; i < abMax.l[lt+1] && i<l[lt+1]; ++i){
                     this->W[lt](temp,i) = abMax.W[lt](temp,i);
-                    this->W[lt](temp,i) *= (2/(exp(this->W[lt](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                     //берем веса большей матрицы
                 }
         }
@@ -132,7 +126,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int j = 0; j < abMax.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < abMax.l[lt] && i < l[lt]; ++i){
                 this->W[lt](i,j) = abMax.W[lt](i,j);
-                this->W[lt](i,j) *= (2/(exp(this->W[lt](i,j)*10))+1)*(95+(rand()%11))/100.0;
                 //просто берём
             }
         }
@@ -163,7 +156,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
     for (int j = 0; j < a.l[a.S-1] && j < b.l[b.S-1]; ++j){
         for (int i = 0; i < a.l[a.S-2] && i < b.l[b.S-2]; ++i){
             this->W[S-2](i,j) = (a.W[a.S-2](i,j)+b.W[b.S-2](i,j))/2.0;
-            this->W[S-2](i,j)*= (2/(exp(this->W[S-2](i,j)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
         }
     }
 
@@ -176,7 +168,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
              temp < this->l[S-2] && temp < abMax.l[abMax.S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
                 this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i);
-                this->W[S-2](temp,i)*= (2/(exp(this->W[S-2](temp,i)*10))+1)*(95+(rand()%11))/100.0; ////вот тут шум
                                                             //берем веса большей матрицы
             }
         }
@@ -184,25 +175,15 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int temp = abMax.l[abMax.S-2]; //берем за начальную точку конец БОЛЬШЕЙ матрицы
              temp < this->l[S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
-                this->W[S-2](temp,i) = (-50+rand()%101)/100.0;
+                this->W[S-2](temp,i) = (-100+rand()%201)/100.0;
             }
         }
     }
 }
 
 void brain::mutate(){
-//    ofstream fout("mutate" + std::to_string(++ID) + ".log");
-//    string name;
-//    name = '_'+std::to_string(S);
-//    name.push_back('s');
-//    for (auto &i: l){
-//        name += std::to_string(i);
-//        name.push_back('.');
-//    }
-
     int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
     if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
-//    fout << name << "\n" << std::to_string(ID) + "\t S -> " + std::to_string(mutatedLayers) + "\n";
     S+=mutatedLayers;
 
     //мутирует количество слоёв
@@ -232,17 +213,12 @@ void brain::mutate(){
 
     //мутирует кол-во нейронов в слоях
     vector<int> vec(S);
-//    fout << ID << "\t l -> ";
     for (auto &v: vec){
         v = int(1 == rand()%6)*(rand()%2? 1 : 1); //в одном из десяти мутация на один
     }
 
     vec[0]=0;
     vec[S-1]=0;
-//    for (auto &v: vec){
-//        fout << v << "\t";
-//    }
-//    fout << "\n\n";
     int i = 0;
 
     for (auto v = vec.begin(); v+1!=vec.end(); ++v){
@@ -287,14 +263,27 @@ void brain::mutate(){
 
 }
 
+void brain::noiseWeights()
+{
+    for (auto &w: W){
+        for (auto &i: w.reshaped()){
+            i *= (2/(exp(i*10))+1)*(95+(rand()%11))/100.0;
+        }
+    }
+}
+
 
 
 
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
-        A[0](k)=sigmoid_distance(A[0](k));
+//        A[0](k) = sigmoid_distance(A[0](k));
+        A[0](k) /= 10.0;
     }
+    memory.insert(memory.begin(), std::make_shared<Eigen::RowVectorXd>(A[0]));
+    memory.resize(5);
+
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
         for(auto &a: A[i + 1]){
@@ -318,6 +307,9 @@ bool brain::viable(){
 }
 
 
+void brain::learn(){
+
+}
 
 
 

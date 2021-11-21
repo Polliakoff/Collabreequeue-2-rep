@@ -15,6 +15,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     pathway.cpp \
+    pattern.cpp \
     polygon.cpp \
     ship.cpp \
     ship_physics.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     brain.h \
     mainwindow.h \
     pathway.h \
+    pattern.h \
     polygon.h \
     ship.h \
     ship_physics.h \

@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     painter_timer = std::make_unique<QTimer>();
 
     map = std::make_shared<pathway>();
-    ship_evolution = std::make_unique<evolution>(600, map);
+    ship_evolution = std::make_unique<evolution>(1, map);
     //    map->add_point(250,250);
     //    map->add_point(250,150);
     //    map->add_point(150,150);
@@ -81,9 +81,9 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
 
-    if(ship_evolution->in_deep_search){
-        scene->addEllipse(ship_evolution->death_position.first-5,ship_evolution->death_position.second-5,10,10, QPen(Qt::blue));
-    }
+//    if(ship_evolution->in_deep_search){
+//        scene->addEllipse(ship_evolution->death_position.first-5,ship_evolution->death_position.second-5,10,10, QPen(Qt::blue));
+//    }
 
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
         if(shp->get()->operational){
