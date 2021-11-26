@@ -104,21 +104,21 @@ void ship_physics::engine(const int &mode)
     {
         velocity_x -= sin(angle)*thrust/2;
         velocity_y -= cos(angle)*thrust/2;
-        fuel_consumption = 0.5;
+        fuel_consumption = 1;
         fuel -= fuel_consumption;
     }
     if (mode == 2)
     {
         velocity_x -= sin(angle)*thrust;
         velocity_y -= cos(angle)*thrust;
-        fuel_consumption = 1;
+        fuel_consumption = 2;
         fuel -= fuel_consumption;
     }
     if (mode == 3)
     {
         velocity_x += sin(angle)*thrust;
         velocity_y += cos(angle)*thrust;
-        fuel_consumption = 1;
+        fuel_consumption = 2;
         fuel -= fuel_consumption;
     }
     if (mode == 4)
@@ -134,7 +134,7 @@ void ship_physics::engine(const int &mode)
             {
                 velocity_x -= sin(angle)*thrust;
                 velocity_y -= cos(angle)*thrust;
-                fuel_consumption = 1;
+                fuel_consumption = 2;
             }
 
             fuel -= fuel_consumption;
@@ -144,8 +144,8 @@ void ship_physics::engine(const int &mode)
 
 void ship_physics::helm(const int &mode2)
 {
-    double agility = 0.0003;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
-    double max_maneuver = 0.010;
+    double agility = 0.0006;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
+    double max_maneuver = 0.020;
 
     if (mode2 == 1 || mode2 == 4)
     {
@@ -156,13 +156,13 @@ void ship_physics::helm(const int &mode2)
     if (mode2 == 2)
     {
         angular_velocity += agility;
-        fuel_consumption += 0.5;
+        fuel_consumption += 1;
         fuel -= fuel_consumption;
     }
     if (mode2 == 3)
     {
         angular_velocity -= agility;
-        fuel_consumption += 0.5;
+        fuel_consumption += 1;
         fuel -= fuel_consumption;
     }
     if (angular_velocity > max_maneuver)
@@ -212,8 +212,8 @@ void ship_physics::friction()
 
     if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
     {
-        velocity_x -= friction_value*velocity_x*0.1;
-        velocity_y -= friction_value*velocity_y*0.1;
+        velocity_x -= friction_value*velocity_x*0.05;
+        velocity_y -= friction_value*velocity_y*0.05;
     }
 }
 
