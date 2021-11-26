@@ -8,9 +8,9 @@ double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
 
-double brain::sigmoid_distance(const double &x){
-    return 1/(1+exp((-x+80)/5));
-}
+//double brain::sigmoid_distance(const double &x){
+//    return 1/(1+exp((-x+80)/5));
+//}
 
 brain::brain(): behavior(){
     S = 5 + rand() % 7;//максимум пять внутренних слоёв

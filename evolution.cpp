@@ -20,10 +20,6 @@ void evolution::evolve()
     //dscnnct();
     fout.open("evolution_obj.log", std::ios::app);
 
-    ///отлов бага==========================
-    //if(in_search) fout<<"BUG pin-down:::::::::::::::::::::::::::::::::::::::::::::::::::\n";
-    ///отлов бага==========================
-
     if(genName[3]=='z') {
         if (genName[2]=='9'){
             genName[2] = '0';
@@ -46,65 +42,12 @@ void evolution::evolve()
     vector<int> index;
     int i = 0;
     for (auto &shp: population){
-        /*///отлов бага==========================
-        if(in_search && shp->id == subject_id){
-            if(!shp->can_be_parrent){
-                fout<<"=============\n";
-                fout<<"subject stopped being parrent\n";
-//                if(!in_deep_search)
-//                    in_search = false;
-            }
-            if(shp->get_position().first != death_position.first &&
-                    shp->get_position().second != death_position.second){
-                fout<<"death position has been changed\n";
-//                if(!in_deep_search)
-//                    in_search = false;
-            }
-            if(shp->fuel != final_fuel){
-                fout<<"final fuel ammount has been changed\n";
-                fout<<"=============\n";
-//                if(!in_deep_search)
-//                    in_search = false;
-            }
-
-            //комната одиночества=================
-            if(!in_deep_search){
-                in_deep_search = true;
-                subject = std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
-                                                         map->final_point.first,map->final_point.second,shp->getBrain());
-                subject->set_id(shp->id);
-                subject->initial_fix();
-                fout<< "deep search activated\n";
-            }
-            if(in_deep_search){
-                population.clear();
-
-                think_n_do_connections.clear();
-                update_connections.clear();
-
-                population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
-                                                                       map->final_point.first,map->final_point.second,subject->getBrain()));
-                population.back()->set_id(subject_id);
-                population.back()->initial_fix();
-
-                clock = 0;
-                cnnct();
-                fout<< "deep search active, search: "<<deep_search_counter<<"\n";
-                fout.close();
-                deep_search_counter++;
-                return;
-            }
-            //комната одиночества=================
-        }
-        ///отлов бага==========================*/
         if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
         ++i;
     } //выбрали норм корабли //доработать
-    if(in_deep_search){
-        return;
-    }
+
     std::multimap<double, std::pair<std::string,int>> best;
 
     for(auto &imp: index){
@@ -140,13 +83,6 @@ void evolution::evolve()
     fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
     if(newGenParents.size()==1){
         fout << "single parrent:\t" << newGenParents[0].second << "\n";
-        /*///отлов бага==========================
-        in_search = true;
-        subject_id = newGenParents[0].first->id;
-        death_position.first = newGenParents[0].first->get_position().first;
-        death_position.second = newGenParents[0].first->get_position().second;
-        final_fuel = newGenParents[0].first->fuel;
-        ///отлов бага==========================*/
     }
     for(int t = 2; t>0; --t){
         if (newGenParents.size()>0){

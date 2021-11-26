@@ -81,10 +81,6 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
 
-//    if(ship_evolution->in_deep_search){
-//        scene->addEllipse(ship_evolution->death_position.first-5,ship_evolution->death_position.second-5,10,10, QPen(Qt::blue));
-//    }
-
     for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
         if(shp->get()->operational){
             qdraw_polygon(shp->get()->body,scene.get());

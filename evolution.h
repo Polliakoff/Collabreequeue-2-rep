@@ -39,15 +39,6 @@ public:
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
 
-    ///отлов бага==========================
-    int deep_search_counter = 0;
-    bool in_search;
-    bool in_deep_search;
-    int subject_id;
-    std::unique_ptr<ship_physics> subject;
-    pair<double, double> death_position;
-    double final_fuel;
-    ///отлов бага==========================
 public slots:
     void evolution_stat();
 

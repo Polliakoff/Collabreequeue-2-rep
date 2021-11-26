@@ -15,7 +15,7 @@ class brain
 {
 protected:
     double sigmoid(const double&);
-    double sigmoid_distance(const double&);
+//    double sigmoid_distance(const double&);
     void inheritWeights(brain &a, brain &b, double dmnc);
 
     std::vector<std::shared_ptr<Eigen::RowVectorXd>> memory;
