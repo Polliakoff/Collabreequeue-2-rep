@@ -41,12 +41,16 @@ public:
     void initial_fix();
     void engine(const int &mode);
     void helm(const int &mode2);
+    void test_engine(double neuron1, double neuron2);
+    void test_helm(double neuron3, double neuron4);
     void brainstorm();
     void friction();
     void change_destination(const double& dest_x,const double& dest_y);
     void modify_path();
     bool viable();
     brain& getBrain();
+
+    double test;
 
     int id;
     void set_id(const int& new_id);

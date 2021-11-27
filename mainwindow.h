@@ -66,6 +66,5 @@ private:
     tmblr_slow_time = false,
     tmblr_generator = false;
 
-
 };
 #endif // MAINWINDOW_H

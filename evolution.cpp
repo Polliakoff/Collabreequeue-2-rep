@@ -142,7 +142,7 @@ void evolution::evolution_stat()
 {
     ++clock;
 
-    if(clock==10){
+    if(clock==5){
         for(auto &i: population){
             if(i->fuel == 2200){
                 i->operational = false;
@@ -151,9 +151,9 @@ void evolution::evolution_stat()
         }
     }
 
-    if(clock==250){
+    if(clock==25){
         for(auto &i: population){
-            if(i->velocity_sum<=min_speed-60){
+            if(i->velocity_sum<=min_speed-98){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
@@ -178,7 +178,7 @@ void evolution::evolution_stat()
         }
     }
 
-    if(ready_to_evolve || clock==4000){
+    if(ready_to_evolve || clock==2000){
         for(auto &i: population){
             if(i->get_position().second>300){
                 i->can_be_parrent = false;

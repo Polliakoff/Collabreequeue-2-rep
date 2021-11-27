@@ -64,32 +64,23 @@ void ship_physics::think_n_do()
 {
     brainstorm();
 
-    if (net.A.back()(0) > 0.8 && net.A.back()(1) > 0.8) engine(1);   //добавить газу
-    else if (net.A.back()(0) > 0.8) engine(2);                       //макс скорость
-    else if (net.A.back()(1) > 0.8) engine(3);                       //обратный ход
-    else engine(4);                                                  //глушим двигатель
+    /// старое управление ----------------------------------------------------------------------------
+//    if (net.A.back()(0) > 0.8 && net.A.back()(1) > 0.8) engine(1);   //добавить газу
+//    else if (net.A.back()(0) > 0.8) engine(2);                       //макс скорость
+//    else if (net.A.back()(1) > 0.8) engine(3);                       //обратный ход
+//    else engine(4);                                                  //глушим двигатель
 
-    if (net.A.back()(2) > 0.8 && net.A.back()(3) <= 0.8) helm(2);    //поворот туда
-    if (net.A.back()(3) > 0.8 && net.A.back()(2) <= 0.8) helm(3);    //поворот НЕ ТУДА
-    if(!(net.A.back()(2) > 0.8 || net.A.back()(3) > 0.8)) helm(1);   //убить угловую скорость
+//    if (net.A.back()(2) > 0.8 && net.A.back()(3) <= 0.8) helm(2);    //поворот туда
+//    if (net.A.back()(3) > 0.8 && net.A.back()(2) <= 0.8) helm(3);    //поворот НЕ ТУДА
+//    if(!(net.A.back()(2) > 0.8 || net.A.back()(3) > 0.8)) helm(1);   //убить угловую скорость
+    /// ----------------------------------------------------------------------------------------------
 
+    // нейроны по сторонам
+    // 0 - +вперёд, 1 - -назад
+    // 2 - +влево, 3 - -вправо
 
-    //    //добавить газу
-    //    if (net.A.back()(0) > 0.8)
-    //        engine(2); //просто вдавить вперед
-    //    //стоп машина
-    //    if (net.A.back()(1) > 0.8)
-    //        engine(3); //должно быть вдавить назад
-
-    //    11 медленнее ехать(больше топлива?) 00 убивать скорость об трение
-    //    //поворот туда
-    //    if (net.A.back()(2) > 0.8)
-    //        helm(2); //просто налево
-    //    //поворот НЕ ТУДА
-    //    if (net.A.back()(3) > 0.8)
-    //        helm(3); //просто направо
-    //    пусть сам ищет путь 11 - без изменений(но больше топлива?) 00 без изменений
-
+    engine(1);
+    helm(1);
 
     friction();
     move_by_coords(velocity_x, velocity_y);
@@ -99,72 +90,89 @@ void ship_physics::think_n_do()
 void ship_physics::engine(const int &mode)
 {
     double thrust = 0.02;  //Базовый параметр тяги, от которого зависят остальные. Дёргай для изменения ускорения.
+    /// старое управление ----------------------------------------------------------------------------
+//    if (mode == 1)
+//    {
+//        velocity_x -= sin(angle)*thrust/2;
+//        velocity_y -= cos(angle)*thrust/2;
+//        fuel_consumption = 1;
+//        fuel -= fuel_consumption;
+//    }
+//    if (mode == 2)
+//    {
+//        velocity_x -= sin(angle)*thrust;
+//        velocity_y -= cos(angle)*thrust;
+//        fuel_consumption = 2;
+//        fuel -= fuel_consumption;
+//    }
+//    if (mode == 3)
+//    {
+//        velocity_x += sin(angle)*thrust;
+//        velocity_y += cos(angle)*thrust;
+//        fuel_consumption = 2;
+//        fuel -= fuel_consumption;
+//    }
+//    if (mode == 4)
+//    {
+//        if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
+//        {
+//            if(abs_velocity*friction_value*0.1 < thrust)
+//            {
+//                velocity_x -= sin(angle)*abs_velocity*friction_value*0.1;
+//                velocity_y -= cos(angle)*abs_velocity*friction_value*0.1;
+//                fuel_consumption = abs_velocity*friction_value*0.1/thrust;
+//            }else
+//            {
+//                velocity_x -= sin(angle)*thrust;
+//                velocity_y -= cos(angle)*thrust;
+//                fuel_consumption = 2;
+//            }
 
-    if (mode == 1)
-    {
-        velocity_x -= sin(angle)*thrust/2;
-        velocity_y -= cos(angle)*thrust/2;
-        fuel_consumption = 1;
-        fuel -= fuel_consumption;
-    }
-    if (mode == 2)
-    {
-        velocity_x -= sin(angle)*thrust;
-        velocity_y -= cos(angle)*thrust;
-        fuel_consumption = 2;
-        fuel -= fuel_consumption;
-    }
-    if (mode == 3)
-    {
-        velocity_x += sin(angle)*thrust;
-        velocity_y += cos(angle)*thrust;
-        fuel_consumption = 2;
-        fuel -= fuel_consumption;
-    }
-    if (mode == 4)
-    {
-        if (velocity_x != 0 || velocity_y != 0) //по какой-то неясной причине friction value не умножается при скорости равной нулю и убивает корабль как объект. Too bad.
-        {
-            if(abs_velocity*friction_value*0.1 < thrust)
-            {
-                velocity_x -= sin(angle)*abs_velocity*friction_value*0.1;
-                velocity_y -= cos(angle)*abs_velocity*friction_value*0.1;
-                fuel_consumption = abs_velocity*friction_value*0.1/thrust;
-            }else
-            {
-                velocity_x -= sin(angle)*thrust;
-                velocity_y -= cos(angle)*thrust;
-                fuel_consumption = 2;
-            }
-
-            fuel -= fuel_consumption;
-        }
-    }
+//            fuel -= fuel_consumption;
+//        }
+//    }
+    /// ----------------------------------------------------------------------------------------------
+    velocity_x -= sin(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
+    velocity_y -= cos(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
+    fuel_consumption = 2*abs(net.A.back()(0)-net.A.back()(1));
+    fuel -= fuel_consumption;
 }
 
 void ship_physics::helm(const int &mode2)
 {
     double agility = 0.0006;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
     double max_maneuver = 0.020;
-
-    if (mode2 == 1 || mode2 == 4)
-    {
-        if (angular_velocity > 0) angular_velocity -= agility;
-        else if (angular_velocity < 0) angular_velocity += agility;
-        if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
-    }
-    if (mode2 == 2)
-    {
-        angular_velocity += agility;
-        fuel_consumption += 1;
-        fuel -= fuel_consumption;
-    }
-    if (mode2 == 3)
-    {
-        angular_velocity -= agility;
-        fuel_consumption += 1;
-        fuel -= fuel_consumption;
-    }
+    /// старое управление ----------------------------------------------------------------------------
+//    if (mode2 == 1 || mode2 == 4)
+//    {
+//        if (angular_velocity > 0) angular_velocity -= agility;
+//        else if (angular_velocity < 0) angular_velocity += agility;
+//        if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
+//    }
+//    if (mode2 == 2)
+//    {
+//        angular_velocity += agility;
+//        fuel_consumption += 1;
+//        fuel -= fuel_consumption;
+//    }
+//    if (mode2 == 3)
+//    {
+//        angular_velocity -= agility;
+//        fuel_consumption += 1;
+//        fuel -= fuel_consumption;
+//    }
+//    if (angular_velocity > max_maneuver)
+//    {
+//        angular_velocity = max_maneuver;
+//    }
+//    if (angular_velocity < -max_maneuver)
+//    {
+//        angular_velocity = -max_maneuver;
+//    }
+    /// ----------------------------------------------------------------------------------------------
+    angular_velocity += agility*(net.A.back()(2)-net.A.back()(3));
+    fuel_consumption += 1*abs(net.A.back()(2)-net.A.back()(3));
+    fuel -= fuel_consumption;
     if (angular_velocity > max_maneuver)
     {
         angular_velocity = max_maneuver;
@@ -173,7 +181,7 @@ void ship_physics::helm(const int &mode2)
     {
         angular_velocity = -max_maneuver;
     }
-
+    //if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
 }
 
 void ship_physics::brainstorm()
@@ -271,17 +279,46 @@ void ship_physics::update(polygon &map)
 ///-----------------------------Функция для дебага, управляющая тестовым кораблём--------------------------------------
 void ship_physics::dumb_n_do(double neuron1, double neuron2, double neuron3, double neuron4)
 {
-    if (neuron1 > 0.8 && neuron2 > 0.8) engine(1);   //добавить газу
-    else if (neuron1 > 0.8) engine(2);                       //макс скорость
-    else if (neuron2 > 0.8) engine(3);                       //обратный ход
-    else engine(4);                                                  //глушим двигатель
+//    if (neuron1 > 0.8 && neuron2 > 0.8) engine(1);   //добавить газу
+//    else if (neuron1 > 0.8) engine(2);                       //макс скорость
+//    else if (neuron2 > 0.8) engine(3);                       //обратный ход
+//    else engine(4);                                                  //глушим двигатель
 
-    if (neuron3 > 0.8 && neuron4 <= 0.8) helm(2);    //поворот туда
-    if (neuron4 > 0.8 && neuron3 <= 0.8) helm(3);    //поворот НЕ ТУДА
-    if(!(neuron3 > 0.8 || neuron4 > 0.8)) helm(1);   //убить угловую скорость
+//    if (neuron3 > 0.8 && neuron4 <= 0.8) helm(2);    //поворот туда
+//    if (neuron4 > 0.8 && neuron3 <= 0.8) helm(3);    //поворот НЕ ТУДА
+//    if(!(neuron3 > 0.8 || neuron4 > 0.8)) helm(1);   //убить угловую скорость
 
+    test_engine(neuron1, neuron2);
+    test_helm(neuron3, neuron4);
     friction();
     move_by_coords(velocity_x, velocity_y);
     rotate_by(angular_velocity);
+}
+
+void ship_physics::test_engine(double neuron1, double neuron2)
+{
+    double thrust = 0.02;  //Базовый параметр тяги, от которого зависят остальные. Дёргай для изменения ускорения.
+    velocity_x -= sin(angle)*thrust*(neuron1-neuron2);
+    velocity_y -= cos(angle)*thrust*(neuron1-neuron2);
+    fuel_consumption = 2*abs(neuron1-neuron2);
+    fuel -= fuel_consumption;
+}
+
+void ship_physics::test_helm(double neuron3, double neuron4)
+{
+    double agility = 0.0006;  //Базовый параметр поворотливости, от которого зависят остальные. Дёргай для изменения ускорения.
+    double max_maneuver = 0.020;
+    angular_velocity += agility*(neuron3-neuron4);
+    fuel_consumption += 1*abs(neuron3-neuron4);
+    fuel -= fuel_consumption;
+    if (angular_velocity > max_maneuver)
+    {
+        angular_velocity = max_maneuver;
+    }
+    if (angular_velocity < -max_maneuver)
+    {
+        angular_velocity = -max_maneuver;
+    }
+    //if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
 }
 ///--------------------------------------------------------------------------------------------------------------------
