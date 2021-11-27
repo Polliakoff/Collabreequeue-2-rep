@@ -8,6 +8,11 @@ double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
 
+double brain::diff_sigmoid(const double &x)
+{
+    return exp(-x)/pow((1+exp(-x)),2);
+}
+
 //double brain::sigmoid_distance(const double &x){
 //    return 1/(1+exp((-x+80)/5));
 //}
@@ -38,7 +43,7 @@ brain::brain(brain &a, brain &b, double dmnc):
     behavior(a.behavior, b.behavior)
 {
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
-                                            //тут влияние dmnc
+    //тут влияние dmnc
     this->l.clear();
     this->l.reserve(this->S);
 
@@ -132,17 +137,17 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
 
         //в начале можно потерять одну строку ?
         {       //восстанавливаем потерянные строки
-//        if (first_special_layer){
-//            auto &abMax = (a.l[lt-1] >= b.l[lt-1]? a : b); //сравниваем по количеству строк
-//            auto &abMin = (a.l[lt-1] <  b.l[lt-1]? a : b);
-//            for (int temp = abMin.l[lt-1]; //берем за начальную точку конец меньшей матрицы
-//                 temp < this->l[lt-1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
-//                for (int i = 0; i < abMax.l[lt]; ++i){
-//                    this->W[lt](temp,i) = abMax.W[lt-1](temp,i); //берем веса большей матрицы
-//                }
-//            }
-//            first_special_layer=false;
-//        }
+            //        if (first_special_layer){
+            //            auto &abMax = (a.l[lt-1] >= b.l[lt-1]? a : b); //сравниваем по количеству строк
+            //            auto &abMin = (a.l[lt-1] <  b.l[lt-1]? a : b);
+            //            for (int temp = abMin.l[lt-1]; //берем за начальную точку конец меньшей матрицы
+            //                 temp < this->l[lt-1]; ++temp){ //пока точка не вышла за пределы текущей матрицы
+            //                for (int i = 0; i < abMax.l[lt]; ++i){
+            //                    this->W[lt](temp,i) = abMax.W[lt-1](temp,i); //берем веса большей матрицы
+            //                }
+            //            }
+            //            first_special_layer=false;
+            //        }
         }
         ++lt;
     }
@@ -168,7 +173,7 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
              temp < this->l[S-2] && temp < abMax.l[abMax.S-2]; ++temp){ //пока точка не вышла за пределы текущей матрицы
             for (int i = 0; i < abMax.l[abMax.S-1]; ++i){
                 this->W[S-2](temp,i) = abMax.W[abMax.S-2](temp,i);
-                                                            //берем веса большей матрицы
+                //берем веса большей матрицы
             }
         }
         //ебнутый вариант
@@ -178,6 +183,69 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                 this->W[S-2](temp,i) = (-100+rand()%201)/100.0;
             }
         }
+    }
+}
+
+Eigen::RowVectorXd brain::false_prophet(std::shared_ptr<Eigen::RowVectorXd> wrong_ones)
+{
+    Eigen::RowVectorXd return_vector(last);
+    for(int i = 0; i<last; i++){
+        if(i==0 || i==1){
+            if(behavior.speed>=0){
+                switch (i) {
+                case 0:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.speed/2);
+                    break;
+                case 1:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.speed/2);
+                    break;
+                }
+            }
+            else{
+                switch (i) {
+                case 0:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.speed/2);
+                    break;
+                case 1:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.speed/2);
+                    break;
+                }
+            }
+        }
+        else{
+            if(behavior.swing>=0){
+                switch (i) {
+                case 2:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.swing/2);
+                    break;
+                case 3:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.swing/2);
+                    break;
+                }
+            }
+            else{
+                switch (i) {
+                case 2:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.swing/2);
+                    break;
+                case 3:
+                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.swing/2);
+                    break;
+                }
+            }
+        }
+    }
+
+    return return_vector;
+}
+
+double brain::round_to_one(const double &subject)
+{
+    if(abs(subject)>1){
+        return subject/subject;
+    }
+    else{
+        return subject;
     }
 }
 
@@ -278,7 +346,7 @@ void brain::noiseWeights()
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
-//        A[0](k) = sigmoid_distance(A[0](k));
+        //        A[0](k) = sigmoid_distance(A[0](k));
         A[0](k) /= 10.0;
     }
     memory.insert(memory.begin(), std::make_shared<Eigen::RowVectorXd>(A[0]));
@@ -298,6 +366,26 @@ void brain::think(){
     }
 }
 
+void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
+{
+    int i = 0;
+    A[0] = *input_A;
+    for (auto &w: W) {
+        A[i + 1] = A[i] * w;
+        learning_A[i+1] = A[i + 1];
+        for(auto &a: A[i + 1]){
+            a = sigmoid(a);
+        }
+        ++i;
+    }
+    i = 0;
+    for (auto &a: A[S-1]) {
+        A[0](first-last+i)=a;
+        ++i;
+    }
+    learning_A[0] = A[0];
+}
+
 bool brain::viable(){
     for (vector<int>::iterator it = l.begin(); it + 1 != l.end();) {
         if(*it < *(it+1)) return false;
@@ -308,7 +396,41 @@ bool brain::viable(){
 
 
 void brain::learn(){
+    int ticks_remembered = 5;
+    for(int mem_num = 0; mem_num<ticks_remembered; mem_num++){
+        //генерация выходных данные по запомненным входным
+        think(memory[mem_num]);
 
+        //генерация "правильных" выходных данных
+        auto moving_A = std::make_shared<Eigen::RowVectorXd>(A.back());
+        auto prediction = false_prophet(moving_A);
+
+        //подсчет ошибки выходного слоя
+        auto deltas = A;
+        deltas.back()= prediction - A.back();
+
+        //рассчет ошибок всей матрицы
+        for(int row_number = S-2; row_number>0; row_number--){
+            deltas[row_number] = deltas[row_number+1]*W[row_number].transpose();
+        }
+
+        //Корректировка весов
+        auto new_W = W;
+        auto new_A = A;
+        for (int k = 0; k<W.size(); k++){
+            //k - номер слоя
+            for (int i = 0; i<W[k].rows(); i++){
+                //i - номер начального нейрона в слое
+                for (int j = 0; j<W[k].cols(); j++){
+                    //j - номер конечного нейрона в слое
+                    new_W[k](i,j) = W[k](i,j) + behavior.h_factor
+                            *deltas[k+1](j)
+                            *diff_sigmoid(learning_A[k+1](j))
+                            *A[k](i);
+                }
+            }
+        }
+    }
 }
 
 
@@ -328,7 +450,7 @@ QDataStream &operator<<(QDataStream &out, const brain &item){
         out << l_;
     for (auto &w: item.W){
         for(auto &r : w.reshaped())
-                out << r;
+            out << r;
     }
     out.setFloatingPointPrecision(prev);
     return out;

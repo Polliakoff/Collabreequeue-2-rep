@@ -15,15 +15,18 @@ class brain
 {
 protected:
     double sigmoid(const double&);
+    double diff_sigmoid(const double&);
 //    double sigmoid_distance(const double&);
     void inheritWeights(brain &a, brain &b, double dmnc);
-
+    Eigen::RowVectorXd false_prophet(std::shared_ptr<Eigen::RowVectorXd>);
+    double round_to_one(const double& subject);
     std::vector<std::shared_ptr<Eigen::RowVectorXd>> memory;
 public:
     pattern behavior;
-    int S;                              //внутренних слоёв
+    int S;                              //всего слоёв
     std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам
     std::vector<Eigen::RowVectorXd> A;  //S+2 всего слоёв (размер 1хl[n])
+    std::vector<Eigen::RowVectorXd> learning_A;
     std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
 
     int first=14;   //количество входных слоёв
@@ -36,6 +39,7 @@ public:
                                                                 //до 1.00(копирование первой сети)
     bool viable();      //проверяет сеть на вменяемость
     void think();       //пересчитывает значения
+    void think(std::shared_ptr<Eigen::RowVectorXd>);
     void mutate();      //мутирует с некоторой вероятностью
     void noiseWeights();//шумит веса
     void learn();
