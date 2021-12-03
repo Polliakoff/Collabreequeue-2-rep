@@ -281,6 +281,7 @@ void ship_physics::update(polygon &map)
     }
     if(fuel <= 0 || collided){
         operational = false;
+       
     }
     distance_to_finish = vector_module(path.first,path.second);
 }

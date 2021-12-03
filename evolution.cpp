@@ -137,6 +137,7 @@ void evolution::evolve()
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
         population[population.size()-1]->set_id(par.first->id);
+        population[population.size()-1]->lives = par.first->lives;
         names.emplace_back(par.second);
     }
     //переезд учащихся
@@ -145,6 +146,7 @@ void evolution::evolve()
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,ler.first.get()->getBrain()));
         population[population.size()-1]->set_id(ler.first->id);
+        population[population.size()-1]->lives = ler.first->lives;
         names.emplace_back(ler.second);
         fout << genName + ler.second << "\n";
     }
@@ -215,6 +217,7 @@ void evolution::evolution_stat()
         for(auto &i: population){
             if(i->get_position().second>300){
                 i->can_be_parrent = false;
+                i->lives--;
             } /*else if(i->distance_to_finish <= 450){
                 i->can_be_parrent = true;
             }*/
