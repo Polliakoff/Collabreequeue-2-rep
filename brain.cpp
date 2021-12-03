@@ -411,7 +411,7 @@ void brain::learn(){
             deltas[row_number] = deltas[row_number+1]*W[row_number].transpose();
         }
 
-        //Корректировка весов
+        //Создание весовых дельт
         auto delta_W = W;
         for (int k = 0; k<W.size(); k++){
             //k - номер слоя
@@ -425,6 +425,13 @@ void brain::learn(){
                             *A[k](i);
                 }
             }
+        }
+
+        //корректировка весов
+        int j = 0;
+        for(auto& i:W){
+            i += delta_W[j];
+            j++;
         }
     }
     memory.clear();
