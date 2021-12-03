@@ -340,9 +340,6 @@ void brain::noiseWeights()
     }
 }
 
-
-
-
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
@@ -415,15 +412,14 @@ void brain::learn(){
         }
 
         //Корректировка весов
-        auto new_W = W;
-        auto new_A = A;
+        auto delta_W = W;
         for (int k = 0; k<W.size(); k++){
             //k - номер слоя
             for (int i = 0; i<W[k].rows(); i++){
                 //i - номер начального нейрона в слое
                 for (int j = 0; j<W[k].cols(); j++){
                     //j - номер конечного нейрона в слое
-                    new_W[k](i,j) = W[k](i,j) + behavior.h_factor
+                    delta_W[k](i,j) = behavior.h_factor
                             *deltas[k+1](j)
                             *diff_sigmoid(learning_A[k+1](j))
                             *A[k](i);
@@ -431,6 +427,7 @@ void brain::learn(){
             }
         }
     }
+    memory.clear();
 }
 
 

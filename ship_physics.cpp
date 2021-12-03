@@ -257,6 +257,11 @@ brain &ship_physics::getBrain()
     return net;
 }
 
+void ship_physics::time_to_learn()
+{
+    net.learn();
+}
+
 void ship_physics::set_id(const int& new_id)
 {
     id = new_id;
@@ -269,6 +274,12 @@ void ship_physics::update(polygon &map)
     velocity_sum+=abs_velocity;
     if(collided){
         can_be_parrent = false;
+    }
+    if(can_be_parrent == false){
+        lives--;
+    }
+    if(lives<=0){
+        autist = true;
     }
     if(fuel <= 0 || collided){
         operational = false;

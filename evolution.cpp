@@ -38,23 +38,26 @@ void evolution::evolve()
         ++num;
     } //стоп машина
 
-
     vector<int> index;
+    vector<int> learning_index;
     int i = 0;
     for (auto &shp: population){
         if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
+        else if(shp.get()->autist == false){
+            shp.get()->time_to_learn();
+            learning_index.push_back(i);
+        }
         ++i;
     } //выбрали норм корабли //доработать
 
+    //отбор родителей
     std::multimap<double, std::pair<std::string,int>> best;
 
     for(auto &imp: index){
         best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
     }
-
-
 
     i=0;
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
@@ -69,6 +72,24 @@ void evolution::evolve()
             if (i == 10)
                 break;
         } //отобрали пять лучших
+    }
+
+    //отбор учащихся
+    std::multimap<double, std::pair<std::string,int>> learning_best;
+
+    for(auto &imp: learning_index){
+        learning_best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
+    }
+
+    i=0;
+    vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenLearners;
+    if(learning_index.size()>0){
+        for (auto &m: learning_best){
+            newGenLearners.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+            ++i;
+            if (i == 200)
+                break;
+        }
     }
 
     names.clear();
@@ -118,6 +139,15 @@ void evolution::evolve()
         population[population.size()-1]->set_id(par.first->id);
         names.emplace_back(par.second);
     }
+    //переезд учащихся
+    fout<<"Found learners:\n";
+    for(auto &ler: newGenLearners){
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->final_point.second,ler.first.get()->getBrain()));
+        population[population.size()-1]->set_id(ler.first->id);
+        names.emplace_back(ler.second);
+        fout << genName + ler.second << "\n";
+    }
     //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
@@ -147,6 +177,7 @@ void evolution::evolution_stat()
             if(i->fuel == 2200){
                 i->operational = false;
                 i->can_be_parrent = false;
+                i->autist = true;
             }
         }
     }
@@ -156,6 +187,7 @@ void evolution::evolution_stat()
             if(i->velocity_sum<=min_speed-98){
                 i->operational = false;
                 i->can_be_parrent = false;
+                i->autist = true;
             }
         }
     }
@@ -165,6 +197,7 @@ void evolution::evolution_stat()
             if(i->velocity_sum<=min_speed-40){
                 i->operational = false;
                 i->can_be_parrent = false;
+                i->autist = true;
             }
         }
     }

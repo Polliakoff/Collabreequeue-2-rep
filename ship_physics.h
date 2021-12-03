@@ -32,8 +32,11 @@ public:
     double ship_and_velocity_angle;
     double friction_value;
     double distance_to_finish;
+
     bool operational = true;
     bool can_be_parrent = true;
+    int lives = 5;
+    bool autist = false;
 
     double to_turn_to;
     double velocity_projection;
@@ -49,6 +52,7 @@ public:
     void modify_path();
     bool viable();
     brain& getBrain();
+    void time_to_learn();
 
     double test;
 
