@@ -148,7 +148,7 @@ void evolution::evolve()
         population[population.size()-1]->set_id(ler.first->id);
         population[population.size()-1]->lives = ler.first->lives;
         names.emplace_back(ler.second);
-        fout << genName + ler.second << "\n";
+        fout << ler.second << "\n";
     }
     //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
