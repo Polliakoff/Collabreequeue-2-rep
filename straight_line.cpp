@@ -39,6 +39,17 @@ void straight_line::rotate(const double &angle)
     rotation(2,2) = 1;
 
     direction = rotation*direction;
+
+    for(auto &i: direction){
+        if(abs(i)<0.0001){
+            if(i>0) i = 0.0001;
+            else i = -0.0001;
+        }
+        if(qIsNaN(i)){
+            i=0;
+        }
+    }
+
 }
 
 void straight_line::move_by(const double &x, const double &y)

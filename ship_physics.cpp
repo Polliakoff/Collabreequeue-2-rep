@@ -189,6 +189,7 @@ void ship_physics::brainstorm()
     //++test;
     if (test == 8000)
         --test;*/
+
     net.A[0](0)=distances[0];
     net.A[0](1)=distances[1];
     net.A[0](2)=distances[2];
@@ -199,6 +200,14 @@ void ship_physics::brainstorm()
     net.A[0](7)=10*velocity_projection;
     net.A[0](8)=10*abs_velocity; //должно быть в проекции на вектор правильного направления
     net.A[0](9)=220/fuel;
+    for(auto &i:net.A[0]){
+        if(qIsNaN(i)){
+            //std::cout<<"kek";
+            this->can_be_parrent = false;
+            this->autist = true;
+            this->operational = false;
+        }
+    }
     net.think();
 }
 
@@ -208,8 +217,8 @@ void ship_physics::friction()
     abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
     if (velocity_x < 0.0001 && velocity_x > -0.0001 && velocity_y < 0.0001 && velocity_y > -0.0001)
     {
-        velocity_x = 0;
-        velocity_y = 0;
+        velocity_x = 0.000001;
+        velocity_y = 0.000001;
     }
 
     actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));

@@ -5,6 +5,7 @@
 #include "ship.h"
 #include "brain.h"
 #include <string>
+#include <cmath>
 
 class ship_physics : public ship
 {

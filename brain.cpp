@@ -19,6 +19,7 @@ double brain::diff_sigmoid(const double &x)
 //}
 
 brain::brain(): behavior(){
+    memory.resize(5);
     S = 5 + rand() % 7;//максимум пять внутренних слоёв
     l.reserve(S);
     l.emplace_back(first);
@@ -43,6 +44,7 @@ brain::brain(): behavior(){
 brain::brain(brain &a, brain &b, double dmnc):
     behavior(a.behavior, b.behavior)
 {
+    memory.resize(5);
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
     //тут влияние dmnc
     this->l.clear();
@@ -347,8 +349,14 @@ void brain::think(){
         //        A[0](k) = sigmoid_distance(A[0](k));
         A[0](k) /= 10.0;
     }
-    memory.insert(memory.begin(), std::make_shared<Eigen::RowVectorXd>(A[0]));
-    memory.resize(5);
+
+    for(int j = memory.size()-1;j>0;j--){
+        memory[j] = memory[j-1];
+    }
+    memory[0] = std::make_shared<Eigen::RowVectorXd>(A[0]);
+
+    //memory.insert(memory.begin(), std::make_shared<Eigen::RowVectorXd>(A[0]));
+    //memory.resize(5);
 
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
@@ -398,6 +406,11 @@ void brain::learn(){
     int ticks_remembered = 5;
     for(int mem_num = 0; mem_num<ticks_remembered; mem_num++){
         //генерация выходных данные по запомненным входным
+        for(auto &i:memory){
+            if(i==NULL){
+                cout<<"kek";
+            }
+        }
         think(memory[mem_num]);
 
         //генерация "правильных" выходных данных
@@ -425,6 +438,10 @@ void brain::learn(){
                             *deltas[k+1](j)
                             *diff_sigmoid(learning_A[k+1](j))
                             *A[k](i);
+                    if(qIsNaN(delta_W[k](i,j)) || abs(delta_W[k](i,j)) == std::numeric_limits<double>::infinity())
+                    {
+                        cout<<"kek";
+                    }
                 }
             }
         }
@@ -432,11 +449,18 @@ void brain::learn(){
         //корректировка весов
         int j = 0;
         for(auto& i:W){
+            for(auto& j:i.reshaped()){
+                if(qIsNaN(j) || abs(j) == std::numeric_limits<double>::infinity())
+                {
+                    cout<<"kek";
+                }
+            }
             i += delta_W[j];
             j++;
         }
     }
     memory.clear();
+    memory.resize(5);
 }
 
 //========================================================================
