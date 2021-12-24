@@ -405,44 +405,48 @@ bool brain::viable(){
 void brain::learn(){
     int ticks_remembered = 5;
     for(int mem_num = 0; mem_num<ticks_remembered; mem_num++){
-        //генерация выходных данные по запомненным входным
-        think(memory[mem_num]);
+        for(int run = 0; run < 5; run++)
+        {
+            //генерация выходных данные по запомненным входным
+            think(memory[mem_num]);
 
-        //генерация "правильных" выходных данных
-        auto moving_A = std::make_shared<Eigen::RowVectorXd>(A.back());
-        auto prediction = false_prophet(moving_A);
+            //генерация "правильных" выходных данных
+            auto moving_A = std::make_shared<Eigen::RowVectorXd>(A.back());
+            auto prediction = false_prophet(moving_A);
 
-        //подсчет ошибки выходного слоя
-        auto deltas = A;
-        deltas.back()= prediction - A.back();
+            //подсчет ошибки выходного слоя
+            auto deltas = A;
+            deltas.back()= prediction - A.back();
 
-        //рассчет ошибок всей матрицы
-        for(int row_number = S-2; row_number>0; row_number--){
-            deltas[row_number] = deltas[row_number+1]*W[row_number].transpose();
-        }
+            //рассчет ошибок всей матрицы
+            for(int row_number = S-2; row_number>0; row_number--){
+                deltas[row_number] = deltas[row_number+1]*W[row_number].transpose();
+            }
 
-        //Создание весовых дельт
-        auto delta_W = W;
-        for (int k = 0; k<W.size(); k++){
-            //k - номер слоя
-            for (int i = 0; i<W[k].rows(); i++){
-                //i - номер начального нейрона в слое
-                for (int j = 0; j<W[k].cols(); j++){
-                    //j - номер конечного нейрона в слое
-                    delta_W[k](i,j) = behavior.h_factor
-                            *deltas[k+1](j)
-                            *diff_sigmoid(learning_A[k+1](j))
-                            *A[k](i);
+            //Создание весовых дельт
+            auto delta_W = W;
+            for (int k = 0; k<W.size(); k++){
+                //k - номер слоя
+                for (int i = 0; i<W[k].rows(); i++){
+                    //i - номер начального нейрона в слое
+                    for (int j = 0; j<W[k].cols(); j++){
+                        //j - номер конечного нейрона в слое
+                        delta_W[k](i,j) = behavior.h_factor
+                                *deltas[k+1](j)
+                                *diff_sigmoid(learning_A[k+1](j))
+                                *A[k](i);
+                    }
                 }
+            }
+
+            //корректировка весов
+            int j = 0;
+            for(auto& i:W){
+                i += delta_W[j];
+                j++;
             }
         }
 
-        //корректировка весов
-        int j = 0;
-        for(auto& i:W){
-            i += delta_W[j];
-            j++;
-        }
     }
     memory.clear();
     memory.resize(5);
