@@ -338,7 +338,7 @@ void brain::noiseWeights()
 {
     for (auto &w: W){
         for (auto &i: w.reshaped()){
-            i *= (2/(exp(i*10))+1)*(95+(rand()%11))/100.0;
+            i *= (95+(rand()%11))/100.0;
         }
     }
 }
@@ -406,11 +406,6 @@ void brain::learn(){
     int ticks_remembered = 5;
     for(int mem_num = 0; mem_num<ticks_remembered; mem_num++){
         //генерация выходных данные по запомненным входным
-        for(auto &i:memory){
-            if(i==NULL){
-                cout<<"kek";
-            }
-        }
         think(memory[mem_num]);
 
         //генерация "правильных" выходных данных
@@ -438,10 +433,6 @@ void brain::learn(){
                             *deltas[k+1](j)
                             *diff_sigmoid(learning_A[k+1](j))
                             *A[k](i);
-                    if(qIsNaN(delta_W[k](i,j)) || abs(delta_W[k](i,j)) == std::numeric_limits<double>::infinity())
-                    {
-                        cout<<"kek";
-                    }
                 }
             }
         }
@@ -449,12 +440,6 @@ void brain::learn(){
         //корректировка весов
         int j = 0;
         for(auto& i:W){
-            for(auto& j:i.reshaped()){
-                if(qIsNaN(j) || abs(j) == std::numeric_limits<double>::infinity())
-                {
-                    cout<<"kek";
-                }
-            }
             i += delta_W[j];
             j++;
         }

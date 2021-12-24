@@ -202,7 +202,6 @@ void ship_physics::brainstorm()
     net.A[0](9)=220/fuel;
     for(auto &i:net.A[0]){
         if(qIsNaN(i)){
-            //std::cout<<"kek";
             this->can_be_parrent = false;
             this->autist = true;
             this->operational = false;
