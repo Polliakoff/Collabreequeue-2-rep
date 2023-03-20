@@ -1,20 +1,20 @@
-//#ifndef SHIP_H
-//#define SHIP_H
-#pragma once
+#ifndef SHIP_H
+#define SHIP_H
 
 #include <vector>
 #include "straight_line.h"
 #include "polygon.h"
 //#include "brain.h"
 #include <QDataStream>
+#include <QObject>
 
-
-class ship
+class ship: public QObject
 {
+    Q_OBJECT
 protected:
     pair<double, double> position;
 public:
-    ship();//не использовать
+    explicit ship(QObject *parent = nullptr);//не использовать
     ship(const double& pos_x,const double& pos_y); // задавать корабль исключительно этим конструктором с установленной позицией
     ~ship();
 
@@ -43,4 +43,5 @@ public slots:
 
 pair<double, double> point_rotation(const pair<double, double>& point, const pair<double, double>& axis, const double &delta_angle);
 bool point_to_poly(const pair<double,double>& point, polygon &pol);
-//#endif // SHIP_H
+
+#endif // SHIP_H

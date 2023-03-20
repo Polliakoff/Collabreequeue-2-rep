@@ -4,11 +4,17 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
     map = pthw;
+    int thread_count = -1;
     for(int i = 0; i < generation_size; i++)
     {
+        if(i % 10 == 0){
+           population_threads.emplace_back(std::make_unique<QThread>());
+           thread_count++;
+        }
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
+        population[i].get()->moveToThread(population_threads[thread_count].get());
     }
     generation = generation_size;
     fout << "";
@@ -95,7 +101,11 @@ void evolution::evolve()
     names.clear();
     names.reserve(generation);
 
+    for(int i = 0; i<population_threads.size(); i++){
+        population_threads[i].get()->terminate();
+    }
     population.clear();
+    population_threads.clear();
     think_n_do_connections.clear();
     update_connections.clear();
 
@@ -159,6 +169,15 @@ void evolution::evolve()
     //избавляемся от остаточных галлюцинаций
     for(auto &ship:population){
         ship->initial_fix();
+    }
+
+    int thread_count = -1;
+    for(int i = 0; i<generation; i++){
+        if(i % 10 == 0){
+           population_threads.emplace_back(std::make_unique<QThread>());
+           thread_count++;
+        }
+        population[i].get()->moveToThread(population_threads[thread_count].get());
     }
 
     fout.close();
@@ -238,6 +257,13 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
     }
+
+    if(!(population_threads[0].get()->isRunning())){
+        t = population_threads.size();
+        for(int i = 0; i < t; i++){
+            population_threads[i].get()->start();
+        }
+    }
 }
 
 void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw)
@@ -252,6 +278,13 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
     }
+
+    if(!(population_threads[0].get()->isRunning())){
+        t = population_threads.size();
+        for(int i = 0; i < t; i++){
+            population_threads[i].get()->start();
+        }
+    }
 }
 
 void evolution::cnnct()
@@ -263,6 +296,13 @@ void evolution::cnnct()
 
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
+    }
+
+    if(!(population_threads[0].get()->isRunning())){
+        t = population_threads.size();
+        for(int i = 0; i < t; i++){
+            population_threads[i].get()->start();
+        }
     }
 }
 

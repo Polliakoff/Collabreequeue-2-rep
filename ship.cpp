@@ -1,6 +1,9 @@
 #include "ship.h"
 
-ship::ship(){}
+ship::ship(QObject *parent): QObject{parent}
+{
+
+}
 
 ship::ship(const double& pos_x,const double& pos_y)
 {

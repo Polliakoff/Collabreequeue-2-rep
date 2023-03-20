@@ -9,12 +9,11 @@
 #include <QTimer>
 #include "pathway.h"
 #include <QObject>
-
+#include <QThread>
 
 class evolution
 {
 protected:
-
     std::ofstream fout;
 public:
     evolution()=default;//РЅРµ С‚СЂРѕРіР°С‚СЊ
@@ -26,6 +25,8 @@ public:
     int clock=0;
     int min_speed = 100;
     int tst=0;
+
+    vector<std::unique_ptr<QThread>> population_threads;
     vector<std::unique_ptr<ship_physics>> population;
     vector<std::string> names;
     vector<QMetaObject::Connection> update_connections;
