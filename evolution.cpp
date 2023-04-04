@@ -4,17 +4,23 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
     map = pthw;
-    int thread_count = -1;
+    //*потоки*
+//    int thread_count = -1;
+    //*потоки*
     for(int i = 0; i < generation_size; i++)
     {
-        if(i % 10 == 0){
-           population_threads.emplace_back(std::make_unique<QThread>());
-           thread_count++;
-        }
+        //*потоки*
+//        if(i % 500 == 0){
+//           population_threads.emplace_back(std::make_unique<QThread>());
+//           thread_count++;
+//        }
+        //*потоки*
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
-        population[i].get()->moveToThread(population_threads[thread_count].get());
+        //*потоки*
+//        population[i].get()->moveToThread(population_threads[thread_count].get());
+        //*потоки*
     }
     generation = generation_size;
     fout << "";
@@ -23,7 +29,7 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 
 void evolution::evolve()
 {
-    //dscnnct();
+
     fout.open("evolution_obj.log", std::ios::app);
 
     if(genName[3]=='z') {
@@ -100,12 +106,15 @@ void evolution::evolve()
 
     names.clear();
     names.reserve(generation);
-
-    for(int i = 0; i<population_threads.size(); i++){
-        population_threads[i].get()->terminate();
-    }
+    //*потоки*
+//    for(int i = 0; i<population_threads.size(); i++){
+//        population_threads[i].get()->quit();
+//    }
+    //*потоки*
     population.clear();
-    population_threads.clear();
+    //*потоки*
+//    population_threads.clear();
+    //*потоки*
     think_n_do_connections.clear();
     update_connections.clear();
 
@@ -171,14 +180,16 @@ void evolution::evolve()
         ship->initial_fix();
     }
 
-    int thread_count = -1;
-    for(int i = 0; i<generation; i++){
-        if(i % 10 == 0){
-           population_threads.emplace_back(std::make_unique<QThread>());
-           thread_count++;
-        }
-        population[i].get()->moveToThread(population_threads[thread_count].get());
-    }
+    //*потоки*
+//    int thread_count = -1;
+//    for(int i = 0; i<generation; i++){
+//        if(i % 500 == 0){
+//           population_threads.emplace_back(std::make_unique<QThread>());
+//           thread_count++;
+//        }
+//        population[i].get()->moveToThread(population_threads[thread_count].get());
+//    }
+    //*потоки*
 
     fout.close();
     clock = 0;
@@ -258,12 +269,14 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
                                                              [=](){population[i]->think_n_do();}));
     }
 
-    if(!(population_threads[0].get()->isRunning())){
-        t = population_threads.size();
-        for(int i = 0; i < t; i++){
-            population_threads[i].get()->start();
-        }
-    }
+    //*потоки*
+//    if(!(population_threads[0].get()->isRunning())){
+//        t = population_threads.size();
+//        for(int i = 0; i < t; i++){
+//            population_threads[i].get()->start();
+//        }
+//    }
+    //*потоки*
 }
 
 void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw)
@@ -279,12 +292,14 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
                                                              [=](){population[i]->think_n_do();}));
     }
 
-    if(!(population_threads[0].get()->isRunning())){
-        t = population_threads.size();
-        for(int i = 0; i < t; i++){
-            population_threads[i].get()->start();
-        }
-    }
+    //*потоки*
+//    if(!(population_threads[0].get()->isRunning())){
+//        t = population_threads.size();
+//        for(int i = 0; i < t; i++){
+//            population_threads[i].get()->start();
+//        }
+//    }
+    //*потоки*
 }
 
 void evolution::cnnct()
@@ -298,12 +313,14 @@ void evolution::cnnct()
                                                              [=](){population[i]->think_n_do();}));
     }
 
-    if(!(population_threads[0].get()->isRunning())){
-        t = population_threads.size();
-        for(int i = 0; i < t; i++){
-            population_threads[i].get()->start();
-        }
-    }
+    //*потоки*
+//    if(!(population_threads[0].get()->isRunning())){
+//        t = population_threads.size();
+//        for(int i = 0; i < t; i++){
+//            population_threads[i].get()->start();
+//        }
+//    }
+    //*потоки*
 }
 
 void evolution::dscnnct()

@@ -12,16 +12,14 @@ MainWindow::MainWindow(QWidget *parent)
     update_timer = std::make_unique<QTimer>();
     painter_timer = std::make_unique<QTimer>();
 
-    map = std::make_shared<pathway>();
-    ship_evolution = std::make_unique<evolution>(500, map);
-    //    map->add_point(250,250);
-    //    map->add_point(250,150);
-    //    map->add_point(150,150);
-    //    map->add_point(150,250);
+    //==раньше было тут
+    //map = std::make_shared<pathway>();
+    //ship_evolution = std::make_unique<evolution>(500, map);
 
     ///===========тестовый
-    test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+    //test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
     ///===========тестовый
+    //==раньше было тут
 }
 
 MainWindow::~MainWindow()
@@ -54,11 +52,22 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 
 void MainWindow::on_pushButton_clicked()
 {
-    ui->graphicsView->setScene(scene.get());
+    if(first_boot){
+        ui->checkBox->setEnabled(false);
+        map = std::make_shared<pathway>();
+        map->switcher(tmblr_generator);
+        ship_evolution = std::make_unique<evolution>(500, map);
+
+        ///===========тестовый
+        test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+        ///===========тестовый
+
+        ui->graphicsView->setScene(scene.get());
+
+        first_boot = false;
+    }
 
     connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
-
-    //connect(&ship_evolution, SIGNAL(&evolution::valueChanged), this, SLOT(genNameSet(ship_evolution.genName)));
 
     ship_evolution->cnnct(update_timer);
     ///===========тестовый
@@ -226,6 +235,5 @@ void MainWindow::genNameSet(std::string name)
 void MainWindow::on_checkBox_stateChanged()
 {
     tmblr_generator =! tmblr_generator;
-    map->switcher(tmblr_generator);
 }
 
