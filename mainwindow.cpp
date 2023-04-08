@@ -56,7 +56,7 @@ void MainWindow::on_pushButton_clicked()
         ui->checkBox->setEnabled(false);
         map = std::make_shared<pathway>();
         map->switcher(tmblr_generator);
-        ship_evolution = std::make_unique<evolution>(500, map);
+        ship_evolution = std::make_unique<evolution>(100, map);
 
         ///===========тестовый
         test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);

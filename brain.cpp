@@ -20,12 +20,27 @@ double brain::diff_sigmoid(const double &x)
 
 brain::brain(): behavior(){
     memory.resize(5);
-    S = 5 + rand() % 7;//максимум пять внутренних слоёв
+    //рандом
+//    S = 5 + rand() % 7;//максимум пять внутренних слоёв
+    //рандом
+    //хардкод
+    S = 7;
+    //хардкод
+
     l.reserve(S);
     l.emplace_back(first);
-    for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
-        l.emplace_back(last + 1 + rand() % (first-last)); //внутренний слой размером в диапазоне от last+1 до first-1
-    }
+    //рандом
+//    for (int i = 1; i < S-1; ++i){ //на каждый слой внутренний по количеству вершин
+//        l.emplace_back(last + 1 + rand() % (first-last)); //внутренний слой размером в диапазоне от last+1 до first-1
+//    }
+    //рандом
+    //хардкод
+    l.emplace_back(12);
+    l.emplace_back(10);
+    l.emplace_back(10);
+    l.emplace_back(8);
+    l.emplace_back(6);
+    //хардкод
     l.emplace_back(last);
     sort(l.begin(), l.end(), greater<int>()); //количество вершин не растет
 
@@ -69,7 +84,8 @@ brain::brain(brain &a, brain &b, double dmnc):
 
     inheritWeights(a,b,dmnc);
     noiseWeights();
-    mutate();
+    ///Структурная мутация
+    //mutate();
 }
 
 void brain::inheritWeights(brain &a, brain &b, double dmnc){
@@ -253,6 +269,7 @@ double brain::round_to_one(const double &subject)
 }
 
 void brain::mutate(){
+    ///Структурная мутация
     int mutatedLayers = int(1 == rand()%20)*(rand()%2? 1 : -1); //в одном из 20-ти происходит мутация слоев на один(не больше)
     if (S == 2 && mutatedLayers < 0 ) mutatedLayers = 0;
     S+=mutatedLayers;
