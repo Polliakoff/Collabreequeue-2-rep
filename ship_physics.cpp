@@ -53,9 +53,10 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,
 
 void ship_physics::initial_fix()
 {
-    for (int k = 1; k < net.last+1; ++k){
-        net.A[0](net.first-k) = 0;
-    }
+    ///Обратная связь
+//    for (int k = 1; k < net.last+1; ++k){
+//        net.A[0](net.first-k) = 0;
+//    }
 }
 
 

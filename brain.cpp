@@ -35,11 +35,18 @@ brain::brain(): behavior(){
 //    }
     //рандом
     //хардкод
-    l.emplace_back(12);
-    l.emplace_back(10);
-    l.emplace_back(10);
+    ///Обратная связь
+//    l.emplace_back(12);
+//    l.emplace_back(10);
+//    l.emplace_back(10);
+//    l.emplace_back(8);
+//    l.emplace_back(6);
+
+    l.emplace_back(9);
     l.emplace_back(8);
+    l.emplace_back(7);
     l.emplace_back(6);
+    l.emplace_back(5);
     //хардкод
     l.emplace_back(last);
     sort(l.begin(), l.end(), greater<int>()); //количество вершин не растет
@@ -383,10 +390,11 @@ void brain::think(){
         ++i;
     }
     i = 0;
-    for (auto &a: A[S-1]) {
-        A[0](first-last+i)=a;
-        ++i;
-    }
+    ///Обратная связь
+//    for (auto &a: A[S-1]) {
+//        A[0](first-last+i)=a;
+//        ++i;
+//    }
 }
 
 void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
@@ -403,10 +411,11 @@ void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
         ++i;
     }
     i = 0;
-    for (auto &a: A[S-1]) {
-        A[0](first-last+i)=a;
-        ++i;
-    }
+    ///Обратная связь
+//    for (auto &a: A[S-1]) {
+//        A[0](first-last+i)=a;
+//        ++i;
+//    }
     learning_A[0] = A[0];
 }
 

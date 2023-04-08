@@ -29,7 +29,11 @@ public:
     std::vector<Eigen::RowVectorXd> learning_A;
     std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
 
-    int first=14;   //количество входных слоёв
+    ///Обратная связь
+//    int first=14;   //количество входных слоёв
+
+    int first=10;
+
     int last=4;     //количество выходных
 
     brain();
