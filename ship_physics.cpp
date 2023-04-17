@@ -133,10 +133,18 @@ void ship_physics::engine(const int &mode)
 //        }
 //    }
     /// ----------------------------------------------------------------------------------------------
-    velocity_x -= sin(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
-    velocity_y -= cos(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
-    fuel_consumption = 2*abs(net.A.back()(0)-net.A.back()(1));
+    /// Под 4 нейрона
+//    velocity_x -= sin(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
+//    velocity_y -= cos(angle)*thrust*(net.A.back()(0)-net.A.back()(1));
+//    fuel_consumption = 2*abs(net.A.back()(0)-net.A.back()(1));
+//    fuel -= fuel_consumption;
+    /// ----------------------------------------------------------------------------------------------
+    /// Под 2 нейрона
+    velocity_x -= sin(angle)*thrust*((net.A.back()(0)-0.5)*2);
+    velocity_y -= cos(angle)*thrust*((net.A.back()(0)-0.5)*2);
+    fuel_consumption = 2*abs((net.A.back()(0)-0.5)*2);
     fuel -= fuel_consumption;
+    /// ----------------------------------------------------------------------------------------------
 }
 
 void ship_physics::helm(const int &mode2)
@@ -171,8 +179,22 @@ void ship_physics::helm(const int &mode2)
 //        angular_velocity = -max_maneuver;
 //    }
     /// ----------------------------------------------------------------------------------------------
-    angular_velocity += agility*(net.A.back()(2)-net.A.back()(3));
-    fuel_consumption += 1*abs(net.A.back()(2)-net.A.back()(3));
+    /// Через 4 нейрона
+//    angular_velocity += agility*(net.A.back()(2)-net.A.back()(3));
+//    fuel_consumption += 1*abs(net.A.back()(2)-net.A.back()(3));
+//    fuel -= fuel_consumption;
+//    if (angular_velocity > max_maneuver)
+//    {
+//        angular_velocity = max_maneuver;
+//    }
+//    if (angular_velocity < -max_maneuver)
+//    {
+//        angular_velocity = -max_maneuver;
+//    }
+    /// ----------------------------------------------------------------------------------------------
+    /// Через 2 нейрона
+    angular_velocity += agility*((net.A.back()(1)-0.5)*2);
+    fuel_consumption += 1*abs((net.A.back()(1)-0.5)*2);
     fuel -= fuel_consumption;
     if (angular_velocity > max_maneuver)
     {
@@ -182,7 +204,7 @@ void ship_physics::helm(const int &mode2)
     {
         angular_velocity = -max_maneuver;
     }
-    //if (angular_velocity <= agility+0.0001 && angular_velocity >= -(agility+0.0001)) angular_velocity = 0;
+    /// ----------------------------------------------------------------------------------------------
 }
 
 void ship_physics::brainstorm()
@@ -197,10 +219,17 @@ void ship_physics::brainstorm()
     net.A[0](3)=distances[3];
     net.A[0](4)=distances[4];
     net.A[0](5)=distances[5];
-    net.A[0](6)=to_turn_to;
-    net.A[0](7)=10*velocity_projection;
-    net.A[0](8)=10*abs_velocity; //должно быть в проекции на вектор правильного направления
-    net.A[0](9)=220/fuel;
+
+//    net.A[0](6)=to_turn_to; //куда повернуть
+//    net.A[0](7)=10*velocity_projection; // куда газануть
+
+//    net.A[0](8)=10*abs_velocity; //должно быть в проекции на вектор правильного направления
+//    net.A[0](9)=220/fuel;
+
+    net.A[0](6)=10*abs_velocity; //должно быть в проекции на вектор правильного направления
+
+//    net.A[0](7)=220/fuel;
+
     for(auto &i:net.A[0]){
         if(qIsNaN(i)){
             this->can_be_parrent = false;

@@ -24,7 +24,7 @@ brain::brain(): behavior(){
 //    S = 5 + rand() % 7;//максимум пять внутренних слоёв
     //рандом
     //хардкод
-    S = 7;
+    S = 5;
     //хардкод
 
     l.reserve(S);
@@ -42,11 +42,15 @@ brain::brain(): behavior(){
 //    l.emplace_back(8);
 //    l.emplace_back(6);
 
-    l.emplace_back(9);
-    l.emplace_back(8);
-    l.emplace_back(7);
+//    l.emplace_back(7);
+//    l.emplace_back(6);
+//    l.emplace_back(5);
+//    l.emplace_back(4);
+//    l.emplace_back(3);
+
     l.emplace_back(6);
     l.emplace_back(5);
+    l.emplace_back(4);
     //хардкод
     l.emplace_back(last);
     sort(l.begin(), l.end(), greater<int>()); //количество вершин не растет
@@ -362,7 +366,17 @@ void brain::noiseWeights()
 {
     for (auto &w: W){
         for (auto &i: w.reshaped()){
-            i *= (95+(rand()%11))/100.0;
+
+//            i *= (95+(rand()%11))/100.0;
+
+            i += (rand()%201 - 100)/1000.0;
+            if(i>1){
+                i=1;
+            }
+            if(i<-1){
+                i=-1;
+            }
+
         }
     }
 }

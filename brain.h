@@ -32,9 +32,11 @@ public:
     ///Обратная связь
 //    int first=14;   //количество входных слоёв
 
-    int first=10;
+    int first=7;
 
-    int last=4;     //количество выходных
+//    int last=4;     //количество выходных когда чатыре
+
+    int last=2;     //количество выходных
 
     brain();
     brain(brain &a, brain &b, double dominance);                //новая нейросеть на основе старых,
