@@ -27,7 +27,7 @@ public:
     std::string name;
 
     double fuel_consumption;
-    double fuel = 2200;
+    double fuel = 4400;
     double actual_angle;
     double velocity_sum = 0;
     double ship_and_velocity_angle;

@@ -282,7 +282,7 @@ void ship_physics::update(polygon &map)
     modify_path();
     velocity_sum+=abs_velocity;
     if(collided){
-        can_be_parrent = false;
+        //can_be_parrent = false;
         lives--;
     }
     if(lives<=0){

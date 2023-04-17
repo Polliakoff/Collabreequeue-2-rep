@@ -51,16 +51,17 @@ void evolution::evolve()
     } //стоп машина
 
     vector<int> index;
-    vector<int> learning_index;
+//    vector<int> learning_index;
     int i = 0;
     for (auto &shp: population){
         if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
-        else if(shp.get()->autist == false){
-            shp.get()->time_to_learn();
-            learning_index.push_back(i);
-        }
+//        else if(shp.get()->autist == false){
+            ///ПРИМЕНЕНИЕ МОРО
+//            shp.get()->time_to_learn();
+//            learning_index.push_back(i);
+//        }
         ++i;
     } //выбрали норм корабли //доработать
 
@@ -87,22 +88,22 @@ void evolution::evolve()
     }
 
     //отбор учащихся
-    std::multimap<double, std::pair<std::string,int>> learning_best;
+//    std::multimap<double, std::pair<std::string,int>> learning_best;
 
-    for(auto &imp: learning_index){
-        learning_best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
-    }
+//    for(auto &imp: learning_index){
+//        learning_best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
+//    }
 
     i=0;
-    vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenLearners;
-    if(learning_index.size()>0){
-        for (auto &m: learning_best){
-            newGenLearners.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
-            ++i;
-            if (i == 200)
-                break;
-        }
-    }
+//    vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenLearners;
+//    if(learning_index.size()>0){
+//        for (auto &m: learning_best){
+//            newGenLearners.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+//            ++i;
+//            if (i == 200)
+//                break;
+//        }
+//    }
 
     names.clear();
     names.reserve(generation);
@@ -160,15 +161,15 @@ void evolution::evolve()
         names.emplace_back(par.second);
     }
     //переезд учащихся
-    fout<<"Found learners:\n";
-    for(auto &ler: newGenLearners){
-        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
-                                                               map->final_point.first,map->final_point.second,ler.first.get()->getBrain()));
-        population[population.size()-1]->set_id(ler.first->id);
-        population[population.size()-1]->lives = ler.first->lives;
-        names.emplace_back(ler.second);
-        fout << ler.second << "\n";
-    }
+//    fout<<"Found learners:\n";
+//    for(auto &ler: newGenLearners){
+//        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+//                                                               map->final_point.first,map->final_point.second,ler.first.get()->getBrain()));
+//        population[population.size()-1]->set_id(ler.first->id);
+//        population[population.size()-1]->lives = ler.first->lives;
+//        names.emplace_back(ler.second);
+//        fout << ler.second << "\n";
+//    }
     //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
