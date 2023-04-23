@@ -17,7 +17,8 @@ protected:
 public:
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y); // задавать корабль исключительно этим конструктором с установленной позицией
     ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,const double& pos_x,const double& pos_y); //для наследования
-    ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain& newBrain); //переносим мозг новому
+    ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain& newBrain, bool noise = false); //переносим мозг новому
+
 
 
     double velocity_x = 0, velocity_y = 0, abs_velocity;
@@ -53,6 +54,7 @@ public:
     void modify_path();
     bool viable();
     brain& getBrain();
+    void noise_Brain();
     void time_to_learn();
 
     double test;

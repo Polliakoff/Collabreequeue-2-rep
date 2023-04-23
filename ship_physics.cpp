@@ -36,11 +36,14 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,
 }
 
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,
-                           const double& dest_x, const double& dest_y, brain& newBrain):
+                           const double& dest_x, const double& dest_y, brain& newBrain, bool noise):
     ship(pos_x, pos_y)
 {
     id = ++sId;
     net = newBrain;
+    if(noise){
+        net.noiseWeights();
+    }
     name = '_'+std::to_string(net.S);
     name.push_back('s');
     for (auto &i: net.l){
@@ -293,6 +296,11 @@ bool ship_physics::viable()
 brain &ship_physics::getBrain()
 {
     return net;
+}
+
+void ship_physics::noise_Brain()
+{
+    net.noiseWeights();
 }
 
 void ship_physics::time_to_learn()
