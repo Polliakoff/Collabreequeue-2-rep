@@ -17,7 +17,7 @@ void pathway::make_my_way()
     if(generated == false)
     {
         final_point = std::make_pair(0,125);
-        start_point = std::make_pair(575,550);
+        start_point = std::make_pair(575,700);
         add_point(-110,0);
         add_point(700,0);
         add_point(700,700);
@@ -464,9 +464,9 @@ void pathway::generator()
     // Стартовые координаты
 
     xl.emplace_back(450);
-    yl.emplace_back(600);
+    yl.emplace_back(750);
     xr.emplace_back(250);
-    yr.emplace_back(600);
+    yr.emplace_back(750);
 
     xmain.emplace_back(350);
     ymain.emplace_back(600);
@@ -577,7 +577,7 @@ void pathway::generator()
     }
 
     final_point = std::make_pair(((xl[l_count] + xr[r_count])/2), ((yl[l_count] + yr[r_count])/2));
-    start_point = std::make_pair(350,550);
+    start_point = std::make_pair(350,700);
 }
 
 void pathway::switcher(bool tmblr_generator)
