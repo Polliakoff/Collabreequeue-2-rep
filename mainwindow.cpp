@@ -54,15 +54,12 @@ void MainWindow::on_pushButton_clicked()
 {
     if(first_boot){
         ui->checkBox->setEnabled(false);
-        map = std::make_shared<pathway>();
-        map->switcher(tmblr_generator);
+        ui->pushButton_8->setEnabled(false);
         ship_evolution = std::make_unique<evolution>(150, map);
 
         ///===========тестовый
         test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
         ///===========тестовый
-
-        ui->graphicsView->setScene(scene.get());
 
         first_boot = false;
     }
@@ -235,5 +232,24 @@ void MainWindow::genNameSet(std::string name)
 void MainWindow::on_checkBox_stateChanged()
 {
     tmblr_generator =! tmblr_generator;
+}
+
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    if(first_map){
+        ui->pushButton->setEnabled(true);
+    }
+
+    scene->clear();
+    map = std::make_shared<pathway>();
+    map->switcher(tmblr_generator);
+
+    qdraw_polygon(*map,scene.get());
+
+    if(first_map){
+        ui->graphicsView->setScene(scene.get());
+        first_map = false;
+    }
 }
 

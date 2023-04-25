@@ -42,6 +42,8 @@ private slots:
 
     void on_checkBox_stateChanged();
 
+    void on_pushButton_8_clicked();
+
 private:
 
     Ui::MainWindow *ui;
@@ -59,6 +61,7 @@ private:
     std::shared_ptr<QTimer> painter_timer;
     double neuron1 = 0, neuron2 = 0, neuron3 = 0, neuron4 = 0;
     bool first_boot = true,
+    first_map = true,
     tmblr_1 = false,
     tmblr_2 = false,
     tmblr_3 = false,
