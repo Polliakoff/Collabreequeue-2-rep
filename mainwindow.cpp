@@ -52,13 +52,18 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 
 void MainWindow::on_pushButton_clicked()
 {
+    ui->pushButton_9->setEnabled(false);
+    only_test = false;
+
     if(first_boot){
         ui->checkBox->setEnabled(false);
         ui->pushButton_8->setEnabled(false);
         ship_evolution = std::make_unique<evolution>(150, map);
 
         ///===========тестовый
-        test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+        if(!pre_init){
+            test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+        }
         ///===========тестовый
 
         first_boot = false;
@@ -67,18 +72,25 @@ void MainWindow::on_pushButton_clicked()
     connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
 
     ship_evolution->cnnct(update_timer);
-    ///===========тестовый
-    test_ship->fuel+=10000;
-    test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
-    test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
-    ///===========тестовый
-    connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
-    connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
-    //disconnect(timer.get(), &QTimer::timeout,)
 
-    update_timer->start(1);
-    painter_timer->start(100);
+    if(!pre_init){
+        ui->pushButton_2->setEnabled(true);
+        ui->pushButton_3->setEnabled(true);
+        ui->pushButton_4->setEnabled(true);
+        ui->pushButton_5->setEnabled(true);
+        ui->pushButton_6->setEnabled(true);
+        ui->pushButton_7->setEnabled(true);
+        test_ship->fuel+=10000;
+        test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
+        test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
 
+        connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+        connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
+        //disconnect(timer.get(), &QTimer::timeout,)
+
+        update_timer->start(1);
+        painter_timer->start(100);
+    }
 }
 
 void MainWindow::painter()
@@ -86,46 +98,48 @@ void MainWindow::painter()
     scene->clear();
     qdraw_polygon(*map,scene.get());
 
-    for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
-        if(shp->get()->operational){
-            qdraw_polygon(shp->get()->body,scene.get());
+    if (!only_test){
+        for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
+            if(shp->get()->operational){
+                qdraw_polygon(shp->get()->body,scene.get());
 
-//            scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-//                    shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
-//            scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-//                    shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
-//            scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-//                    shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
+    //            scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
+    //                    shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
+    //            scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
+    //                    shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
+    //            scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
+    //                    shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
 
-//            scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-//            scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-//            scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-//            scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-//            scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-//            scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+    //            scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+            }
+            ++shp;
         }
-        ++shp;
     }
+
 
 
     ///===========тестовый
-    if(test_ship->operational){
-        qdraw_polygon(test_ship->body,scene.get());
+    qdraw_polygon(test_ship->body,scene.get());
 
-        scene->addLine(test_ship->point_seen[0].first,test_ship->point_seen[0].second,
-                test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
-        scene->addLine(test_ship->point_seen[2].first,test_ship->point_seen[2].second,
-                test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
-        scene->addLine(test_ship->point_seen[4].first,test_ship->point_seen[4].second,
-                test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
+    scene->addLine(test_ship->point_seen[0].first,test_ship->point_seen[0].second,
+            test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
+    scene->addLine(test_ship->point_seen[2].first,test_ship->point_seen[2].second,
+            test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
+    scene->addLine(test_ship->point_seen[4].first,test_ship->point_seen[4].second,
+            test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
 
-        scene->addEllipse(test_ship->point_seen[0].first-10,test_ship->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(test_ship->point_seen[1].first-10,test_ship->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(test_ship->point_seen[2].first-10,test_ship->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(test_ship->point_seen[3].first-10,test_ship->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-        scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
-    }
+    scene->addEllipse(test_ship->point_seen[0].first-10,test_ship->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+    scene->addEllipse(test_ship->point_seen[1].first-10,test_ship->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+    scene->addEllipse(test_ship->point_seen[2].first-10,test_ship->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+    scene->addEllipse(test_ship->point_seen[3].first-10,test_ship->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+    scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+    scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+
 
     scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
     scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
@@ -141,13 +155,19 @@ void MainWindow::painter()
 
 void MainWindow::gauges()
 {
-    ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
+    if(!only_test){
+            ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
+    }
 
     ///===========тестовый
     ui->lineEdit->setText(QString::number(test_ship->path.first));
     ui->lineEdit_2->setText(QString::number(test_ship->path.second));
     ui->lineEdit_3->setText(QString::number(test_ship->abs_velocity));
-    ui->lineEdit_4->setText(QString::number(ship_evolution->clock));
+
+    if(!only_test){
+        ui->lineEdit_4->setText(QString::number(ship_evolution->clock));
+    }
+
     ui->lineEdit_5->setText(QString::number(test_ship->fuel_consumption));
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
@@ -238,6 +258,7 @@ void MainWindow::on_checkBox_stateChanged()
 void MainWindow::on_pushButton_8_clicked()
 {
     if(first_map){
+        ui->pushButton_9->setEnabled(true);
         ui->pushButton->setEnabled(true);
     }
 
@@ -251,5 +272,31 @@ void MainWindow::on_pushButton_8_clicked()
         ui->graphicsView->setScene(scene.get());
         first_map = false;
     }
+}
+
+
+void MainWindow::on_pushButton_9_clicked()
+{
+    ui->pushButton_2->setEnabled(true);
+    ui->pushButton_3->setEnabled(true);
+    ui->pushButton_4->setEnabled(true);
+    ui->pushButton_5->setEnabled(true);
+    ui->pushButton_6->setEnabled(true);
+    ui->pushButton_7->setEnabled(true);
+    ui->pushButton_9->setEnabled(false);
+    only_test = true;
+    pre_init = true;
+
+    test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+
+    test_ship->fuel+=10000;
+    test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
+    test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
+
+    connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+    connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
+
+    update_timer->start(1);
+    painter_timer->start(100);
 }
 

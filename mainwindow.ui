@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1368</width>
+    <width>1366</width>
     <height>768</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1366</width>
+    <height>768</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1366</width>
+    <height>768</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -476,9 +488,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>342</y>
+      <y>440</y>
       <width>172</width>
-      <height>277</height>
+      <height>269</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -486,39 +498,68 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout">
-         <item row="3" column="1">
+         <item row="8" column="1">
           <widget class="QPushButton" name="pushButton_5">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Направо</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="pushButton_4">
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="checkBox">
            <property name="text">
-            <string>Налево</string>
+            <string>Генерировать карту</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButton">
+         <item row="7" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton_2">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="text">
-            <string>запуск</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButton_2">
            <property name="text">
             <string>Вперед</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0" colspan="2">
+         <item row="8" column="0">
+          <widget class="QPushButton" name="pushButton_4">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Налево</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="pushButton_7">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Пауза</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Запуск</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="2">
           <widget class="QPushButton" name="pushButton_3">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Назад</string>
            </property>
@@ -531,40 +572,36 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton_6">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Замедлить выполнение</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton_9">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Вкл. Тестовый</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Упр. Тестовым:</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton_6">
-         <property name="text">
-          <string>ULTRA INSTINCT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QPushButton" name="pushButton_7">
-         <property name="text">
-          <string>ZA WARUDO</string>
-         </property>
-        </widget>
-       </item>
       </layout>
-     </item>
-     <item row="1" column="0" colspan="2">
-      <widget class="QCheckBox" name="checkBox">
-       <property name="text">
-        <string>Генерировать карту</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>generation</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_11"/>
      </item>
     </layout>
    </widget>
@@ -574,109 +611,133 @@
       <x>11</x>
       <y>11</y>
       <width>171</width>
-      <height>326</height>
+      <height>406</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="lineEdit_3"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>path_x</string>
+        <string>ск. y</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_10">
        <property name="text">
-        <string>path_y</string>
+        <string>топл.</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="lineEdit"/>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>abs_vel</string>
+        <string>абс. ск.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>ск. х</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="1">
+      <widget class="QLineEdit" name="lineEdit_11"/>
+     </item>
+     <item row="13" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Время</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>фин. x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>угл. ск.</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_3"/>
+      <widget class="QLineEdit" name="lineEdit_2"/>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>time</string>
+        <string>фин y</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="13" column="1">
       <widget class="QLineEdit" name="lineEdit_4"/>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_5">
+     <item row="12" column="0" colspan="2">
+      <widget class="QLabel" name="label_13">
        <property name="text">
-        <string>fuel cons</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="lineEdit_5"/>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>vel_x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="lineEdit_6"/>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>vel_y</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="lineEdit_7"/>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>v_sum</string>
+        <string>Параметры поколения:</string>
        </property>
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="QLineEdit" name="lineEdit_8"/>
+      <widget class="QLineEdit" name="lineEdit_7"/>
+     </item>
+     <item row="14" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Номер</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLineEdit" name="lineEdit_10"/>
      </item>
      <item row="8" column="0">
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>s_v_ang</string>
+        <string>общ. ск</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>Параметры тестового</string>
        </property>
       </widget>
      </item>
      <item row="8" column="1">
+      <widget class="QLineEdit" name="lineEdit_8"/>
+     </item>
+     <item row="9" column="1">
       <widget class="QLineEdit" name="lineEdit_9"/>
      </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="label_10">
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="lineEdit_6"/>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>fuel</string>
+        <string>потр. т.</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
-      <widget class="QLineEdit" name="lineEdit_10"/>
+     <item row="11" column="1">
+      <widget class="QLineEdit" name="lineEdit_5"/>
      </item>
     </layout>
    </widget>
@@ -686,7 +747,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1368</width>
+     <width>1366</width>
      <height>22</height>
     </rect>
    </property>

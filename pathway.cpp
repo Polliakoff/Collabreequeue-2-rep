@@ -17,7 +17,7 @@ void pathway::make_my_way()
     if(generated == false)
     {
         final_point = std::make_pair(0,125);
-        start_point = std::make_pair(575,700);
+        start_point = std::make_pair(575,600);
         add_point(-110,0);
         add_point(700,0);
         add_point(700,700);
