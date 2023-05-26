@@ -16,7 +16,6 @@ class brain
 protected:
     double sigmoid(const double&);
     double diff_sigmoid(const double&);
-//    double sigmoid_distance(const double&);
     void inheritWeights(brain &a, brain &b, double dmnc);
     Eigen::RowVectorXd false_prophet(std::shared_ptr<Eigen::RowVectorXd>);
     double round_to_one(const double& subject);
@@ -29,13 +28,7 @@ public:
     std::vector<Eigen::RowVectorXd> learning_A;
     std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
 
-    ///Обратная связь
-//    int first=14;   //количество входных слоёв
-
-    int first=7;
-
-//    int last=4;     //количество выходных когда чатыре
-
+    int first=7;    //количество входных
     int last=2;     //количество выходных
 
     brain();
@@ -46,9 +39,7 @@ public:
     bool viable();      //проверяет сеть на вменяемость
     void think();       //пересчитывает значения
     void think(std::shared_ptr<Eigen::RowVectorXd>);
-    void mutate();      //мутирует с некоторой вероятностью
     void noiseWeights();//шумит веса
-    void learn();
     static int ID;
 };
 

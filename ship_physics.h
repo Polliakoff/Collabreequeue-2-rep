@@ -19,8 +19,6 @@ public:
     ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,const double& pos_x,const double& pos_y); //для наследования
     ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y, brain& newBrain, bool noise = false); //переносим мозг новому
 
-
-
     double velocity_x = 0, velocity_y = 0, abs_velocity;
     pair<double, double> path;
     double angular_velocity = 0;
@@ -37,13 +35,10 @@ public:
 
     bool operational = true;
     bool can_be_parrent = true;
-    int lives = 5;
-    bool autist = false;
 
     double to_turn_to;
     double velocity_projection;
 
-    void initial_fix();
     void engine(const int &mode);
     void helm(const int &mode2);
     void test_engine(double neuron1, double neuron2);
@@ -55,7 +50,6 @@ public:
     bool viable();
     brain& getBrain();
     void noise_Brain();
-    void time_to_learn();
 
     double test;
 

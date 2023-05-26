@@ -611,19 +611,18 @@
       <x>11</x>
       <y>11</y>
       <width>171</width>
-      <height>406</height>
+      <height>412</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="lineEdit_3"/>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEdit"/>
      </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>ск. y</string>
-       </property>
-      </widget>
+     <item row="13" column="1">
+      <widget class="QLineEdit" name="lineEdit_4"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="lineEdit_7"/>
      </item>
      <item row="10" column="0">
       <widget class="QLabel" name="label_10">
@@ -632,37 +631,40 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>абс. ск.</string>
+        <string>фин y</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_7">
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>ск. х</string>
+        <string>потр. т.</string>
        </property>
       </widget>
      </item>
-     <item row="14" column="1">
-      <widget class="QLineEdit" name="lineEdit_11"/>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>ск. y</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEdit_2"/>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLineEdit" name="lineEdit_9"/>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLineEdit" name="lineEdit_8"/>
      </item>
      <item row="13" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Время</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>фин. x</string>
        </property>
       </widget>
      </item>
@@ -673,43 +675,23 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_2"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>фин y</string>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="1">
-      <widget class="QLineEdit" name="lineEdit_4"/>
-     </item>
-     <item row="12" column="0" colspan="2">
-      <widget class="QLabel" name="label_13">
-       <property name="text">
-        <string>Параметры поколения:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLineEdit" name="lineEdit_7"/>
-     </item>
-     <item row="14" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>Номер</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLineEdit" name="lineEdit_10"/>
-     </item>
      <item row="8" column="0">
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>общ. ск</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="lineEdit_3"/>
+     </item>
+     <item row="14" column="1">
+      <widget class="QLineEdit" name="lineEdit_11"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>фин. x</string>
        </property>
       </widget>
      </item>
@@ -720,24 +702,52 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
-      <widget class="QLineEdit" name="lineEdit_8"/>
-     </item>
-     <item row="9" column="1">
-      <widget class="QLineEdit" name="lineEdit_9"/>
-     </item>
      <item row="6" column="1">
       <widget class="QLineEdit" name="lineEdit_6"/>
      </item>
-     <item row="11" column="0">
-      <widget class="QLabel" name="label_5">
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>потр. т.</string>
+        <string>абс. ск.</string>
        </property>
       </widget>
      </item>
      <item row="11" column="1">
       <widget class="QLineEdit" name="lineEdit_5"/>
+     </item>
+     <item row="14" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Номер</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>ск. х</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0" colspan="2">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>Параметры поколения:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLineEdit" name="lineEdit_10"/>
+     </item>
+     <item row="15" column="0" colspan="2">
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Показ. датчики</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

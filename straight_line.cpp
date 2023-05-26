@@ -15,8 +15,6 @@ straight_line::straight_line(const double &x1, const double &y1, const double &x
     rotation_point = point;
 }
 
-
-
 straight_line::~straight_line()
 {
 
@@ -49,7 +47,6 @@ void straight_line::rotate(const double &angle)
             i=0;
         }
     }
-
 }
 
 void straight_line::move_by(const double &x, const double &y)

@@ -11,15 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     update_timer = std::make_unique<QTimer>();
     painter_timer = std::make_unique<QTimer>();
-
-    //==раньше было тут
-    //map = std::make_shared<pathway>();
-    //ship_evolution = std::make_unique<evolution>(500, map);
-
-    ///===========тестовый
-    //test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
-    ///===========тестовый
-    //==раньше было тут
 }
 
 MainWindow::~MainWindow()
@@ -42,11 +33,6 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
         if(j==1) j = 2;
         if(i==pol.vertexes.size()){i=0;j=1;}
     }
-    //    for(int i = 1; i < 30; i++)
-    //    {
-    //        scene->addLine(map->xmainout[i], map->ymainout[i],
-    //                map->xmainout[i-1], map->ymainout[i-1], QPen(Qt::magenta));
-    //    }
 }
 
 
@@ -86,7 +72,6 @@ void MainWindow::on_pushButton_clicked()
 
         connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
         connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
-        //disconnect(timer.get(), &QTimer::timeout,)
 
         update_timer->start(1);
         painter_timer->start(100);
@@ -102,26 +87,25 @@ void MainWindow::painter()
         for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
             if(shp->get()->operational){
                 qdraw_polygon(shp->get()->body,scene.get());
+                if (tmblr_eyes){
+                    scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
+                            shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
+                    scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
+                            shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
+                    scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
+                            shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
 
-    //            scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-    //                    shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
-    //            scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-    //                    shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
-    //            scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-    //                    shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
-
-    //            scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
-    //            scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
-    //            scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
-    //            scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
-    //            scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
-    //            scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[2].first-10,shp->get()->point_seen[2].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[3].first-10,shp->get()->point_seen[3].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[4].first-10,shp->get()->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
+                    scene->addEllipse(shp->get()->point_seen[5].first-10,shp->get()->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
+                }
             }
             ++shp;
         }
     }
-
-
 
     ///===========тестовый
     qdraw_polygon(test_ship->body,scene.get());
@@ -188,10 +172,7 @@ void MainWindow::on_pushButton_2_clicked()
 {
     tmblr_1 =! tmblr_1;
     neuron1 = int(tmblr_1);
-
-
 }
-
 
 void MainWindow::on_pushButton_3_clicked()
 {
@@ -254,7 +235,6 @@ void MainWindow::on_checkBox_stateChanged()
     tmblr_generator =! tmblr_generator;
 }
 
-
 void MainWindow::on_pushButton_8_clicked()
 {
     if(first_map){
@@ -274,7 +254,6 @@ void MainWindow::on_pushButton_8_clicked()
     }
 }
 
-
 void MainWindow::on_pushButton_9_clicked()
 {
     ui->pushButton_2->setEnabled(true);
@@ -283,7 +262,9 @@ void MainWindow::on_pushButton_9_clicked()
     ui->pushButton_5->setEnabled(true);
     ui->pushButton_6->setEnabled(true);
     ui->pushButton_7->setEnabled(true);
+    ui->checkBox_2->setEnabled(true);
     ui->pushButton_9->setEnabled(false);
+
     only_test = true;
     pre_init = true;
 
@@ -298,5 +279,11 @@ void MainWindow::on_pushButton_9_clicked()
 
     update_timer->start(1);
     painter_timer->start(100);
+}
+
+
+void MainWindow::on_checkBox_2_stateChanged(int arg1)
+{
+    tmblr_eyes = !tmblr_eyes;
 }
 

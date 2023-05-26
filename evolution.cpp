@@ -4,23 +4,11 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
     map = pthw;
-    //*потоки*
-    //    int thread_count = -1;
-    //*потоки*
     for(int i = 0; i < generation_size; i++)
     {
-        //*потоки*
-        //        if(i % 500 == 0){
-        //           population_threads.emplace_back(std::make_unique<QThread>());
-        //           thread_count++;
-        //        }
-        //*потоки*
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
-        //*потоки*
-        //        population[i].get()->moveToThread(population_threads[thread_count].get());
-        //*потоки*
     }
     generation = generation_size;
     fout << "";
@@ -51,17 +39,11 @@ void evolution::evolve()
     } //стоп машина
 
     vector<int> index;
-    //    vector<int> learning_index;
     int i = 0;
     for (auto &shp: population){
         if(shp.get()->can_be_parrent){
             index.push_back(i);
         }
-        //        else if(shp.get()->autist == false){
-        ///ПРИМЕНЕНИЕ МОРО
-        //            shp.get()->time_to_learn();
-        //            learning_index.push_back(i);
-        //        }
         ++i;
     } //выбрали норм корабли //доработать
 
@@ -76,46 +58,18 @@ void evolution::evolve()
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
     if(index.size()>0){
         for (auto &m: best){
-            //auto par = population[i];
             newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
-            ////не убирать, для проверки скрещивания
-            //            auto pal = std::make_unique<ship_physics>(575,650,0,0);
-            //            newGenParents.push_back(std::make_pair(std::move(pal), genName + pal.get()->name));
             ++i;
             if (i == 7)
                 break;
         } //отобрали семь лучших
     }
 
-    //отбор учащихся
-    //    std::multimap<double, std::pair<std::string,int>> learning_best;
-
-    //    for(auto &imp: learning_index){
-    //        learning_best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
-    //    }
-
     i=0;
-    //    vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenLearners;
-    //    if(learning_index.size()>0){
-    //        for (auto &m: learning_best){
-    //            newGenLearners.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
-    //            ++i;
-    //            if (i == 200)
-    //                break;
-    //        }
-    //    }
 
     names.clear();
     names.reserve(generation);
-    //*потоки*
-    //    for(int i = 0; i<population_threads.size(); i++){
-    //        population_threads[i].get()->quit();
-    //    }
-    //*потоки*
     population.clear();
-    //*потоки*
-    //    population_threads.clear();
-    //*потоки*
     think_n_do_connections.clear();
     update_connections.clear();
 
@@ -159,7 +113,6 @@ void evolution::evolve()
             population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                    map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
             population[population.size()-1]->set_id(par.first->id);
-            population[population.size()-1]->lives = par.first->lives;
             names.emplace_back(par.second);
         }
     }
@@ -168,41 +121,15 @@ void evolution::evolve()
             population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain(), true));
             population[population.size()-1]->set_id(par.first->id);
-            population[population.size()-1]->lives = par.first->lives;
             names.emplace_back(par.second);
     }
 
-    //переезд учащихся
-    //    fout<<"Found learners:\n";
-    //    for(auto &ler: newGenLearners){
-    //        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
-    //                                                               map->final_point.first,map->final_point.second,ler.first.get()->getBrain()));
-    //        population[population.size()-1]->set_id(ler.first->id);
-    //        population[population.size()-1]->lives = ler.first->lives;
-    //        names.emplace_back(ler.second);
-    //        fout << ler.second << "\n";
-    //    }
     //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
         names.emplace_back(genName + population.back().get()->name);
     }
-    //избавляемся от остаточных галлюцинаций
-    for(auto &ship:population){
-        ship->initial_fix();
-    }
-
-    //*потоки*
-    //    int thread_count = -1;
-    //    for(int i = 0; i<generation; i++){
-    //        if(i % 500 == 0){
-    //           population_threads.emplace_back(std::make_unique<QThread>());
-    //           thread_count++;
-    //        }
-    //        population[i].get()->moveToThread(population_threads[thread_count].get());
-    //    }
-    //*потоки*
 
     fout.close();
     clock = 0;
@@ -222,7 +149,6 @@ void evolution::evolution_stat()
             if(i->fuel == 2200){
                 i->operational = false;
                 i->can_be_parrent = false;
-                i->autist = true;
             }
         }
     }
@@ -232,7 +158,6 @@ void evolution::evolution_stat()
             if(i->velocity_sum<=min_speed-98){
                 i->operational = false;
                 i->can_be_parrent = false;
-                i->autist = true;
             }
         }
     }
@@ -242,7 +167,6 @@ void evolution::evolution_stat()
             if(i->velocity_sum<=min_speed-40){
                 i->operational = false;
                 i->can_be_parrent = false;
-                i->autist = true;
             }
         }
     }
@@ -260,10 +184,7 @@ void evolution::evolution_stat()
         for(auto &i: population){
             if(i->get_position().second>300){
                 i->can_be_parrent = false;
-                i->lives--;
-            } /*else if(i->distance_to_finish <= 450){
-                i->can_be_parrent = true;
-            }*/
+            }
         }
         evolve();
     }
@@ -281,15 +202,6 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
     }
-
-    //*потоки*
-    //    if(!(population_threads[0].get()->isRunning())){
-    //        t = population_threads.size();
-    //        for(int i = 0; i < t; i++){
-    //            population_threads[i].get()->start();
-    //        }
-    //    }
-    //*потоки*
 }
 
 void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw)
@@ -304,15 +216,6 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
     }
-
-    //*потоки*
-    //    if(!(population_threads[0].get()->isRunning())){
-    //        t = population_threads.size();
-    //        for(int i = 0; i < t; i++){
-    //            population_threads[i].get()->start();
-    //        }
-    //    }
-    //*потоки*
 }
 
 void evolution::cnnct()
@@ -325,15 +228,6 @@ void evolution::cnnct()
         think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                              [=](){population[i]->think_n_do();}));
     }
-
-    //*потоки*
-    //    if(!(population_threads[0].get()->isRunning())){
-    //        t = population_threads.size();
-    //        for(int i = 0; i < t; i++){
-    //            population_threads[i].get()->start();
-    //        }
-    //    }
-    //*потоки*
 }
 
 void evolution::dscnnct()
@@ -343,8 +237,6 @@ void evolution::dscnnct()
         if(!i->get()->operational){
             QObject::disconnect(update_connections[num]);
             QObject::disconnect(think_n_do_connections[num]);
-            //population.erase(i);
-            //--num;
         }
         ++i;
         ++num;

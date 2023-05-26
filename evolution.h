@@ -16,7 +16,7 @@ class evolution
 protected:
     std::ofstream fout;
 public:
-    evolution()=default;//РЅРµ С‚СЂРѕРіР°С‚СЊ
+    evolution()=default;
     std::string genName="000x";
     evolution(const int& generation_size, std::shared_ptr<pathway> &pthw);
     virtual ~evolution();

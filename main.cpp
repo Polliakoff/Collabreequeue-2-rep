@@ -30,16 +30,6 @@ int main(int argc, char *argv[])
 
 
     m_sensors.append(new brain(*m_sensors[0],*m_sensors[1],0.8));
-    //brain b(*m_sensors[0],*m_sensors[1],80);
-//    QByteArray content;
-//    QDataStream writeStream(&content, QIODevice::WriteOnly);
-//    writeStream << *m_sensors[0];
-
-//    m_dataStreamExports.append(content);
-
-//    QDataStream readStream(&m_dataStreamExports[0], QIODevice::ReadOnly);
-//    brain sensorImport;
-//    readStream >> sensorImport;
     delete m_sensors[0];
     delete m_sensors[1];
     delete m_sensors[2];
