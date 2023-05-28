@@ -277,4 +277,3 @@ void MainWindow::on_checkBox_2_stateChanged(int arg1)
 {
     tmblr_eyes = !tmblr_eyes;
 }
-

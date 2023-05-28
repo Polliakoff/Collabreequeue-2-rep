@@ -4,6 +4,7 @@ int ship_physics::sId = 0;
 
 ship_physics::ship_physics()
 {
+
 }
 
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
