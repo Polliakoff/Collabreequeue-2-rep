@@ -38,6 +38,7 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 
 void MainWindow::on_pushButton_clicked()
 {
+    ui->checkBox_2->setEnabled(true);
     ui->pushButton_9->setEnabled(false);
     only_test = false;
 
@@ -124,7 +125,6 @@ void MainWindow::painter()
     scene->addEllipse(test_ship->point_seen[4].first-10,test_ship->point_seen[4].second-10,20,20, QPen(Qt::lightGray));
     scene->addEllipse(test_ship->point_seen[5].first-10,test_ship->point_seen[5].second-10,20,20, QPen(Qt::lightGray));
 
-
     scene->addEllipse(test_ship->get_position().first-10,test_ship->get_position().second-10,20,20, QPen(Qt::red));
     scene->addLine(test_ship->get_position().first,test_ship->get_position().second,
                    test_ship->get_position().first+test_ship->path.first,test_ship->get_position().second+test_ship->path.second, QPen(Qt::red));
@@ -166,7 +166,6 @@ void MainWindow::gauges()
     ///===========тестовый
 }
 
-
 ///===========тестовый
 void MainWindow::on_pushButton_2_clicked()
 {
@@ -178,9 +177,7 @@ void MainWindow::on_pushButton_3_clicked()
 {
     tmblr_2 =! tmblr_2;
     neuron2 = int(tmblr_2);
-
 }
-
 
 void MainWindow::on_pushButton_5_clicked()
 {
@@ -188,13 +185,11 @@ void MainWindow::on_pushButton_5_clicked()
     neuron4 = int(tmblr_4);
 }
 
-
 void MainWindow::on_pushButton_4_clicked()
 { 
     tmblr_3 =! tmblr_3;
     neuron3 = int(tmblr_3);
 }
-
 
 void MainWindow::on_pushButton_6_clicked()
 {
@@ -209,7 +204,6 @@ void MainWindow::on_pushButton_6_clicked()
     }
 }
 
-
 void MainWindow::on_pushButton_7_clicked()
 {
     tmblr_time =! tmblr_time;
@@ -221,7 +215,6 @@ void MainWindow::on_pushButton_7_clicked()
         update_timer->start(1);
         painter_timer->start(200);
     }
-
 }
 
 void MainWindow::genNameSet(std::string name)
@@ -262,7 +255,6 @@ void MainWindow::on_pushButton_9_clicked()
     ui->pushButton_5->setEnabled(true);
     ui->pushButton_6->setEnabled(true);
     ui->pushButton_7->setEnabled(true);
-    ui->checkBox_2->setEnabled(true);
     ui->pushButton_9->setEnabled(false);
 
     only_test = true;
@@ -280,7 +272,6 @@ void MainWindow::on_pushButton_9_clicked()
     update_timer->start(1);
     painter_timer->start(100);
 }
-
 
 void MainWindow::on_checkBox_2_stateChanged(int arg1)
 {
