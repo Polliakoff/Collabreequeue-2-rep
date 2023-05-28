@@ -6,7 +6,6 @@
 #include <cmath>
 #include <QtCore/qglobal.h>
 
-
 class straight_line
 {
 public:

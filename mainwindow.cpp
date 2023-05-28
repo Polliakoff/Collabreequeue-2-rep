@@ -35,7 +35,6 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
     }
 }
 
-
 void MainWindow::on_pushButton_clicked()
 {
     ui->checkBox_2->setEnabled(true);

@@ -4,7 +4,6 @@
 class pattern
 {
 public:
-
     double swing;
     double speed;
     double h_factor;

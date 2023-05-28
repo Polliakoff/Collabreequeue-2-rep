@@ -31,7 +31,6 @@ void pathway::make_my_way()
             add_point(glacier_x[i], glacier_y[i]);
         }
     }
-
 }
 
 void pathway::generator()

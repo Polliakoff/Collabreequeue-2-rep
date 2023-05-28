@@ -36,7 +36,6 @@ brain::brain(): behavior(){
     A.emplace_back(l[S-1]);
 }
 
-
 brain::brain(brain &a, brain &b, double dmnc):
     behavior(a.behavior, b.behavior)
 {
@@ -229,8 +228,6 @@ double brain::round_to_one(const double &subject)
         return subject;
     }
 }
-
-
 
 void brain::noiseWeights()
 {

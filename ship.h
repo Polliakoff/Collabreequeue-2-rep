@@ -34,8 +34,6 @@ public:
     void rotate_by(const double& new_angle);
     bool collision(polygon &pol);
     void eyesight(polygon &pol);
-
-
 public slots:
     virtual void update(polygon &map);
 

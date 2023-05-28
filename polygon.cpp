@@ -4,7 +4,6 @@ polygon::polygon(){}
 
 polygon::~polygon(){}
 
-
 void polygon::add_point(double x, double y)
 {
     vertexes.emplace_back(std::make_pair(x, y));

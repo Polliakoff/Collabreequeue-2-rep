@@ -43,6 +43,5 @@ public:
     static int ID;
 };
 
-
 QDataStream &operator<<(QDataStream &, const brain &);
 QDataStream &operator>>(QDataStream &, brain &);
