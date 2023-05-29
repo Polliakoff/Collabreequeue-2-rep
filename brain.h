@@ -16,9 +16,7 @@ protected:
     double sigmoid(const double&);
     double diff_sigmoid(const double&);
     void inheritWeights(brain &a, brain &b, double dmnc);
-    Eigen::RowVectorXd false_prophet(std::shared_ptr<Eigen::RowVectorXd>);
     double round_to_one(const double& subject);
-    std::vector<std::shared_ptr<Eigen::RowVectorXd>> memory;
 public:
     int S;                              //всего слоёв
     std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам

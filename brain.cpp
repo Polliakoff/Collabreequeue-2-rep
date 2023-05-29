@@ -15,7 +15,6 @@ double brain::diff_sigmoid(const double &x)
 
 brain::brain()
 {
-    memory.resize(5);
     S = 5;
 
     l.reserve(S);
@@ -39,7 +38,6 @@ brain::brain()
 
 brain::brain(brain &a, brain &b, double dmnc)
 {
-    memory.resize(5);
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
     //тут влияние dmnc
     this->l.clear();
@@ -195,11 +193,6 @@ void brain::think(){
     for (int k = 0; k<6; ++k){
         A[0](k) /= 10.0;
     }
-
-    for(int j = memory.size()-1;j>0;j--){
-        memory[j] = memory[j-1];
-    }
-    memory[0] = std::make_shared<Eigen::RowVectorXd>(A[0]);
 
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
