@@ -14,14 +14,13 @@ class brain
 {
 protected:
     double sigmoid(const double&);
-    double diff_sigmoid(const double&);
     void inheritWeights(brain &a, brain &b, double dmnc);
     double round_to_one(const double& subject);
 public:
     int S;                              //всего слоёв
-    std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам
-    std::vector<Eigen::RowVectorXd> A;  //S+2 всего слоёв (размер 1хl[n])
-    std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
+    std::vector<int> l;                 //вершины слоёв, задаёт размеры следующим матрицам
+    std::vector<Eigen::RowVectorXd> A;  //Значения нейронов в слоях
+    std::vector<Eigen::MatrixXd> W;     //S-1 матриц весов - связей нейронов между слоями
 
     int first=7;    //количество входных
     int last=2;     //количество выходных

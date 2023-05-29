@@ -8,11 +8,6 @@ double brain::sigmoid(const double &x){
     return 1/(1+exp(-x));
 }
 
-double brain::diff_sigmoid(const double &x)
-{
-    return sigmoid(x)*(1-sigmoid(x));
-}
-
 brain::brain()
 {
     S = 5;
