@@ -6,7 +6,6 @@
 #include <iostream>
 #include <fstream>
 #include <QDataStream>
-#include "pattern.h"
 #include <memory>
 //https://www.qt.io/blog/2018/05/31/serialization-in-and-with-qt
 //https://github.com/mauricek/qt_iot_blog_samples/blob/master/part2/serialization/sensorinformation.cpp#L188
@@ -21,7 +20,6 @@ protected:
     double round_to_one(const double& subject);
     std::vector<std::shared_ptr<Eigen::RowVectorXd>> memory;
 public:
-    pattern behavior;
     int S;                              //всего слоёв
     std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам
     std::vector<Eigen::RowVectorXd> A;  //S+2 всего слоёв (размер 1хl[n])

@@ -13,7 +13,8 @@ double brain::diff_sigmoid(const double &x)
     return sigmoid(x)*(1-sigmoid(x));
 }
 
-brain::brain(): behavior(){
+brain::brain()
+{
     memory.resize(5);
     S = 5;
 
@@ -36,8 +37,7 @@ brain::brain(): behavior(){
     A.emplace_back(l[S-1]);
 }
 
-brain::brain(brain &a, brain &b, double dmnc):
-    behavior(a.behavior, b.behavior)
+brain::brain(brain &a, brain &b, double dmnc)
 {
     memory.resize(5);
     this->S=a.S*dmnc+b.S*(1-dmnc)+0.5;      //+0.5 для правильного окргуления дробных чисел
@@ -164,59 +164,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
             }
         }
     }
-}
-
-Eigen::RowVectorXd brain::false_prophet(std::shared_ptr<Eigen::RowVectorXd> wrong_ones)
-{
-    Eigen::RowVectorXd return_vector(last);
-    for(int i = 0; i<last; i++){
-        if(i==0 || i==1){
-            if(behavior.speed>=0){
-                switch (i) {
-                case 0:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.speed/2);
-                    break;
-                case 1:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.speed/2);
-                    break;
-                }
-            }
-            else{
-                switch (i) {
-                case 0:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.speed/2);
-                    break;
-                case 1:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.speed/2);
-                    break;
-                }
-            }
-        }
-        else{
-            if(behavior.swing>=0){
-                switch (i) {
-                case 2:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.swing/2);
-                    break;
-                case 3:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.swing/2);
-                    break;
-                }
-            }
-            else{
-                switch (i) {
-                case 2:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) - behavior.swing/2);
-                    break;
-                case 3:
-                    return_vector(i) = round_to_one((*wrong_ones)(i) + behavior.swing/2);
-                    break;
-                }
-            }
-        }
-    }
-
-    return return_vector;
 }
 
 double brain::round_to_one(const double &subject)
