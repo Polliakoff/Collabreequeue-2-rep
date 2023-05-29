@@ -8,7 +8,3 @@ double skalar_multipl(const double &x1,const double &y1,const double &x2,const d
 double vectors_projection(const double &x1, const double &y1, const double &x2, const double &y2);
 double vectors_angle(const double &x1, const double &y1, const double &x2, const double &y2);
 double vector_length(const double &x1, const double &y1, const double &x2, const double &y2);
-
-
-
-
