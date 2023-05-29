@@ -81,7 +81,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
         for (int j = 0; j < a.l[lt+1] && j < b.l[lt+1] && j < l[lt+1]; ++j){
             for (int i = 0; i < a.l[lt] && i < b.l[lt] && i < l[lt]; ++i){
                 this->W[lt](i,j) = (a.W[lt](i,j)+b.W[lt](i,j))/2.0;
-                //cout << i << "\t" << j << "\n"; //11,6 проверка
             }
         }
 
@@ -115,7 +114,6 @@ void brain::inheritWeights(brain &a, brain &b, double dmnc){
                     //берем веса большей матрицы
                 }
         }
-
         ++lt;
     }
 
@@ -180,9 +178,6 @@ void brain::noiseWeights()
 {
     for (auto &w: W){
         for (auto &i: w.reshaped()){
-
-//            i *= (95+(rand()%11))/100.0;
-
             i += (rand()%201 - 100)/1000.0;
             if(i>1){
                 i=1;
@@ -198,7 +193,6 @@ void brain::noiseWeights()
 void brain::think(){
     int i = 0;
     for (int k = 0; k<6; ++k){
-        //        A[0](k) = sigmoid_distance(A[0](k));
         A[0](k) /= 10.0;
     }
 
@@ -206,9 +200,6 @@ void brain::think(){
         memory[j] = memory[j-1];
     }
     memory[0] = std::make_shared<Eigen::RowVectorXd>(A[0]);
-
-    //memory.insert(memory.begin(), std::make_shared<Eigen::RowVectorXd>(A[0]));
-    //memory.resize(5);
 
     for (auto &w: W) {
         A[i + 1] = A[i] * w;
@@ -218,11 +209,6 @@ void brain::think(){
         ++i;
     }
     i = 0;
-    ///Обратная связь
-//    for (auto &a: A[S-1]) {
-//        A[0](first-last+i)=a;
-//        ++i;
-//    }
 }
 
 void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
@@ -251,12 +237,10 @@ bool brain::viable(){
 }
 
 //========================================================================
-
 QDataStream &operator<<(QDataStream &out, const brain &item){
     QDataStream::FloatingPointPrecision prev = out.floatingPointPrecision();
     out.setFloatingPointPrecision(QDataStream::DoublePrecision);
     out << item.S;
-    //https://eigen.tuxfamily.org/dox/group__TutorialSTL.html
     for (auto &l_: item.l)
         out << l_;
     for (auto &w: item.W){
