@@ -202,23 +202,6 @@ void brain::think(){
     i = 0;
 }
 
-void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
-{
-    int i = 0;
-    learning_A = A;
-    A[0] = *input_A;
-    for (auto &w: W) {
-        A[i + 1] = A[i] * w;
-        learning_A[i+1] = A[i + 1];
-        for(auto &a: A[i + 1]){
-            a = sigmoid(a);
-        }
-        ++i;
-    }
-    i = 0;
-    learning_A[0] = A[0];
-}
-
 //========================================================================
 QDataStream &operator<<(QDataStream &out, const brain &item){
     QDataStream::FloatingPointPrecision prev = out.floatingPointPrecision();

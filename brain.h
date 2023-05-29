@@ -21,7 +21,6 @@ public:
     int S;                              //всего слоёв
     std::vector<int> l;                 //вершин внутренних слоёв, задаёт размеры следующим матрицам
     std::vector<Eigen::RowVectorXd> A;  //S+2 всего слоёв (размер 1хl[n])
-    std::vector<Eigen::RowVectorXd> learning_A;
     std::vector<Eigen::MatrixXd> W;     //S+1 матриц весов (размер l[n]хl[n+1])
 
     int first=7;    //количество входных
@@ -33,7 +32,6 @@ public:
                                                                 //и должна принимать значение от 0.00(копирование второй сети)
                                                                 //до 1.00(копирование первой сети)
     void think();       //пересчитывает значения
-    void think(std::shared_ptr<Eigen::RowVectorXd>);
     void noiseWeights();//шумит веса
     static int ID;
 };

@@ -17,7 +17,6 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 
 void evolution::evolve()
 {
-
     fout.open("evolution_obj.log", std::ios::app);
 
     if(genName[3]=='z') {
