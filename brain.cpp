@@ -58,8 +58,6 @@ brain::brain(brain &a, brain &b, double dmnc)
     this->l.emplace_back(last); //выходной всегда last
     //итого у нас информация о количестве нейронов в каждом слое
 
-    if (!viable()) return;
-
     inheritWeights(a,b,dmnc);
     noiseWeights();
 }
@@ -219,14 +217,6 @@ void brain::think(std::shared_ptr<Eigen::RowVectorXd> input_A)
     }
     i = 0;
     learning_A[0] = A[0];
-}
-
-bool brain::viable(){
-    for (vector<int>::iterator it = l.begin(); it + 1 != l.end();) {
-        if(*it < *(it+1)) return false;
-        ++it;
-    }
-    return true;
 }
 
 //========================================================================

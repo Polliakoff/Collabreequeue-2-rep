@@ -159,11 +159,6 @@ void ship_physics::modify_path()
     distance_to_finish = vector_module(path.first,path.second);
 }
 
-bool ship_physics::viable()
-{
-    return net.viable();
-}
-
 brain &ship_physics::getBrain()
 {
     return net;

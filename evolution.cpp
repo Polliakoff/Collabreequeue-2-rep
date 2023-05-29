@@ -97,12 +97,6 @@ void evolution::evolve()
         dmnc+=0.2;
     }
 
-    //проверка на антихриста
-    for(auto temp = population.begin(); temp!=population.end(); ){
-        if(!temp->get()->viable()){
-            population.erase(temp);
-        } else ++temp;
-    }
     //время менять имена
     for(auto &shp: population){
         names.emplace_back(genName + shp->name);
