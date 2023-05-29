@@ -511,7 +511,7 @@
          <item row="1" column="0" colspan="2">
           <widget class="QCheckBox" name="checkBox">
            <property name="text">
-            <string>Генерировать карту</string>
+            <string>Случайная карта</string>
            </property>
           </widget>
          </item>
@@ -568,7 +568,7 @@
          <item row="0" column="0" colspan="2">
           <widget class="QPushButton" name="pushButton_8">
            <property name="text">
-            <string>Карта</string>
+            <string>Сформировать карту</string>
            </property>
           </widget>
          </item>
@@ -758,7 +758,7 @@
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
