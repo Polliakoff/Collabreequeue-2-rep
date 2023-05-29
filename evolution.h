@@ -26,7 +26,6 @@ public:
     int min_speed = 100;
     int tst=0;
 
-    vector<std::unique_ptr<QThread>> population_threads;
     vector<std::unique_ptr<ship_physics>> population;
     vector<std::string> names;
     vector<QMetaObject::Connection> update_connections;
