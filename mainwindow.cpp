@@ -37,6 +37,7 @@ void MainWindow::qdraw_polygon(const polygon &pol,QGraphicsScene* scene)
 
 void MainWindow::on_pushButton_clicked()
 {
+    ui->pushButton->setEnabled(false);
     ui->checkBox_2->setEnabled(true);
     ui->pushButton_9->setEnabled(false);
     only_test = false;
@@ -194,10 +195,12 @@ void MainWindow::on_pushButton_6_clicked()
 {
     tmblr_slow_time =! tmblr_slow_time;
     if (tmblr_slow_time == true) {
+        ui->pushButton_6->setText("Ускорить");
         update_timer->stop();
         update_timer->start(40);
     }
     else {
+        ui->pushButton_6->setText("Замедлить");
         update_timer->stop();
         update_timer->start(1);
     }
@@ -207,12 +210,15 @@ void MainWindow::on_pushButton_7_clicked()
 {
     tmblr_time =! tmblr_time;
     if (tmblr_time == true) {
+        ui->pushButton_7->setText("Запсук");
         update_timer->stop();
         painter_timer->stop();
     }
     else {
-        update_timer->start(1);
-        painter_timer->start(200);
+        ui->pushButton_7->setText("Пауза");
+        if(tmblr_slow_time == true) update_timer->start(40);
+        else update_timer->start(1);
+        painter_timer->start(100);
     }
 }
 

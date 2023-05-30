@@ -490,7 +490,7 @@
       <x>10</x>
       <y>440</y>
       <width>172</width>
-      <height>269</height>
+      <height>290</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -508,50 +508,13 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="checkBox">
-           <property name="text">
-            <string>Случайная карта</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButton_2">
+         <item row="5" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton_9">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Вперед</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QPushButton" name="pushButton_4">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Налево</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="pushButton_7">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Пауза</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Запуск</string>
+            <string>Вкл. Тестовый</string>
            </property>
           </widget>
          </item>
@@ -565,6 +528,16 @@
            </property>
           </widget>
          </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Вперед</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0" colspan="2">
           <widget class="QPushButton" name="pushButton_8">
            <property name="text">
@@ -572,30 +545,57 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
+         <item row="4" column="0" colspan="2">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Упр. Тестовым:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="checkBox">
+           <property name="text">
+            <string>Случайная карта</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QPushButton" name="pushButton_4">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Налево</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
           <widget class="QPushButton" name="pushButton_6">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Замедлить выполнение</string>
+            <string>Замедлить</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButton_9">
+         <item row="3" column="1">
+          <widget class="QPushButton" name="pushButton_7">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Вкл. Тестовый</string>
+            <string>Пауза</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0" colspan="2">
-          <widget class="QLabel" name="label_12">
+         <item row="2" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>Упр. Тестовым:</string>
+            <string>Начать</string>
            </property>
           </widget>
          </item>
