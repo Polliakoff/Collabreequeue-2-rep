@@ -139,7 +139,7 @@ void evolution::evolution_stat()
 
     if(clock==5){
         for(auto &i: population){
-            if(i->fuel == 2200){
+            if(i->fuel == 4400){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
