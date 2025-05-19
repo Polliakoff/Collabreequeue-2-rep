@@ -15,3 +15,6 @@
 *.dll
 *.exe
 
+# ignore any directory starting with "build"
+build*/
+
