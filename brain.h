@@ -8,6 +8,9 @@
 #include <QDataStream>
 #include <memory>
 #include <algorithm>
+#include <vector>
+#include <random>
+#include <tuple>
 //https://www.qt.io/blog/2018/05/31/serialization-in-and-with-qt
 //https://github.com/mauricek/qt_iot_blog_samples/blob/master/part2/serialization/sensorinformation.cpp#L188
 
@@ -22,7 +25,8 @@ public:
     std::vector<int> l;                 //вершины слоёв, задаёт размеры следующим матрицам
     std::vector<Eigen::RowVectorXd> A;  //Значения нейронов в слоях
     std::vector<Eigen::MatrixXd> W;     //S-1 матриц весов - связей нейронов между слоями
-    using Mask = Eigen::ArrayXX<char>;      // 1 – связь активна, 0 – вырезана
+    /*  ArrayXX<char> в Eigen не алиасирован, объявляем явно */
+    using Mask = Eigen::Array<char,Eigen::Dynamic,Eigen::Dynamic>;
     std::vector<Mask> E;                    // маски того же размера, что и W
 
 
@@ -43,6 +47,13 @@ public:
     void addRandomConnection();             // mutation: add-connection
     void splitConnection(std::size_t layer, // mutation: add-node
                          std::size_t src, std::size_t dst);
+
+    /* --- новые операторы --- */
+    void disableRandomConnection();               // mutation: del-connection
+    void pruneIsolatedNeurons();                  // «чистка» мёртвых нейронов
+    void insertHiddenLayer(std::size_t pos,
+                           int neurons = 4);      // mutation: add-layer
+    void removeHiddenLayer(std::size_t pos);      // mutation: del-layer
 
     /* вероятность вызова этих мутаций решит ваш GA */
 

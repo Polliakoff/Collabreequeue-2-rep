@@ -10,11 +10,23 @@
 #include "pathway.h"
 #include <QObject>
 #include <QThread>
+#include <random>               // <-- единый ГСЧ
+#include <vector>       //  Нужен, т.к. ниже есть std::vector
+#include <fstream>      //  std::ofstream в составе класса
+#include <tuple>
 
 class evolution
 {
 protected:
     std::ofstream fout;
+    /* --- параметры GA (можно подправить эмпирически) --- */
+    static constexpr double P_NOISE      = 0.20;
+    static constexpr double P_ADD_CONN   = 0.05;
+    static constexpr double P_DEL_CONN   = 0.05;
+    static constexpr double P_SPLIT      = 0.05;
+    static constexpr double P_ADD_LAYER  = 0.02;
+    static constexpr double P_DEL_LAYER  = 0.02;
+
 public:
     evolution()=default;
     std::string genName="000x";
@@ -26,13 +38,14 @@ public:
     int min_speed = 100;
     int tst=0;
 
-    vector<std::unique_ptr<ship_physics>> population;
-    vector<std::string> names;
-    vector<QMetaObject::Connection> update_connections;
-    vector<QMetaObject::Connection> think_n_do_connections;
+    std::vector<std::unique_ptr<ship_physics>> population;
+    std::vector<std::string> names;
+    std::vector<QMetaObject::Connection> update_connections;
+    std::vector<QMetaObject::Connection> think_n_do_connections;
 
     void cnnct(std::shared_ptr<QTimer> &timer, std::shared_ptr<pathway> &pthw);
     void cnnct(std::shared_ptr<QTimer> &timer);
+    void mutate(ship_physics &);
     void cnnct();
     void dscnnct();
     void evolve();

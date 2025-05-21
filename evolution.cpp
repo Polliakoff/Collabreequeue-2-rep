@@ -1,5 +1,10 @@
 #include "evolution.h"
 
+using namespace std;
+
+static thread_local std::mt19937 RNG_EVO{ std::random_device{}() };
+static thread_local std::uniform_real_distribution<double> U01(0.0, 1.0);
+
 evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
@@ -14,6 +19,48 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     fout << "";
     fout.close();
 }
+
+void evolution::mutate(ship_physics &shp)
+{
+    brain &br = shp.getBrain();
+
+    double r = U01(RNG_EVO);
+    if      (r < P_ADD_CONN)   br.addRandomConnection();
+    else if (r < P_ADD_CONN + P_DEL_CONN) br.disableRandomConnection();
+    else if (r < P_ADD_CONN + P_DEL_CONN + P_SPLIT) {
+        /*  выбираем случайную активную связь, если она есть,
+        и «раскалываем» её                                  */
+        const auto &E = br.E;
+        std::vector<std::tuple<std::size_t,std::size_t,std::size_t>> pool;
+        for (std::size_t l = 0; l < E.size(); ++l)
+            for (std::size_t i = 0; i < (std::size_t)E[l].rows(); ++i)
+                for (std::size_t j = 0; j < (std::size_t)E[l].cols(); ++j)
+                    if (E[l](i,j)) pool.emplace_back(l,i,j);
+        if (!pool.empty()) {
+            auto [li,si,di] = pool[ std::uniform_int_distribution<std::size_t>(0,pool.size()-1)(RNG_EVO) ];
+            br.splitConnection(li,si,di);
+        }
+    }
+    else if (r < P_ADD_CONN + P_DEL_CONN + P_SPLIT + P_ADD_LAYER) {
+        if (br.S > 1) {
+            std::uniform_int_distribution<std::size_t> pos(0, br.S-2);
+            br.insertHiddenLayer(pos(RNG_EVO));
+        }
+    }
+    else if (r < P_ADD_CONN + P_DEL_CONN + P_SPLIT + P_ADD_LAYER + P_DEL_LAYER) {
+        if (br.S > 3) {                         // хотя бы один скрытый слой останется
+            std::uniform_int_distribution<std::size_t> pos(1, br.S-2);
+            br.removeHiddenLayer(pos(RNG_EVO));
+        }
+    }
+    else if (r < P_ADD_CONN + P_DEL_CONN + P_SPLIT +
+                      P_ADD_LAYER + P_DEL_LAYER + P_NOISE) {
+        br.noiseWeights();
+    }
+
+    br.pruneIsolatedNeurons();                 // финальная «чистка»
+}
+
 
 void evolution::evolve()
 {
@@ -86,9 +133,12 @@ void evolution::evolve()
                     fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
                     population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
                                                                            dmnc,map->start_point.first,map->start_point.second));
+                    mutate(*population.back());  // <-- МУТАЦИЯ
                     fout << "first:\t\t" << genName + population.back().get()->name << "\n";
                     population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
                                                                            1-dmnc,map->start_point.first,map->start_point.second));
+                    mutate(*population.back());  // <-- МУТАЦИЯ
+
                     fout << "second:\t\t" << genName + population.back().get()->name << "\n\n";
                 }
             }
@@ -111,16 +161,17 @@ void evolution::evolve()
     }
     //создание псевдородителей
     for(auto &par: newGenParents){
-            population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain(), true));
-            population[population.size()-1]->set_id(par.first->id);
-            names.emplace_back(par.second);
+        population[population.size()-1]->set_id(par.first->id);
+        names.emplace_back(par.second);
     }
 
     //завоз рандомов
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
+        mutate(*population.back());
         names.emplace_back(genName + population.back().get()->name);
     }
 
