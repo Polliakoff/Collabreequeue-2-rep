@@ -34,6 +34,7 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     {
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
+        population.back()->rotate_by( map->get_spawn_heading() );
         names.emplace_back(genName + population.back().get()->name);
     }
     generation = generation_size;
@@ -154,10 +155,12 @@ void evolution::evolve()
                     fout << "merging:\t" << temp->second << "\n\t\t\t" << inner_temp->second << "\n";
                     population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
                                                                            dmnc,map->start_point.first,map->start_point.second));
+                    population.back()->rotate_by( map->get_spawn_heading() );
                     mutate(*population.back());  // <-- МУТАЦИЯ
                     fout << "first:\t\t" << genName + population.back().get()->name << "\n";
                     population.emplace_back(std::make_unique<ship_physics>(*temp->first.get(), *inner_temp->first.get(),
                                                                            1-dmnc,map->start_point.first,map->start_point.second));
+                    population.back()->rotate_by( map->get_spawn_heading() );
                     mutate(*population.back());  // <-- МУТАЦИЯ
 
                     fout << "second:\t\t" << genName + population.back().get()->name << "\n\n";
@@ -176,6 +179,7 @@ void evolution::evolve()
         for(auto &par: newGenParents){
             population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                    map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
+            population.back()->rotate_by( map->get_spawn_heading() );
             population[population.size()-1]->set_id(par.first->id);
             names.emplace_back(par.second);
         }
@@ -184,6 +188,7 @@ void evolution::evolve()
     for(auto &par: newGenParents){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain(), true));
+        population.back()->rotate_by( map->get_spawn_heading() );
         population[population.size()-1]->set_id(par.first->id);
         names.emplace_back(par.second);
     }
@@ -192,6 +197,7 @@ void evolution::evolve()
     for(auto &par: newGenParents){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
+        population.back()->rotate_by( map->get_spawn_heading() );
         mutate(*population.back());
         population[population.size()-1]->set_id(par.first->id);
         names.emplace_back(par.second);
@@ -201,6 +207,7 @@ void evolution::evolve()
     for (int i = population.size(); i < generation; ++i){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second));
+        population.back()->rotate_by( map->get_spawn_heading() );
         mutate(*population.back());
         names.emplace_back(genName + population.back().get()->name);
     }

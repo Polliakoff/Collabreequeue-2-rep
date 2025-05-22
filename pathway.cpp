@@ -127,23 +127,110 @@ bool pathway::load_geojson(const QString &fileName)
 
     const double SHIFT = 300.0;                       // 20 м – половина ширины судна
 
-    if (!trackStart.isNull() && !trackEnd.isNull()) {
-        QPointF s = mapPt(trackStart);
-        QPointF f = mapPt(trackEnd);
-        /*  вектор «к центру safe» → нормализуем и сдвигаем start на 20 м   */
-        double vx = cx - s.x();
-        double vy = cy - s.y();
-        double len = std::hypot(vx, vy);
-        if (len > 1e-6) { vx = vx / len * SHIFT;  vy = vy / len * SHIFT; }
-        start_point = std::make_pair(s.x() + vx, s.y() + vy);
-        final_point = std::make_pair(f.x() - vx, f.y() - vy);
-    } else {
-        /*  нет трека – стартуем просто в сторону центроида                */
-        double vx = 0, vy = -SHIFT;                 // по умолчанию вверх
-        start_point = std::make_pair(cx + vx, cy + vy);
-        final_point = std::make_pair(cx - vx, glacier_y.front() - vy); // как раньше
-    }
+    // if (!trackStart.isNull() && !trackEnd.isNull()) {
+    //     QPointF s = mapPt(trackStart);
+    //     QPointF f = mapPt(trackEnd);
+    //     /*  вектор «к центру safe» → нормализуем и сдвигаем start на 20 м   */
+    //     double vx = cx - s.x();
+    //     double vy = cy - s.y();
+    //     double len = std::hypot(vx, vy);
+    //     if (len > 1e-6) { vx = vx / len * SHIFT;  vy = vy / len * SHIFT; }
+    //     start_point = std::make_pair(s.x() + vx, s.y() + vy);
+    //     final_point = std::make_pair(f.x() - vx, f.y() - vy);
+    // } else {
+    //     /*  нет трека – стартуем просто в сторону центроида                */
+    //     double vx = 0, vy = -SHIFT;                 // по умолчанию вверх
+    //     start_point = std::make_pair(cx + vx, cy + vy);
+    //     final_point = std::make_pair(cx - vx, glacier_y.front() - vy); // как раньше
+    // }
 
+    /*------------------------------------------------------------------
+        1. базовая точка (как раньше)  →  s0                           */
+    QPointF s0;
+    if (!trackStart.isNull())
+        s0 = mapPt(trackStart);
+    else
+        s0 = QPointF(cx, cy);
+
+    /* 2. смещаем к центроиду на SHIFT и ДОПОЛНИТЕЛЬНО так,
+          чтобы отступ от любого ребра ≥ SAFE_MARGIN                  */
+    auto pointToSeg = [](double px, double py,
+                         double x1,double y1,double x2,double y2) -> double
+    {
+        double vx = x2-x1,  vy = y2-y1;
+        double t = ((px-x1)*vx + (py-y1)*vy) / (vx*vx+vy*vy);
+        t = std::clamp(t,0.0,1.0);
+        double dx = x1 + t*vx - px;
+        double dy = y1 + t*vy - py;
+        return std::hypot(dx,dy);
+    };
+
+    double vx0 = cx - s0.x();
+    double vy0 = cy - s0.y();
+    double len0 = std::hypot(vx0, vy0);
+    if (len0 > 1e-6) { vx0 = vx0/len0;  vy0 = vy0/len0; }
+
+    QPointF spawn = s0 + QPointF(vx0*SHIFT, vy0*SHIFT);
+
+    /* итеративно отталкиваемся от стен, пока минимальное
+      расстояние не станет ≥ SAFE_MARGIN                           */
+    auto minDist = [&] (const QPointF &p)->double {
+        double mn = 1e9;
+        int n = glacier_x.size();
+        for (int i=0;i<n;++i)
+            mn = std::min(mn,
+                          pointToSeg(p.x(),p.y(),
+                                     glacier_x[i], glacier_y[i],
+                                     glacier_x[(i+1)%n], glacier_y[(i+1)%n]));
+        return mn;
+    };
+    while (minDist(spawn) < SAFE_MARGIN)
+        spawn += QPointF(vx0, vy0) *
+                 (SAFE_MARGIN - minDist(spawn) + 1.0);
+
+    /* 3. финальная точка финиша (если trackEnd был)                   */
+    QPointF finish;
+    if (!trackEnd.isNull())
+        finish = mapPt(trackEnd);
+    else
+        finish = QPointF(cx, glacier_y.front());
+
+    start_point = std::make_pair(spawn.x(), spawn.y());
+    final_point = std::make_pair(finish.x(), finish.y());
+
+    // /*------------------------------------------------------------------
+    //     4. выбираем курс: ищем лучшую «дыру» на 360°                   */
+    // const int NDIR = 36;               // шаг 10°
+    // double bestA = 0, bestClear = -1;
+    // for (int k=0;k<NDIR;++k) {
+    //     double ang = k*M_PI*2/NDIR;
+    //     double dx  = std::sin(ang);
+    //     double dy  = std::cos(ang);    // 0 рад = «вверх»
+    //     double clear = 1e9;
+    //     int n = glacier_x.size();
+    //     for (int i=0;i<n;++i) {
+    //         /* пересечение луча со стороной полигона */
+    //         double x1=glacier_x[i]-spawn.x(),   y1=glacier_y[i]-spawn.y();
+    //         double x2=glacier_x[(i+1)%n]-spawn.x(),
+    //             y2=glacier_y[(i+1)%n]-spawn.y();
+    //         double det = (x2-x1)*(-dx) - (y2-y1)*(-dy);
+    //         if (std::fabs(det) < 1e-6) continue;
+    //         double t = (x2*y1 - x1*y2) / det;   // по лучу
+    //         double u = (dx*y1 - dy*x1) / det;   // по сегменту
+    //         if (t>0 && u>=0 && u<=1) clear = std::min(clear,t);
+    //     }
+    //     if (clear > bestClear) { bestClear = clear; bestA = ang; }
+    // }
+    // spawn_heading = bestA;          // сохраняем результат
+
+    /*------------------------------------------------------------------
+        4. выбираем курс на цель */
+
+    double dx = final_point.first  - start_point.first;
+    double dy = final_point.second - start_point.second;
+    spawn_heading = std::atan2(dx, dy) + M_PI;
+    if (spawn_heading > M_PI) spawn_heading -= 2*M_PI;
+    else if (spawn_heading <= -M_PI) spawn_heading += 2*M_PI;
 
     return true;
 }
