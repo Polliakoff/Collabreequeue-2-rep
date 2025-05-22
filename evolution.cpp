@@ -5,6 +5,19 @@ using namespace std;
 static thread_local std::mt19937 RNG_EVO{ std::random_device{}() };
 static thread_local std::uniform_real_distribution<double> U01(0.0, 1.0);
 
+/*  Вычисляем минимальное P, при котором rand ≤ 0.25 G.
+    Формула: rand = G − 2 P (P+1) ≤ 0.25 G  ⇒  P(P+1) ≥ 0.375 G           */
+int evolution::chooseParentCount(int G)
+{
+    double g = static_cast<double>(G);
+    double root = (-1.0 + std::sqrt(1.0 + 1.5 * g)) * 0.5;   // корень уравнения
+    int   P     = static_cast<int>(std::ceil(root));
+    if (P < 2) P = 2;                                        // минимум два родителя
+    if (P > G/2) P = G/2;                                    // грубый верхний предел
+    return P;
+}
+
+
 evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
 {
     fout.open("evolution_obj.log");
@@ -83,7 +96,7 @@ void evolution::evolve()
         QObject::disconnect(think_n_do_connections[num]);
         ++num;
     } //стоп машина
-
+    const int P_target = chooseParentCount(generation);
     vector<int> index;
     int i = 0;
     for (auto &shp: population){
@@ -106,7 +119,7 @@ void evolution::evolve()
         for (auto &m: best){
             newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
             ++i;
-            if (i == 7)
+            if (i == P_target)
                 break;
         } //отобрали семь лучших
     }
@@ -163,6 +176,15 @@ void evolution::evolve()
     for(auto &par: newGenParents){
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
                                                                map->final_point.first,map->final_point.second,par.first.get()->getBrain(), true));
+        population[population.size()-1]->set_id(par.first->id);
+        names.emplace_back(par.second);
+    }
+
+    //создание псевдо-псевдо-родителей
+    for(auto &par: newGenParents){
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->final_point.second,par.first.get()->getBrain()));
+        mutate(*population.back());
         population[population.size()-1]->set_id(par.first->id);
         names.emplace_back(par.second);
     }

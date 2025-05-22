@@ -26,6 +26,7 @@ protected:
     static constexpr double P_SPLIT      = 0.05;
     static constexpr double P_ADD_LAYER  = 0.02;
     static constexpr double P_DEL_LAYER  = 0.02;
+    static int chooseParentCount(int G);
 
 public:
     evolution()=default;
