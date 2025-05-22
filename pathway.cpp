@@ -5,32 +5,126 @@ pathway::pathway()
     make_my_way();
 }
 
+pathway::pathway(const QString &geoFile)
+{
+    geojson_loaded = load_geojson(geoFile);  // true, если файл успешно прочитан
+    make_my_way();
+}
+
 pathway::~pathway(){}
 
 void pathway::make_my_way()
 {
-    if(generator_switch == true)
-    {
-        generator();
-    }
-
-    if(generated == false)
-    {
-        final_point = std::make_pair(0,125);
-        start_point = std::make_pair(575,600);
-        add_point(-110,0);
-        add_point(700,0);
-        add_point(700,700);
-        add_point(450,700);
-        add_point(450,250);
-        add_point(-110,250);
-    }else
-    {
-        for (int i = 0; i <= l_count + r_count + 1; i++)
-        {
+    if (geojson_loaded) {
+        for (size_t i = 0; i < glacier_x.size(); ++i)
             add_point(glacier_x[i], glacier_y[i]);
+        return;
+    }
+    else {
+        if(generator_switch == true)
+        {
+            generator();
+        }
+
+        if(generated == false)
+        {
+            final_point = std::make_pair(0,125);
+            start_point = std::make_pair(575,600);
+            add_point(-110,0);
+            add_point(700,0);
+            add_point(700,700);
+            add_point(450,700);
+            add_point(450,250);
+            add_point(-110,250);
+        }else
+        {
+            for (int i = 0; i <= l_count + r_count + 1; i++)
+            {
+                add_point(glacier_x[i], glacier_y[i]);
+            }
         }
     }
+}
+
+bool pathway::load_geojson(const QString &fileName)
+{
+    QFile f(fileName);
+    if (!f.open(QIODevice::ReadOnly))  return false;
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
+    if (err.error != QJsonParseError::NoError)   return false;
+
+    QJsonObject root = doc.object();
+    if (root["type"] != "FeatureCollection")     return false;
+
+    /* --- извлекаем границы полигона "safe" и линию "track" --- */
+    QVector<QPointF> safeRing;
+    QPointF trackStart, trackEnd;
+    for (const QJsonValue &v : root["features"].toArray()) {
+        QJsonObject feat = v.toObject();
+        QString kind = feat["properties"].toObject()["kind"].toString();
+        QJsonObject geom = feat["geometry"].toObject();
+
+        if (kind == "safe" && geom["type"] == "Polygon") {
+            QJsonArray ring = geom["coordinates"].toArray().first().toArray();
+            for (const QJsonValue &pt : ring) {
+                QJsonArray a = pt.toArray();
+                safeRing.append(QPointF(a[0].toDouble(), a[1].toDouble())); // lon,lat
+            }
+        }
+        if (kind == "track" && geom["type"] == "LineString") {
+            QJsonArray line = geom["coordinates"].toArray();
+            if (!line.isEmpty()) {
+                QJsonArray a0 = line.first().toArray();
+                QJsonArray a1 = line.last ().toArray();
+                trackStart = QPointF(a0[0].toDouble(), a0[1].toDouble());
+                trackEnd   = QPointF(a1[0].toDouble(), a1[1].toDouble());
+            }
+        }
+    }
+    if (safeRing.isEmpty())  return false;
+
+    /* --- линейно масштабируем долгот/широты в «экранные» координаты --- */
+    double minX =  safeRing[0].x(), maxX = minX,
+        minY =  safeRing[0].y(), maxY = minY;
+    for (const QPointF &p : safeRing) {
+        minX = std::min(minX, p.x());  maxX = std::max(maxX, p.x());
+        minY = std::min(minY, p.y());  maxY = std::max(maxY, p.y());
+    }
+    double spanX = maxX - minX, spanY = maxY - minY;
+    double scale = 600.0 / std::max(spanX, spanY);     // вписываем в прямоугольник [-110;700]×[0;700]
+
+    auto mapPt = [=](const QPointF &q)->QPointF {
+        double x = (q.x() - minX) * scale - 110.0;
+        double y = (q.y() - minY) * scale;             // вверх = +
+        return QPointF(x, y);
+    };
+
+    glacier_x.clear();
+    glacier_y.clear();
+    for (const QPointF &p : safeRing) {
+        QPointF m = mapPt(p);
+        glacier_x.push_back(m.x());
+        glacier_y.push_back(m.y());
+    }
+    l_count = glacier_x.size() / 2;
+    r_count = glacier_x.size() - l_count - 1;
+    generated = true;          // «как будто» сгенерирована
+
+    /* старт / финиш по линии track (если была)                */
+    if (!trackStart.isNull() && !trackEnd.isNull()) {
+        QPointF s = mapPt(trackStart);
+        QPointF f = mapPt(trackEnd);
+        start_point = std::make_pair(s.x(), s.y());
+        final_point = std::make_pair(f.x(), f.y());
+    } else {
+        // fallback: центр bbox
+        start_point = std::make_pair((glacier_x.front()+glacier_x.back())/2,
+                                     (glacier_y.front()+glacier_y.back())/2);
+        final_point = std::make_pair(start_point.first, glacier_y.front());
+    }
+    return true;
 }
 
 void pathway::generator()
@@ -150,13 +244,25 @@ void pathway::generator()
 
 void pathway::switcher(bool tmblr_generator)
 {
+    clear_data();
     generator_switch = tmblr_generator;
+    geojson_loaded   = false;
+    make_my_way();
+}
+
+void pathway::switcher(const QString &geoFile)
+{
+    clear_data();
+    generator_switch = false;            // отключаем генератор
+    geojson_loaded   = load_geojson(geoFile);   // пытаемся загрузить файл
+    make_my_way();                       // строим границу (если файл не
+}                                        // прочитался, вернётся STATIC)
+
+void pathway::clear_data()
+{
     glacier_x.clear();
     glacier_y.clear();
-    l_count = 0;
-    r_count = 0;
-    main_count = 0;
+    l_count = r_count = main_count = 0;
     vertexes.clear();
     faces.clear();
-    make_my_way();
 }
