@@ -139,24 +139,15 @@ void ship::eyesight(polygon &pol)
 
                 double pos_in_mas;
 
-                if(i!=2){
-                    if(cheching_poit_positon.first < 0){
-                        pos_in_mas = (i+1)*2-2;
+                /*  Определяем, “вперёд” это или “назад”,
+    по знаку проекции точки на вектор глаза  */
+                double along = eyes[i].direction(0) * cheching_poit_positon.first +
+                               eyes[i].direction(1) * cheching_poit_positon.second;
 
-                    }
-                    else{
-                        pos_in_mas = (i+1)*2-1;
-                    }
-                }
-                else{
-                    if(cheching_poit_positon.second > 0){
-                        pos_in_mas = (i+1)*2-2;
-
-                    }
-                    else{
-                        pos_in_mas = (i+1)*2-1;
-                    }
-                }
+                if (along < 0)
+                    pos_in_mas = (i+1)*2 - 2;   // позади судна
+                else
+                    pos_in_mas = (i+1)*2 - 1;   // перед носом
 
                 if(temp_distances[pos_in_mas] == -1){
                     temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
@@ -170,6 +161,20 @@ void ship::eyesight(polygon &pol)
                     temp_point_seen[pos_in_mas].second = checking_point.second;
                 }
             }
+        }
+    }
+
+    /*  Если из пары (0-1, 2-3, 4-5) заполнена только одна точка,
+    дублируем её во вторую ячейку, чтобы не было (0,0)  */
+    for (int k = 0; k < 3; ++k) {
+        int a = k*2, b = a+1;
+        if (temp_distances[a] < 0 && temp_distances[b] >= 0) {
+            temp_distances[a] = temp_distances[b];
+            temp_point_seen[a] = temp_point_seen[b];
+        }
+        else if (temp_distances[b] < 0 && temp_distances[a] >= 0) {
+            temp_distances[b] = temp_distances[a];
+            temp_point_seen[b] = temp_point_seen[a];
         }
     }
 

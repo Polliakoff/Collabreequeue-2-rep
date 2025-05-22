@@ -18,7 +18,6 @@ void pathway::make_my_way()
     if (geojson_loaded) {
         for (size_t i = 0; i < glacier_x.size(); ++i)
             add_point(glacier_x[i], glacier_y[i]);
-        return;
     }
     else {
         if(generator_switch == true)
@@ -44,6 +43,29 @@ void pathway::make_my_way()
             }
         }
     }
+
+    qDebug() << "===== pathway::make_my_way() =====";
+    qDebug() << "vertexes (" << vertexes.size() << ")";
+    for (size_t i = 0; i < vertexes.size(); ++i) {
+        qDebug().nospace()
+        << "  [" << i << "]  ("
+        << vertexes[i].first << ", "
+        << vertexes[i].second << ")";
+    }
+
+    qDebug() << "faces (" << faces.size() << ")";
+    for (size_t i = 0; i < faces.size(); ++i) {
+        const auto &f = faces[i];
+        qDebug().nospace()
+            << "  [" << i << "]  P=("
+            << f.point(0)      << ", "
+            << f.point(1)      << ")  D=("
+            << f.direction(0)  << ", "
+            << f.direction(1)  << ")";
+    }
+    qDebug() << "start point (" << start_point.first <<" , "<< start_point.second << ")";
+    qDebug() << "final point  (" << final_point.first <<" , "<< final_point.second << ")";
+    qDebug() << "==================================";
 }
 
 bool pathway::load_geojson(const QString &fileName)
@@ -126,7 +148,7 @@ bool pathway::load_geojson(const QString &fileName)
     cx /= glacier_x.size();
     cy /= glacier_y.size();
 
-    const double SHIFT = 60.0;                       // 20 м – половина ширины судна
+    const double SHIFT = 500.0;                       // 20 м – половина ширины судна
 
     if (!trackStart.isNull() && !trackEnd.isNull()) {
         QPointF s = mapPt(trackStart);
