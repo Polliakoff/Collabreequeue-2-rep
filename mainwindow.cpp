@@ -242,12 +242,25 @@ void MainWindow::on_pushButton_8_clicked()
 
     scene->clear();
     map = std::make_shared<pathway>();
-    map->switcher(tmblr_generator);
+    // map->switcher(tmblr_generator);
+    map->switcher(QString("C:\\Users\\Nexus\\Documents\\projects\\Collabreequeue-2-rep\\corridor_dataset\\train\\path_0000.geojson"));
 
     qdraw_polygon(*map,scene.get());
 
     if(first_map){
+        // 1) Привязываем сцену к view
         ui->graphicsView->setScene(scene.get());
+
+        // 2) Включаем «руку» для перетаскивания
+        ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+
+        // 3) Центрируем масштабирование под курсором
+        ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        ui->graphicsView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+
+        // 4) Устанавливаем фильтр, чтобы ловить wheel-события
+        ui->graphicsView->viewport()->installEventFilter(this);
+
         first_map = false;
     }
 }
@@ -282,3 +295,30 @@ void MainWindow::on_checkBox_2_stateChanged(int arg1)
 {
     tmblr_eyes = !tmblr_eyes;
 }
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    // Ловим колесо мыши на самом View
+    if (obj == ui->graphicsView->viewport() && event->type() == QEvent::Wheel) {
+        auto *we = static_cast<QWheelEvent*>(event);
+        // стандартный коэффициент масштабирования
+        constexpr double factor = 1.15;
+        if (we->angleDelta().y() > 0)
+            ui->graphicsView->scale(factor, factor);
+        else
+            ui->graphicsView->scale(1.0 / factor, 1.0 / factor);
+        return true;  // событие обработано, дальше не пускаем
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::zoomIn()
+{
+    ui->graphicsView->scale(1.15, 1.15);
+}
+
+void MainWindow::zoomOut()
+{
+    ui->graphicsView->scale(1.0/1.15, 1.0/1.15);
+}
+

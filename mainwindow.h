@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <cstdlib>
 #include "evolution.h"
+#include <QWheelEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,6 +48,10 @@ private slots:
 
     void on_checkBox_2_stateChanged(int arg1);
 
+    void zoomIn();          // слот «приблизить»
+
+    void zoomOut();         // слот «отдалить»
+
 private:
 
     Ui::MainWindow *ui;
@@ -58,6 +63,7 @@ private:
     QMetaObject::Connection test_update_connection;
     QMetaObject::Connection test_think_n_do_connection;
 ///тестовый
+    bool eventFilter(QObject *obj, QEvent *event) override;
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> update_timer;
     std::shared_ptr<QTimer> painter_timer;

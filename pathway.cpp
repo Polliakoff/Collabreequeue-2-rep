@@ -68,8 +68,10 @@ bool pathway::load_geojson(const QString &fileName)
 
         if (kind == "safe" && geom["type"] == "Polygon") {
             QJsonArray ring = geom["coordinates"].toArray().first().toArray();
-            for (const QJsonValue &pt : ring) {
-                QJsonArray a = pt.toArray();
+            int n = ring.size();
+            // последний элемент — тот же, что и первый, его пропускаем
+            for (int i = 0; i < n - 1; ++i) {
+                QJsonArray a = ring[i].toArray();
                 safeRing.append(QPointF(a[0].toDouble(), a[1].toDouble())); // lon,lat
             }
         }
@@ -85,19 +87,24 @@ bool pathway::load_geojson(const QString &fileName)
     }
     if (safeRing.isEmpty())  return false;
 
-    /* --- линейно масштабируем долгот/широты в «экранные» координаты --- */
-    double minX =  safeRing[0].x(), maxX = minX,
-        minY =  safeRing[0].y(), maxY = minY;
+    // находим среднюю широту для расчёта «метров на градус долгот»
+    double lat0 = 0.0;
+    for (const QPointF &p : safeRing) lat0 += p.y();
+    lat0 /= safeRing.size();  // средняя широта
+    const double m_per_deg_lat = 110574.0;                                // метры/° широты
+    const double m_per_deg_lon = 111320.0 * std::cos(lat0 * M_PI/180.0);  // метры/° долготы
+    // находим минимальные координаты (для смещения в ноль)
+    double minLon = safeRing[0].x(), minLat = safeRing[0].y(),
+        maxLat = safeRing[0].y();
     for (const QPointF &p : safeRing) {
-        minX = std::min(minX, p.x());  maxX = std::max(maxX, p.x());
-        minY = std::min(minY, p.y());  maxY = std::max(maxY, p.y());
+        minLon = std::min(minLon, p.x());
+        minLat = std::min(minLat, p.y());
+        maxLat = std::max(maxLat, p.y());
     }
-    double spanX = maxX - minX, spanY = maxY - minY;
-    double scale = 600.0 / std::max(spanX, spanY);     // вписываем в прямоугольник [-110;700]×[0;700]
-
-    auto mapPt = [=](const QPointF &q)->QPointF {
-        double x = (q.x() - minX) * scale - 110.0;
-        double y = (q.y() - minY) * scale;             // вверх = +
+    // функция маппинга: 1° → m_per_deg_* метров, судно остаётся ±10 м
+    auto mapPt = [&](const QPointF &q)->QPointF {
+        double x = (q.x() - minLon) * m_per_deg_lon;
+        double y = (maxLat - q.y()) * m_per_deg_lat;
         return QPointF(x, y);
     };
 
@@ -112,18 +119,33 @@ bool pathway::load_geojson(const QString &fileName)
     r_count = glacier_x.size() - l_count - 1;
     generated = true;          // «как будто» сгенерирована
 
-    /* старт / финиш по линии track (если была)                */
+    // --- определяем центроид safe-полигона (в метрах) ---
+    double cx = 0.0, cy = 0.0;
+    for (double x : glacier_x) cx += x;
+    for (double y : glacier_y) cy += y;
+    cx /= glacier_x.size();
+    cy /= glacier_y.size();
+
+    const double SHIFT = 60.0;                       // 20 м – половина ширины судна
+
     if (!trackStart.isNull() && !trackEnd.isNull()) {
         QPointF s = mapPt(trackStart);
         QPointF f = mapPt(trackEnd);
-        start_point = std::make_pair(s.x(), s.y());
-        final_point = std::make_pair(f.x(), f.y());
+        /*  вектор «к центру safe» → нормализуем и сдвигаем start на 20 м   */
+        double vx = cx - s.x();
+        double vy = cy - s.y();
+        double len = std::hypot(vx, vy);
+        if (len > 1e-6) { vx = vx / len * SHIFT;  vy = vy / len * SHIFT; }
+        start_point = std::make_pair(s.x() + vx, s.y() + vy);
+        final_point = std::make_pair(f.x() - vx, f.y() - vy);
     } else {
-        // fallback: центр bbox
-        start_point = std::make_pair((glacier_x.front()+glacier_x.back())/2,
-                                     (glacier_y.front()+glacier_y.back())/2);
-        final_point = std::make_pair(start_point.first, glacier_y.front());
+        /*  нет трека – стартуем просто в сторону центроида                */
+        double vx = 0, vy = -SHIFT;                 // по умолчанию вверх
+        start_point = std::make_pair(cx + vx, cy + vy);
+        final_point = std::make_pair(cx - vx, glacier_y.front() - vy); // как раньше
     }
+
+
     return true;
 }
 
