@@ -49,10 +49,16 @@ void straight_line::rotate(const double &angle)
     }
 }
 
-void straight_line::move_by(const double &x, const double &y)
+// void straight_line::move_by(const double &x, const double &y)
+// {
+//     point(0)+=x;
+//     point(1)+=y;
+// }
+
+void straight_line::move_by(const double &dx, const double &dy)
 {
-    point(0)+=x;
-    point(1)+=y;
+    point(0)          += dx;      point(1)          += dy;
+    rotation_point(0) += dx;      rotation_point(1) += dy;
 }
 
 double straight_line::get_x(const double &y)

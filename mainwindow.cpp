@@ -242,7 +242,7 @@ void MainWindow::on_pushButton_8_clicked()
 
     scene->clear();
     map = std::make_shared<pathway>();
-    // map->switcher(tmblr_generator);
+    //map->switcher(tmblr_generator);
     map->switcher(QString("C:\\Users\\Nexus\\Documents\\projects\\Collabreequeue-2-rep\\corridor_dataset\\train\\path_0000.geojson"));
 
     qdraw_polygon(*map,scene.get());

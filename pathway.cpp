@@ -18,7 +18,6 @@ void pathway::make_my_way()
     if (geojson_loaded) {
         for (size_t i = 0; i < glacier_x.size(); ++i)
             add_point(glacier_x[i], glacier_y[i]);
-        return;
     }
     else {
         if(generator_switch == true)
@@ -126,7 +125,7 @@ bool pathway::load_geojson(const QString &fileName)
     cx /= glacier_x.size();
     cy /= glacier_y.size();
 
-    const double SHIFT = 60.0;                       // 20 м – половина ширины судна
+    const double SHIFT = 300.0;                       // 20 м – половина ширины судна
 
     if (!trackStart.isNull() && !trackEnd.isNull()) {
         QPointF s = mapPt(trackStart);
