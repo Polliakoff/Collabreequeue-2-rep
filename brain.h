@@ -7,6 +7,10 @@
 #include <fstream>
 #include <QDataStream>
 #include <memory>
+#include <algorithm>
+#include <vector>
+#include <random>
+#include <tuple>
 //https://www.qt.io/blog/2018/05/31/serialization-in-and-with-qt
 //https://github.com/mauricek/qt_iot_blog_samples/blob/master/part2/serialization/sensorinformation.cpp#L188
 
@@ -21,6 +25,10 @@ public:
     std::vector<int> l;                 //вершины слоёв, задаёт размеры следующим матрицам
     std::vector<Eigen::RowVectorXd> A;  //Значения нейронов в слоях
     std::vector<Eigen::MatrixXd> W;     //S-1 матриц весов - связей нейронов между слоями
+    /*  ArrayXX<char> в Eigen не алиасирован, объявляем явно */
+    using Mask = Eigen::Array<char,Eigen::Dynamic,Eigen::Dynamic>;
+    std::vector<Mask> E;                    // маски того же размера, что и W
+
 
     int first=7;    //количество входных
     int last=2;     //количество выходных
@@ -32,6 +40,23 @@ public:
                                                                 //до 1.00(копирование первой сети)
     void think();       //пересчитывает значения
     void noiseWeights();//шумит веса
+    /* --- структурные мутации «в стиле NEAT» --- */
+    void toggleConnection(std::size_t layer,
+                          std::size_t src, std::size_t dst, bool enable);
+
+    void addRandomConnection();             // mutation: add-connection
+    void splitConnection(std::size_t layer, // mutation: add-node
+                         std::size_t src, std::size_t dst);
+
+    /* --- новые операторы --- */
+    void disableRandomConnection();               // mutation: del-connection
+    void pruneIsolatedNeurons();                  // «чистка» мёртвых нейронов
+    void insertHiddenLayer(std::size_t pos,
+                           int neurons = 4);      // mutation: add-layer
+    void removeHiddenLayer(std::size_t pos);      // mutation: del-layer
+
+    /* вероятность вызова этих мутаций решит ваш GA */
+
     static int ID;
 };
 

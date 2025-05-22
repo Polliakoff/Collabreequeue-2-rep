@@ -45,7 +45,7 @@ void MainWindow::on_pushButton_clicked()
     if(first_boot){
         ui->checkBox->setEnabled(false);
         ui->pushButton_8->setEnabled(false);
-        ship_evolution = std::make_unique<evolution>(150, map);
+        ship_evolution = std::make_unique<evolution>(300, map);
 
         ///===========тестовый
         if(!pre_init){
