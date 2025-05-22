@@ -5,16 +5,24 @@ using namespace std;
 static thread_local std::mt19937 RNG_EVO{ std::random_device{}() };
 static thread_local std::uniform_real_distribution<double> U01(0.0, 1.0);
 
-/*  Вычисляем минимальное P, при котором rand ≤ 0.25 G.
-    Формула: rand = G − 2 P (P+1) ≤ 0.25 G  ⇒  P(P+1) ≥ 0.375 G           */
+/*  Подбираем P так, чтобы rand ≈ 0.25·G  (минимум 2 родителя).
+    rand(G,P) = G − ( 2·P² + 2·P )
+-------------------------------------------------------------------- */
 int evolution::chooseParentCount(int G)
 {
-    double g = static_cast<double>(G);
-    double root = (-1.0 + std::sqrt(1.0 + 1.5 * g)) * 0.5;   // корень уравнения
-    int   P     = static_cast<int>(std::ceil(root));
-    if (P < 2) P = 2;                                        // минимум два родителя
-    if (P > G/2) P = G/2;                                    // грубый верхний предел
-    return P;
+    if (G < 8) return 2;            // тривиальный случай
+
+    auto randCnt = [G](int P){ return G - (2*P*P + 2*P); };
+    double g   = static_cast<double>(G);
+    double root= (-1.0 + std::sqrt(1.0 + 1.5 * g)) * 0.5;   // решение P²+P=3G/8
+
+    int p0 = std::max(2, static_cast<int>(std::floor(root)));
+    int p1 = std::min(G/2, p0 + 1);     // ближайшие целые вокруг корня
+
+    double err0 = std::abs(randCnt(p0) - 0.25*g);
+    double err1 = std::abs(randCnt(p1) - 0.25*g);
+
+    return (err1 < err0 ? p1 : p0);
 }
 
 
@@ -67,7 +75,7 @@ void evolution::mutate(ship_physics &shp)
         }
     }
     else if (r < P_ADD_CONN + P_DEL_CONN + P_SPLIT +
-                      P_ADD_LAYER + P_DEL_LAYER + P_NOISE) {
+                     P_ADD_LAYER + P_DEL_LAYER + P_NOISE) {
         br.noiseWeights();
     }
 
