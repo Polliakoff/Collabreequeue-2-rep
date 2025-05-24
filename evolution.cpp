@@ -63,6 +63,34 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     fout.close();
 }
 
+evolution::evolution(const std::shared_ptr<pathway> &pthw, const QString &brainsFile): evolving(false)
+{
+    map = pthw;
+    geo_files.clear();
+    // читаем brains из файла
+    QFile f(brainsFile);
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QDataStream in(&f);
+    in.setFloatingPointPrecision(QDataStream::DoublePrecision);
+    quint32 count;  in >> count;
+    for (quint32 i = 0; i < count; ++i) {
+        brain b; in >> b;
+        auto shp = std::make_unique<ship_physics>(
+            map->start_point.first,
+            map->start_point.second,
+            map->final_point.first,
+            map->final_point.second,
+            b
+            );
+        shp->rotate_by(map->get_spawn_heading());
+        population.emplace_back(std::move(shp));
+        names.emplace_back(genName + population.back()->name);
+    }
+    generation = population.size();
+}
+
+
+
 bool evolution::advance_map()
 {
     if (geo_files.isEmpty()) return false;
@@ -382,7 +410,9 @@ void evolution::evolution_stat()
             }
         }
 
-        evolve();          // обычное формирование нового поколения
+        if(evolving){
+            evolve();          // обычное формирование нового поколения
+        }
     }
 }
 

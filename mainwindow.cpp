@@ -92,7 +92,7 @@ void MainWindow::painter()
 
     if (!only_test){
         for(auto shp = ship_evolution->population.begin(); shp!=ship_evolution->population.end(); ){
-            if(shp->get()->operational){
+            if(shp->get()->operational || exam_run){
                 qdraw_polygon(shp->get()->body,scene.get());
                 if (tmblr_eyes){
                     scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
@@ -274,6 +274,7 @@ void MainWindow::on_pushButton_8_clicked()
         ui->pushButton->setEnabled(true);
         ui->pushButton_10->setEnabled(true);
         ui->pushButton_11->setEnabled(true);
+        ui->pushButton_13->setEnabled(false);
     }
 
     /* ---------- НОВАЯ ЛОГИКА ВЫБОРА КАРТЫ ---------- */
@@ -424,5 +425,85 @@ void MainWindow::on_pushButton_12_clicked()
     painter_timer->start(100);
 
     ship_evolution->saveBestBrains(filename);
+}
+
+
+void MainWindow::on_pushButton_13_clicked()
+{
+    // 2) Сначала выбираем файл с мозгами
+    QString brainsFile = QFileDialog::getOpenFileName(
+        this, tr("Загрузить корабли"), QString(), "*.ships");
+    if (brainsFile.isEmpty()) return;
+
+    // 3) Потом — выбираем карту (GeoJSON)
+    QString mapFile = QFileDialog::getOpenFileName(
+        this, tr("Выбрать карту"), QString(), "*.geojson");
+    if (mapFile.isEmpty()) return;
+    map = std::make_shared<pathway>(mapFile);
+
+    ui->pushButton_10->setEnabled(true);
+    ui->pushButton_11->setEnabled(true);
+
+    scene->clear();
+    qdraw_polygon(*map, scene.get());
+
+    // 1) Привязываем сцену к view
+    ui->graphicsView->setScene(scene.get());
+
+    // 2) Включаем «руку» для перетаскивания
+    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+
+    // 3) Центрируем масштабирование под курсором
+    ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    ui->graphicsView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+
+    // 4) Устанавливаем фильтр, чтобы ловить wheel-события
+    ui->graphicsView->viewport()->installEventFilter(this);
+
+    first_map = false;
+
+    ui->graphicsView->centerOn(map->start_point.first, map->start_point.second);
+
+    ship_evolution = std::make_unique<evolution>(map, brainsFile);
+
+    ui->pushButton->setEnabled(false);
+    ui->pushButton_13->setEnabled(false);
+    ui->checkBox_2->setEnabled(true);
+    ui->pushButton_9->setEnabled(false);
+    ui->pushButton_12->setEnabled(true);
+    only_test = false;
+    first_boot = false;
+
+    ui->groupBox->setEnabled(false);
+    ui->pushButton_8->setEnabled(false);
+    ///===========тестовый
+    test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+    test_ship->rotate_by( map->get_spawn_heading() );
+    ///===========тестовый
+    first_boot = false;
+
+    connect(update_timer.get(), &QTimer::timeout,  [=](){ship_evolution->evolution_stat();});
+
+    ship_evolution->cnnct(update_timer);
+
+    ui->pushButton_2->setEnabled(true);
+    ui->pushButton_3->setEnabled(true);
+    ui->pushButton_4->setEnabled(true);
+    ui->pushButton_5->setEnabled(true);
+    ui->pushButton_6->setEnabled(true);
+    ui->pushButton_7->setEnabled(true);
+
+    test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
+    test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
+
+    connect(painter_timer.get(), SIGNAL(timeout()), this, SLOT(painter()));
+    connect(update_timer.get(), SIGNAL(timeout()), this, SLOT(gauges()));
+
+    tmblr_slow_time = true;
+    ui->pushButton_6->setText("Ускорить");
+    exam_run = true;
+
+    update_timer->start(40);
+    painter_timer->start(100);
 }
 

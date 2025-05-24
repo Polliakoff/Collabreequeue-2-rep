@@ -31,13 +31,14 @@ protected:
     static constexpr double DIST_EPS = 100.0;
     QString endSaveFileName = "";
     bool running = false;
+    bool evolving = true;
 
 public:
     evolution()=default;
     std::string genName="000x";
     evolution(const int& generation_size, std::shared_ptr<pathway> &pthw);
-    evolution(int generation_size,
-              const QStringList &geoMaps);
+    evolution(std::shared_ptr<pathway> const& pthw, const QString &brainsFile);
+    evolution(int generation_size, const QStringList &geoMaps);
     virtual ~evolution();
 
     int generation;

@@ -60,6 +60,8 @@ private slots:
 
     void on_pushButton_12_clicked();
 
+    void on_pushButton_13_clicked();
+
 private:
     QString filename;
     Ui::MainWindow *ui;
@@ -98,7 +100,8 @@ private:
         tmblr_time = false,
         tmblr_slow_time = false,
         tmblr_generator = false,
-        tmblr_eyes = false;
+        tmblr_eyes = false,
+        exam_run = false;
 
 };
 #endif // MAINWINDOW_H
