@@ -158,6 +158,7 @@ void MainWindow::gauges()
     if(!only_test){
         ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
         ui->lineEdit_12->setText(QString::number(ship_evolution->stagnate_cnt));
+        ui->lineEdit_17->setText(QString::number(ship_evolution->gen_cnt));
         ui->lineEdit_13->setText(QString::number(ship_evolution->best_prev));
         ui->lineEdit_16->setText(QString::number(ship_evolution->cur_map));
     }

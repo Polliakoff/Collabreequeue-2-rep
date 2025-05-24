@@ -331,7 +331,7 @@ void evolution::evolution_stat()
         /* --------- анализ прироста --------- */
         if (!geo_files.isEmpty()) {   //  переключать имеет смысл, только если карт > 1
             /* --------- анализ прироста --------- */
-
+            ++gen_cnt;
             double best_now = 1e9;
             for (auto &sh : population)
                 best_now = std::min(best_now, sh->distance_to_finish);
@@ -342,8 +342,9 @@ void evolution::evolution_stat()
                 stagnate_cnt = 0;
             best_prev = best_now;
 
-            if (stagnate_cnt >= N_STAG && advance_map()) {
+            if ((stagnate_cnt >= N_STAG || gen_cnt >= N_GEN) && advance_map()) {
                 stagnate_cnt = 0;
+                gen_cnt = 0;
                 fout << "=== SWITCH MAP to " << geo_files[cur_map].toStdString()
                      << " ===\n";
             }

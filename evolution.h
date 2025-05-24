@@ -50,8 +50,10 @@ public:
 
     /* --- детектор стагнации --- */
     int stagnate_cnt = 0;
+    int gen_cnt = 0;
     double best_prev = 1e9;
-    static constexpr int N_STAG = 5;   // поколений без прироста
+    static constexpr int N_STAG = 3;   // поколений без прироста
+    static constexpr int N_GEN = 10;   // поколений без прироста
     static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
 
     std::vector<std::unique_ptr<ship_physics>> population;

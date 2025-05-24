@@ -117,7 +117,7 @@
       <property name="geometry">
        <rect>
         <x>60</x>
-        <y>200</y>
+        <y>230</y>
         <width>169</width>
         <height>22</height>
        </rect>
@@ -159,7 +159,7 @@
       <property name="geometry">
        <rect>
         <x>60</x>
-        <y>240</y>
+        <y>270</y>
         <width>166</width>
         <height>24</height>
        </rect>
@@ -231,7 +231,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>140</y>
+        <y>170</y>
         <width>121</width>
         <height>24</height>
        </rect>
@@ -254,7 +254,7 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>140</y>
+        <y>170</y>
         <width>91</width>
         <height>24</height>
        </rect>
@@ -299,7 +299,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>170</y>
+        <y>200</y>
         <width>121</width>
         <height>24</height>
        </rect>
@@ -312,13 +312,39 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>170</y>
+        <y>200</y>
         <width>91</width>
         <height>24</height>
        </rect>
       </property>
       <property name="text">
        <string>Номер карты</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_17">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>140</y>
+        <width>121</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_20">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>140</y>
+        <width>91</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Пок. на карте.</string>
       </property>
      </widget>
     </widget>
