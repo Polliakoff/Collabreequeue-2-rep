@@ -5,6 +5,10 @@
 #include <QGraphicsScene>
 #include <cstdlib>
 #include "evolution.h"
+#include <QWheelEvent>
+#include <QFileDialog>
+#include <QDir>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,13 +43,19 @@ private slots:
 
     void genNameSet(std::string name);
 
-    void on_checkBox_stateChanged();
-
     void on_pushButton_8_clicked();
 
     void on_pushButton_9_clicked();
 
     void on_checkBox_2_stateChanged(int arg1);
+
+    void zoomIn();          // слот «приблизить»
+
+    void zoomOut();         // слот «отдалить»
+
+    void on_pushButton_10_clicked();
+
+    void on_pushButton_11_clicked();
 
 private:
 
@@ -53,27 +63,39 @@ private:
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;
     std::unique_ptr<evolution> ship_evolution;
-///тестовый
+    ///тестовый
     std::unique_ptr<ship_physics> test_ship;
     QMetaObject::Connection test_update_connection;
     QMetaObject::Connection test_think_n_do_connection;
-///тестовый
+    ///тестовый
+    bool eventFilter(QObject *obj, QEvent *event) override;
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> update_timer;
     std::shared_ptr<QTimer> painter_timer;
+
+    /* --- список карт, текущий индекс --- */
+    QStringList geo_maps;
+    int         geo_idx = 0;
+
+    /*  общая «актуальная» карта берётся либо из ship_evolution,
+        либо, если эволюции ещё нет, – из поля map  */
+    std::shared_ptr<pathway> current_map() const {
+        return ship_evolution ? ship_evolution->map : map;
+    }
+
     double neuron1 = 0, neuron2 = 0, neuron3 = 0, neuron4 = 0;
     bool first_boot = true,
-    first_map = true,
-    only_test = false,
-    pre_init = false,
-    tmblr_1 = false,
-    tmblr_2 = false,
-    tmblr_3 = false,
-    tmblr_4 = false,
-    tmblr_time = false,
-    tmblr_slow_time = false,
-    tmblr_generator = false,
-    tmblr_eyes = false;
+        first_map = true,
+        only_test = false,
+        pre_init = false,
+        tmblr_1 = false,
+        tmblr_2 = false,
+        tmblr_3 = false,
+        tmblr_4 = false,
+        tmblr_time = false,
+        tmblr_slow_time = false,
+        tmblr_generator = false,
+        tmblr_eyes = false;
 
 };
 #endif // MAINWINDOW_H

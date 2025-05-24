@@ -43,13 +43,19 @@ void MainWindow::on_pushButton_clicked()
     only_test = false;
 
     if(first_boot){
-        ui->checkBox->setEnabled(false);
+        ui->groupBox->setEnabled(false);
         ui->pushButton_8->setEnabled(false);
-        ship_evolution = std::make_unique<evolution>(300, map);
+        if(ui->radioButton_3->isChecked()){
+            ship_evolution = std::make_unique<evolution>(300, geo_maps);
+        }
+        else {
+            ship_evolution = std::make_unique<evolution>(300, map);
+        }
 
         ///===========тестовый
         if(!pre_init){
             test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+            test_ship->rotate_by( map->get_spawn_heading() );
         }
         ///===========тестовый
 
@@ -67,7 +73,6 @@ void MainWindow::on_pushButton_clicked()
         ui->pushButton_5->setEnabled(true);
         ui->pushButton_6->setEnabled(true);
         ui->pushButton_7->setEnabled(true);
-        test_ship->fuel+=10000;
         test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
         test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
 
@@ -90,11 +95,11 @@ void MainWindow::painter()
                 qdraw_polygon(shp->get()->body,scene.get());
                 if (tmblr_eyes){
                     scene->addLine(shp->get()->point_seen[0].first,shp->get()->point_seen[0].second,
-                            shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
+                                   shp->get()->point_seen[1].first,shp->get()->point_seen[1].second, QPen(Qt::lightGray));
                     scene->addLine(shp->get()->point_seen[2].first,shp->get()->point_seen[2].second,
-                            shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
+                                   shp->get()->point_seen[3].first,shp->get()->point_seen[3].second, QPen(Qt::lightGray));
                     scene->addLine(shp->get()->point_seen[4].first,shp->get()->point_seen[4].second,
-                            shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
+                                   shp->get()->point_seen[5].first,shp->get()->point_seen[5].second, QPen(Qt::lightGray));
 
                     scene->addEllipse(shp->get()->point_seen[0].first-10,shp->get()->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
                     scene->addEllipse(shp->get()->point_seen[1].first-10,shp->get()->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
@@ -112,11 +117,11 @@ void MainWindow::painter()
     qdraw_polygon(test_ship->body,scene.get());
 
     scene->addLine(test_ship->point_seen[0].first,test_ship->point_seen[0].second,
-            test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
+                   test_ship->point_seen[1].first,test_ship->point_seen[1].second, QPen(Qt::lightGray));
     scene->addLine(test_ship->point_seen[2].first,test_ship->point_seen[2].second,
-            test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
+                   test_ship->point_seen[3].first,test_ship->point_seen[3].second, QPen(Qt::lightGray));
     scene->addLine(test_ship->point_seen[4].first,test_ship->point_seen[4].second,
-            test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
+                   test_ship->point_seen[5].first,test_ship->point_seen[5].second, QPen(Qt::lightGray));
 
     scene->addEllipse(test_ship->point_seen[0].first-10,test_ship->point_seen[0].second-10,20,20, QPen(Qt::lightGray));
     scene->addEllipse(test_ship->point_seen[1].first-10,test_ship->point_seen[1].second-10,20,20, QPen(Qt::lightGray));
@@ -135,12 +140,27 @@ void MainWindow::painter()
                    test_ship->get_position().second+(test_ship->path.second*test_ship->velocity_projection/vector_module(test_ship->path.first,test_ship->path.second))*50,
                    QPen(Qt::green));
     ///===========тестовый
+    static std::shared_ptr<pathway> last_drawn;
+    auto mp = current_map();
+    if (mp && mp != last_drawn) {          // карта поменялась – перерисовываем фон
+        map = mp;
+        test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+        test_ship->rotate_by( map->get_spawn_heading() );
+        scene->clear();
+        qdraw_polygon(*mp, scene.get());
+        last_drawn = mp;
+        ui->graphicsView->centerOn(map->start_point.first, map->start_point.second);
+    }
 }
 
 void MainWindow::gauges()
 {
     if(!only_test){
-            ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
+        ui->lineEdit_11->setText(QString::fromStdString(ship_evolution->genName));
+        ui->lineEdit_12->setText(QString::number(ship_evolution->stagnate_cnt));
+        ui->lineEdit_17->setText(QString::number(ship_evolution->gen_cnt));
+        ui->lineEdit_13->setText(QString::number(ship_evolution->best_prev));
+        ui->lineEdit_16->setText(QString::number(ship_evolution->cur_map));
     }
 
     ///===========тестовый
@@ -156,8 +176,10 @@ void MainWindow::gauges()
     ui->lineEdit_6->setText(QString::number(test_ship->velocity_x));
     ui->lineEdit_7->setText(QString::number(test_ship->velocity_y));
     ui->lineEdit_8->setText(QString::number(test_ship->velocity_sum));
+    ui->lineEdit_14->setText(QString::number(test_ship->angular_velocity));
     ui->lineEdit_9->setText(QString::number(test_ship->distance_to_finish));
     ui->lineEdit_10->setText(QString::number(test_ship->fuel));
+    ui->lineEdit_15->setText(QString::number(test_ship->distance_to_start));
 
     if(!test_ship->operational) {
         disconnect(test_update_connection);
@@ -228,28 +250,69 @@ void MainWindow::genNameSet(std::string name)
 }
 ///===========тестовый
 
-void MainWindow::on_checkBox_stateChanged()
-{
-    tmblr_generator =! tmblr_generator;
-}
-
 void MainWindow::on_pushButton_8_clicked()
 {
     if(first_map){
         ui->pushButton_9->setEnabled(true);
         ui->pushButton->setEnabled(true);
+        ui->pushButton_10->setEnabled(true);
+        ui->pushButton_11->setEnabled(true);
+    }
+
+    /* ---------- НОВАЯ ЛОГИКА ВЫБОРА КАРТЫ ---------- */
+    geo_maps.clear();                // по умолчанию — «нет переключения»
+    geo_idx = 0;
+
+    if (ui->radioButton->isChecked()) {
+        /* 1. Тренировочная «ручная» карта (как прежде) */
+        map = std::make_shared<pathway>();
+    }
+    else if (ui->radioButton_2->isChecked()) {
+        /* 2. Случайно сгенерированная */
+        map = std::make_shared<pathway>();       // конструктор generator_switch == false
+        map->switcher(true);                     // включаем генератор
+    }
+    else if (ui->radioButton_3->isChecked()) {
+        /* 3. Выбираем папку с GeoJSON-картами */
+        QString dir = QFileDialog::getExistingDirectory(this,
+                                                        tr("Выберите папку с картами"), QString(),
+                                                        QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks);
+        if (dir.isEmpty()) return;               // отказ пользователя
+
+        QDir d(dir);
+        QStringList files = d.entryList(QStringList() << "*.geojson",
+                                        QDir::Files, QDir::Name);
+        if (files.isEmpty()) {
+            QMessageBox::warning(this, tr("Пустая папка"),
+                                 tr("В выбранной папке нет *.geojson-файлов."));
+            return;
+        }
+        for (QString &f : files) f.prepend(dir + '/');
+        geo_maps = files;                        // сохраняем для evolution
+        map = std::make_shared<pathway>( geo_maps.first() );
     }
 
     scene->clear();
-    map = std::make_shared<pathway>();
-    map->switcher(tmblr_generator);
-
-    qdraw_polygon(*map,scene.get());
+    qdraw_polygon(*map, scene.get());
 
     if(first_map){
+        // 1) Привязываем сцену к view
         ui->graphicsView->setScene(scene.get());
+
+        // 2) Включаем «руку» для перетаскивания
+        ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+
+        // 3) Центрируем масштабирование под курсором
+        ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        ui->graphicsView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
+
+        // 4) Устанавливаем фильтр, чтобы ловить wheel-события
+        ui->graphicsView->viewport()->installEventFilter(this);
+
         first_map = false;
     }
+
+    ui->graphicsView->centerOn(map->start_point.first, map->start_point.second);
 }
 
 void MainWindow::on_pushButton_9_clicked()
@@ -266,8 +329,8 @@ void MainWindow::on_pushButton_9_clicked()
     pre_init = true;
 
     test_ship = std::make_unique<ship_physics>(map->start_point.first, map->start_point.second, map->final_point.first, map->final_point.second);
+    test_ship->rotate_by( map->get_spawn_heading() );
 
-    test_ship->fuel+=10000;
     test_update_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->update(*map);});
     test_think_n_do_connection = connect(update_timer.get(), &QTimer::timeout,  [=](){test_ship->dumb_n_do(neuron1, neuron2, neuron3, neuron4);});
 
@@ -282,3 +345,42 @@ void MainWindow::on_checkBox_2_stateChanged(int arg1)
 {
     tmblr_eyes = !tmblr_eyes;
 }
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    // Ловим колесо мыши на самом View
+    if (obj == ui->graphicsView->viewport() && event->type() == QEvent::Wheel) {
+        auto *we = static_cast<QWheelEvent*>(event);
+        // стандартный коэффициент масштабирования
+        constexpr double factor = 1.15;
+        if (we->angleDelta().y() > 0)
+            ui->graphicsView->scale(factor, factor);
+        else
+            ui->graphicsView->scale(1.0 / factor, 1.0 / factor);
+        return true;  // событие обработано, дальше не пускаем
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::zoomIn()
+{
+    ui->graphicsView->scale(1.15, 1.15);
+}
+
+void MainWindow::zoomOut()
+{
+    ui->graphicsView->scale(1.0/1.15, 1.0/1.15);
+}
+
+
+void MainWindow::on_pushButton_10_clicked()
+{
+    ui->graphicsView->centerOn(map->start_point.first, map->start_point.second);
+}
+
+
+void MainWindow::on_pushButton_11_clicked()
+{
+    ui->graphicsView->centerOn(map->final_point.first, map->final_point.second);
+}
+

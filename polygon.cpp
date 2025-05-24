@@ -6,6 +6,14 @@ polygon::~polygon(){}
 
 void polygon::add_point(double x, double y)
 {
+    // ——————————————————————————————————————————————
+    // 1) НЕ добавляем точку, если она совпадает с последней:
+    if (!vertexes.empty() &&
+        std::abs(x - vertexes.back().first)  < 1e-6 &&
+        std::abs(y - vertexes.back().second) < 1e-6)
+        return;
+    // ——————————————————————————————————————————————
+
     vertexes.emplace_back(std::make_pair(x, y));
     size_t length = vertexes.size();
     if(length > 3){

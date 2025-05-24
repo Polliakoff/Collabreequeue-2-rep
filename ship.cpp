@@ -49,6 +49,51 @@ pair<double, double> ship::get_position()
     return position;
 }
 
+bool ship::segmentIntersect(const pair<double, double> &a, const pair<double, double> &b, const pair<double, double> &c, const pair<double, double> &d, pair<double, double> &out)
+{
+    const double EPS = 1e-9;
+
+    double A1 = b.second - a.second;
+    double B1 = a.first  - b.first;
+    double C1 = A1*a.first + B1*a.second;
+
+    double A2 = d.second - c.second;
+    double B2 = c.first  - d.first;
+    double C2 = A2*c.first + B2*c.second;
+
+    double det = A1*B2 - A2*B1;
+    if (std::fabs(det) < EPS) {                     // параллели / коллинеар
+        auto on = [&](const pair<double,double>& p,
+                      const pair<double,double>& p1,
+                      const pair<double,double>& p2){
+            return p.first  >= std::min(p1.first ,p2.first )-EPS &&
+                   p.first  <= std::max(p1.first ,p2.first )+EPS &&
+                   p.second >= std::min(p1.second,p2.second)-EPS &&
+                   p.second <= std::max(p1.second,p2.second)+EPS;
+        };
+        if (std::fabs((A1*c.first + B1*c.second) - C1) < EPS) {
+            if (on(c,a,b)) { out = c; return true; }
+            if (on(d,a,b)) { out = d; return true; }
+        }
+        return false;
+    }
+
+    out.first  = (B2*C1 - B1*C2) / det;
+    out.second = (A1*C2 - A2*C1) / det;
+
+    auto inside = [EPS](double v, double v1, double v2)   // <── захват EPS
+    {
+        return v >= std::min(v1,v2) - EPS &&
+               v <= std::max(v1,v2) + EPS;
+    };
+
+    return inside(out.first ,a.first ,b.first ) &&
+           inside(out.second,a.second,b.second) &&
+           inside(out.first ,c.first ,d.first ) &&
+           inside(out.second,c.second,d.second);
+
+}
+
 void ship::move_by_coords(const double &delta_x, const double &delta_y)
 {
     position.first+=delta_x;
@@ -112,69 +157,53 @@ bool ship::collision(polygon &pol)
 
 void ship::eyesight(polygon &pol)
 {
-    vector<double> temp_distances;
-    for(int i=0;i<6;i++){
-        temp_distances.emplace_back(-1);
-    }
-    vector<pair<double,double>> temp_point_seen;
-    temp_point_seen.resize(6);
+    std::fill(distances.begin(),  distances.end(),  -1);
+    std::fill(point_seen.begin(), point_seen.end(),
+              std::make_pair(std::numeric_limits<double>::quiet_NaN(),
+                             std::numeric_limits<double>::quiet_NaN()));
 
-    for(size_t i = 0; i<eyes.size(); i++){
-        for(size_t j = 0; j<pol.faces.size();j++){
-            pair<double,double> checking_point;
-            int range_1;
-            int range_2;
-            if(j!=pol.faces.size()-1){
-                range_1 = j;
-                range_2 = j+1;
-            }
-            else{
-                range_1 = j;
-                range_2 = 0;
-            }
-            checking_point = intersect(eyes[i],pol.faces[j],pol.vertexes[range_1],pol.vertexes[range_2]);
-            if(checking_point.first != std::numeric_limits<double>::infinity()){
+    for (size_t iEye = 0; iEye < eyes.size(); ++iEye)
+    {
+        Eigen::Vector2d dir(eyes[iEye].direction(0), eyes[iEye].direction(1));
+        dir.normalize();
 
-                auto cheching_poit_positon = convert_to_ship(checking_point);
+        std::vector<std::pair<double,double>> hits;      // все t
+        std::vector<double>                   ts;
 
-                double pos_in_mas;
+        for (size_t j = 0; j < pol.vertexes.size(); ++j)
+        {
+            size_t k = (j+1)%pol.vertexes.size();
+            pair<double,double> p;
+            if (!segmentIntersect(pol.vertexes[j], pol.vertexes[k],
+                                  {eyes[iEye].point(0)-1e6*dir.x(),  // «бесконечный» отрезок
+                                   eyes[iEye].point(1)-1e6*dir.y()},
+                                  {eyes[iEye].point(0)+1e6*dir.x(),
+                                   eyes[iEye].point(1)+1e6*dir.y()}, p))
+                continue;
 
-                if(i!=2){
-                    if(cheching_poit_positon.first < 0){
-                        pos_in_mas = (i+1)*2-2;
+            hits.push_back(p);
+            ts.push_back( (p.first  - position.first) * dir.x() +
+                         (p.second - position.second)* dir.y() );
+        }
 
-                    }
-                    else{
-                        pos_in_mas = (i+1)*2-1;
-                    }
-                }
-                else{
-                    if(cheching_poit_positon.second > 0){
-                        pos_in_mas = (i+1)*2-2;
+        double bestFwd  = 1e100, bestBack = 1e100;
+        pair<double,double> hitFwd, hitBack;
 
-                    }
-                    else{
-                        pos_in_mas = (i+1)*2-1;
-                    }
-                }
-
-                if(temp_distances[pos_in_mas] == -1){
-                    temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
-                    temp_point_seen[pos_in_mas].first = checking_point.first;
-                    temp_point_seen[pos_in_mas].second = checking_point.second;
-                }
-
-                else if(temp_distances[pos_in_mas]>=sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2))){
-                    temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
-                    temp_point_seen[pos_in_mas].first = checking_point.first;
-                    temp_point_seen[pos_in_mas].second = checking_point.second;
-                }
+        for (size_t n = 0; n < ts.size(); ++n) {
+            double t = ts[n];
+            if (t >= 1e-9) {                       // вперед
+                if (t < bestFwd) { bestFwd = t; hitFwd = hits[n]; }
+            } else if (t <= -1e-9) {               // назад
+                if (-t < bestBack) { bestBack = -t; hitBack = hits[n]; }
             }
         }
-    }
 
-    distances = temp_distances;
-    point_seen = temp_point_seen;
+        const size_t base = iEye*2;
+        distances [base]     = bestBack;
+        point_seen[base]     = hitBack;
+        distances [base + 1] = bestFwd;
+        point_seen[base + 1] = hitFwd;
+    }
 }
 
 void ship::update(polygon &map)

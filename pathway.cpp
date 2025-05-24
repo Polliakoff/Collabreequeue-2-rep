@@ -5,32 +5,192 @@ pathway::pathway()
     make_my_way();
 }
 
+pathway::pathway(const QString &geoFile)
+{
+    geojson_loaded = load_geojson(geoFile);  // true, если файл успешно прочитан
+    make_my_way();
+}
+
 pathway::~pathway(){}
 
 void pathway::make_my_way()
 {
-    if(generator_switch == true)
-    {
-        generator();
-    }
-
-    if(generated == false)
-    {
-        final_point = std::make_pair(0,125);
-        start_point = std::make_pair(575,600);
-        add_point(-110,0);
-        add_point(700,0);
-        add_point(700,700);
-        add_point(450,700);
-        add_point(450,250);
-        add_point(-110,250);
-    }else
-    {
-        for (int i = 0; i <= l_count + r_count + 1; i++)
-        {
+    if (geojson_loaded) {
+        for (size_t i = 0; i < glacier_x.size(); ++i)
             add_point(glacier_x[i], glacier_y[i]);
+    }
+    else {
+        if(generator_switch == true)
+        {
+            generator();
+        }
+
+        if(generated == false)
+        {
+            final_point = std::make_pair(0,125);
+            start_point = std::make_pair(575,600);
+            add_point(-110,0);
+            add_point(700,0);
+            add_point(700,700);
+            add_point(450,700);
+            add_point(450,250);
+            add_point(-110,250);
+        }else
+        {
+            for (int i = 0; i <= l_count + r_count + 1; i++)
+            {
+                add_point(glacier_x[i], glacier_y[i]);
+            }
         }
     }
+}
+
+bool pathway::load_geojson(const QString &fileName)
+{
+    QFile f(fileName);
+    if (!f.open(QIODevice::ReadOnly))  return false;
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
+    if (err.error != QJsonParseError::NoError)   return false;
+
+    QJsonObject root = doc.object();
+    if (root["type"] != "FeatureCollection")     return false;
+
+    /* --- извлекаем границы полигона "safe" и линию "track" --- */
+    QVector<QPointF> safeRing;
+    QPointF trackStart, trackEnd;
+    for (const QJsonValue &v : root["features"].toArray()) {
+        QJsonObject feat = v.toObject();
+        QString kind = feat["properties"].toObject()["kind"].toString();
+        QJsonObject geom = feat["geometry"].toObject();
+
+        if (kind == "safe" && geom["type"] == "Polygon") {
+            QJsonArray ring = geom["coordinates"].toArray().first().toArray();
+            int n = ring.size();
+            // последний элемент — тот же, что и первый, его пропускаем
+            for (int i = 0; i < n - 1; ++i) {
+                QJsonArray a = ring[i].toArray();
+                safeRing.append(QPointF(a[0].toDouble(), a[1].toDouble())); // lon,lat
+            }
+        }
+        if (kind == "track" && geom["type"] == "LineString") {
+            QJsonArray line = geom["coordinates"].toArray();
+            if (!line.isEmpty()) {
+                QJsonArray a0 = line.first().toArray();
+                QJsonArray a1 = line.last ().toArray();
+                trackStart = QPointF(a0[0].toDouble(), a0[1].toDouble());
+                trackEnd   = QPointF(a1[0].toDouble(), a1[1].toDouble());
+            }
+        }
+    }
+    if (safeRing.isEmpty())  return false;
+
+    // находим среднюю широту для расчёта «метров на градус долгот»
+    double lat0 = 0.0;
+    for (const QPointF &p : safeRing) lat0 += p.y();
+    lat0 /= safeRing.size();  // средняя широта
+    const double m_per_deg_lat = 110574.0;                                // метры/° широты
+    const double m_per_deg_lon = 111320.0 * std::cos(lat0 * M_PI/180.0);  // метры/° долготы
+    // находим минимальные координаты (для смещения в ноль)
+    double minLon = safeRing[0].x(), minLat = safeRing[0].y(),
+        maxLat = safeRing[0].y();
+    for (const QPointF &p : safeRing) {
+        minLon = std::min(minLon, p.x());
+        minLat = std::min(minLat, p.y());
+        maxLat = std::max(maxLat, p.y());
+    }
+    // функция маппинга: 1° → m_per_deg_* метров, судно остаётся ±10 м
+    auto mapPt = [&](const QPointF &q)->QPointF {
+        double x = (q.x() - minLon) * m_per_deg_lon;
+        double y = (maxLat - q.y()) * m_per_deg_lat;
+        return QPointF(x, y);
+    };
+
+    glacier_x.clear();
+    glacier_y.clear();
+    for (const QPointF &p : safeRing) {
+        QPointF m = mapPt(p);
+        glacier_x.push_back(m.x());
+        glacier_y.push_back(m.y());
+    }
+    l_count = glacier_x.size() / 2;
+    r_count = glacier_x.size() - l_count - 1;
+    generated = true;          // «как будто» сгенерирована
+
+    // --- определяем центроид safe-полигона (в метрах) ---
+    double cx = 0.0, cy = 0.0;
+    for (double x : glacier_x) cx += x;
+    for (double y : glacier_y) cy += y;
+    cx /= glacier_x.size();
+    cy /= glacier_y.size();
+
+    const double SHIFT = 300.0;                       // 20 м – половина ширины судна
+
+    /*------------------------------------------------------------------
+        1. базовая точка (как раньше)  →  s0                           */
+    QPointF s0;
+    if (!trackStart.isNull())
+        s0 = mapPt(trackStart);
+    else
+        s0 = QPointF(cx, cy);
+
+    /* 2. смещаем к центроиду на SHIFT и ДОПОЛНИТЕЛЬНО так,
+          чтобы отступ от любого ребра ≥ SAFE_MARGIN                  */
+    auto pointToSeg = [](double px, double py,
+                         double x1,double y1,double x2,double y2) -> double
+    {
+        double vx = x2-x1,  vy = y2-y1;
+        double t = ((px-x1)*vx + (py-y1)*vy) / (vx*vx+vy*vy);
+        t = std::clamp(t,0.0,1.0);
+        double dx = x1 + t*vx - px;
+        double dy = y1 + t*vy - py;
+        return std::hypot(dx,dy);
+    };
+
+    double vx0 = cx - s0.x();
+    double vy0 = cy - s0.y();
+    double len0 = std::hypot(vx0, vy0);
+    if (len0 > 1e-6) { vx0 = vx0/len0;  vy0 = vy0/len0; }
+
+    QPointF spawn = s0 + QPointF(vx0*SHIFT, vy0*SHIFT);
+
+    /* итеративно отталкиваемся от стен, пока минимальное
+      расстояние не станет ≥ SAFE_MARGIN                           */
+    auto minDist = [&] (const QPointF &p)->double {
+        double mn = 1e9;
+        int n = glacier_x.size();
+        for (int i=0;i<n;++i)
+            mn = std::min(mn,
+                          pointToSeg(p.x(),p.y(),
+                                     glacier_x[i], glacier_y[i],
+                                     glacier_x[(i+1)%n], glacier_y[(i+1)%n]));
+        return mn;
+    };
+    while (minDist(spawn) < SAFE_MARGIN)
+        spawn += QPointF(vx0, vy0) *
+                 (SAFE_MARGIN - minDist(spawn) + 1.0);
+
+    /* 3. финальная точка финиша (если trackEnd был)                   */
+    QPointF finish;
+    if (!trackEnd.isNull())
+        finish = mapPt(trackEnd);
+    else
+        finish = QPointF(cx, glacier_y.front());
+
+    start_point = std::make_pair(spawn.x(), spawn.y());
+    final_point = std::make_pair(finish.x(), finish.y());
+
+    /*------------------------------------------------------------------
+        4. выбираем курс на цель */
+
+    double dx = final_point.first  - start_point.first;
+    double dy = final_point.second - start_point.second;
+    spawn_heading = std::atan2(dx, dy) + M_PI;
+    if (spawn_heading > M_PI) spawn_heading -= 2*M_PI;
+    else if (spawn_heading <= -M_PI) spawn_heading += 2*M_PI;
+
+    return true;
 }
 
 void pathway::generator()
@@ -150,13 +310,25 @@ void pathway::generator()
 
 void pathway::switcher(bool tmblr_generator)
 {
+    clear_data();
     generator_switch = tmblr_generator;
+    geojson_loaded   = false;
+    make_my_way();
+}
+
+void pathway::switcher(const QString &geoFile)
+{
+    clear_data();
+    generator_switch = false;            // отключаем генератор
+    geojson_loaded   = load_geojson(geoFile);   // пытаемся загрузить файл
+    make_my_way();                       // строим границу (если файл не
+}                                        // прочитался, вернётся STATIC)
+
+void pathway::clear_data()
+{
     glacier_x.clear();
     glacier_y.clear();
-    l_count = 0;
-    r_count = 0;
-    main_count = 0;
+    l_count = r_count = main_count = 0;
     vertexes.clear();
     faces.clear();
-    make_my_way();
 }

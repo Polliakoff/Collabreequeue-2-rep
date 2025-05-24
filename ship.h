@@ -6,6 +6,8 @@
 #include "polygon.h"
 #include <QDataStream>
 #include <QObject>
+#include <algorithm>  // для std::sort
+#include <cmath>
 
 class ship: public QObject
 {
@@ -26,7 +28,12 @@ public:
     vector<pair<double,double>> point_seen;
 
     pair<double, double> convert_to_ship(const pair<double, double>& point);
-    pair<double, double> get_position();
+    pair<double, double> get_position(); 
+    bool segmentIntersect(const pair<double,double>& a,
+                          const pair<double,double>& b,
+                          const pair<double,double>& c,
+                          const pair<double,double>& d,
+                          pair<double,double>& out);
     void move_by_coords(const double& new_pos_x,const double& new_pos_y);
     void move_by_distance(const double& distance);
     double get_angle();
