@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
+#include <QDateTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -57,8 +58,10 @@ private slots:
 
     void on_pushButton_11_clicked();
 
-private:
+    void on_pushButton_12_clicked();
 
+private:
+    QString filename;
     Ui::MainWindow *ui;
     void qdraw_polygon(const polygon& pol, QGraphicsScene* scene);
     std::unique_ptr<QGraphicsScene> scene;

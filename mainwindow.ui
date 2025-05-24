@@ -158,9 +158,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>60</x>
-        <y>270</y>
-        <width>166</width>
+        <x>50</x>
+        <y>260</y>
+        <width>91</width>
         <height>24</height>
        </rect>
       </property>
@@ -345,6 +345,22 @@
       </property>
       <property name="text">
        <string>Пок. на карте.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_12">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>260</y>
+        <width>91</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Закончить</string>
       </property>
      </widget>
     </widget>

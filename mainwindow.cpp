@@ -40,6 +40,7 @@ void MainWindow::on_pushButton_clicked()
     ui->pushButton->setEnabled(false);
     ui->checkBox_2->setEnabled(true);
     ui->pushButton_9->setEnabled(false);
+    ui->pushButton_12->setEnabled(true);
     only_test = false;
 
     if(first_boot){
@@ -186,6 +187,22 @@ void MainWindow::gauges()
         disconnect(test_think_n_do_connection);
     }
     ///===========тестовый
+
+    if(!only_test && !ship_evolution->isItRunning()){
+        // Показываем имя файла и единственную кнопку "Выйти"
+        QMessageBox msg(this);
+        msg.setWindowTitle(tr("Сохранено"));
+        msg.setText( QFileInfo(filename).fileName() );
+        msg.setIcon(QMessageBox::Information);
+        msg.setStandardButtons(QMessageBox::NoButton);
+        auto *btn = msg.addButton(tr("Выйти"), QMessageBox::AcceptRole);
+        msg.exec();
+
+        // после закрытия диалога — завершаем приложение
+        if (msg.clickedButton() == btn) {
+            qApp->quit();
+        }
+    }
 }
 
 ///===========тестовый
@@ -382,5 +399,30 @@ void MainWindow::on_pushButton_10_clicked()
 void MainWindow::on_pushButton_11_clicked()
 {
     ui->graphicsView->centerOn(map->final_point.first, map->final_point.second);
+}
+
+
+void MainWindow::on_pushButton_12_clicked()
+{
+    ui->pushButton_12->setEnabled(false);
+    QString defaultName = QDateTime::currentDateTime()
+                              .toString("yyyyMMddhhmm")  // ГГГГММДДЧЧММ
+                          + ".ships";
+
+    update_timer->stop();
+    painter_timer->stop();
+
+    filename = QFileDialog::getSaveFileName(
+        this,
+        tr("Сохранить лучших"),
+        defaultName,
+        tr("Ship files (*.ships)")
+        );
+    if (filename.isEmpty()) return;
+
+    update_timer->start(1);
+    painter_timer->start(100);
+
+    ship_evolution->saveBestBrains(filename);
 }
 

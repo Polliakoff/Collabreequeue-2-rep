@@ -29,6 +29,8 @@ protected:
     static constexpr double P_DEL_LAYER  = 0.02;
     static int chooseParentCount(int G);
     static constexpr double DIST_EPS = 100.0;
+    QString endSaveFileName = "";
+    bool running = false;
 
 public:
     evolution()=default;
@@ -67,6 +69,8 @@ public:
     void cnnct();
     void dscnnct();
     void evolve();
+    void saveBestBrains(const QString &fileName);
+    bool isItRunning();
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
 

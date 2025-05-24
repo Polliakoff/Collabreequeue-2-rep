@@ -183,6 +183,27 @@ void evolution::evolve()
                   }
               });
 
+    if (endSaveFileName!=""){
+        QFile f(endSaveFileName);
+        if (!f.open(QIODevice::WriteOnly)) return;
+        QDataStream out(&f);
+        out.setFloatingPointPrecision(QDataStream::DoublePrecision);
+        // 3) записать их число и сами объекты brain
+        out << (quint32)P_target;
+        for (int k = 0; k < P_target && k < (int)index.size(); ++k) {
+            int idx = index[k];
+            brain &b = population[idx]->getBrain();
+            out << b;
+        }
+        names.clear();
+        names.reserve(generation);
+        population.clear();
+        think_n_do_connections.clear();
+        update_connections.clear();
+        running = false;
+        return;
+    }
+
     // 3) Берём первые P_target
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
     for (int k = 0; k < P_target && k < (int)index.size(); ++k) {
@@ -277,12 +298,23 @@ void evolution::evolve()
     cnnct();
 }
 
+void evolution::saveBestBrains(const QString &fileName)
+{
+    endSaveFileName = fileName;
+}
+
+bool evolution::isItRunning()
+{
+    return running;
+}
+
 evolution::~evolution(){
 
 }
 
 void evolution::evolution_stat()
 {
+    running = true;
     ++clock;
 
     if(clock==5){
@@ -406,3 +438,4 @@ void evolution::dscnnct()
         ++num;
     }
 }
+
