@@ -12,6 +12,7 @@ class ship_physics : public ship
 protected:
     static int sId;
     pair<double, double> final_destination;
+    pair<double, double> initial_position;
     brain net;
     ship_physics();
 public:
@@ -26,12 +27,13 @@ public:
     std::string name;
 
     double fuel_consumption;
-    double fuel = 4400;
+    double fuel = 0;
     double actual_angle;
     double velocity_sum = 0;
     double ship_and_velocity_angle;
     double friction_value;
     double distance_to_finish;
+    double distance_to_start;
 
     bool operational = true;
     bool can_be_parrent = true;
@@ -47,6 +49,7 @@ public:
     void friction();
     void change_destination(const double& dest_x,const double& dest_y);
     void modify_path();
+    void get_distance();
     brain& getBrain();
     void noise_Brain();
 

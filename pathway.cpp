@@ -127,23 +127,6 @@ bool pathway::load_geojson(const QString &fileName)
 
     const double SHIFT = 300.0;                       // 20 м – половина ширины судна
 
-    // if (!trackStart.isNull() && !trackEnd.isNull()) {
-    //     QPointF s = mapPt(trackStart);
-    //     QPointF f = mapPt(trackEnd);
-    //     /*  вектор «к центру safe» → нормализуем и сдвигаем start на 20 м   */
-    //     double vx = cx - s.x();
-    //     double vy = cy - s.y();
-    //     double len = std::hypot(vx, vy);
-    //     if (len > 1e-6) { vx = vx / len * SHIFT;  vy = vy / len * SHIFT; }
-    //     start_point = std::make_pair(s.x() + vx, s.y() + vy);
-    //     final_point = std::make_pair(f.x() - vx, f.y() - vy);
-    // } else {
-    //     /*  нет трека – стартуем просто в сторону центроида                */
-    //     double vx = 0, vy = -SHIFT;                 // по умолчанию вверх
-    //     start_point = std::make_pair(cx + vx, cy + vy);
-    //     final_point = std::make_pair(cx - vx, glacier_y.front() - vy); // как раньше
-    // }
-
     /*------------------------------------------------------------------
         1. базовая точка (как раньше)  →  s0                           */
     QPointF s0;
@@ -197,31 +180,6 @@ bool pathway::load_geojson(const QString &fileName)
 
     start_point = std::make_pair(spawn.x(), spawn.y());
     final_point = std::make_pair(finish.x(), finish.y());
-
-    // /*------------------------------------------------------------------
-    //     4. выбираем курс: ищем лучшую «дыру» на 360°                   */
-    // const int NDIR = 36;               // шаг 10°
-    // double bestA = 0, bestClear = -1;
-    // for (int k=0;k<NDIR;++k) {
-    //     double ang = k*M_PI*2/NDIR;
-    //     double dx  = std::sin(ang);
-    //     double dy  = std::cos(ang);    // 0 рад = «вверх»
-    //     double clear = 1e9;
-    //     int n = glacier_x.size();
-    //     for (int i=0;i<n;++i) {
-    //         /* пересечение луча со стороной полигона */
-    //         double x1=glacier_x[i]-spawn.x(),   y1=glacier_y[i]-spawn.y();
-    //         double x2=glacier_x[(i+1)%n]-spawn.x(),
-    //             y2=glacier_y[(i+1)%n]-spawn.y();
-    //         double det = (x2-x1)*(-dx) - (y2-y1)*(-dy);
-    //         if (std::fabs(det) < 1e-6) continue;
-    //         double t = (x2*y1 - x1*y2) / det;   // по лучу
-    //         double u = (dx*y1 - dy*x1) / det;   // по сегменту
-    //         if (t>0 && u>=0 && u<=1) clear = std::min(clear,t);
-    //     }
-    //     if (clear > bestClear) { bestClear = clear; bestA = ang; }
-    // }
-    // spawn_heading = bestA;          // сохраняем результат
 
     /*------------------------------------------------------------------
         4. выбираем курс на цель */

@@ -14,6 +14,7 @@
 #include <vector>       //  Нужен, т.к. ниже есть std::vector
 #include <fstream>      //  std::ofstream в составе класса
 #include <tuple>
+#include <QStringList>
 
 class evolution
 {
@@ -27,17 +28,31 @@ protected:
     static constexpr double P_ADD_LAYER  = 0.02;
     static constexpr double P_DEL_LAYER  = 0.02;
     static int chooseParentCount(int G);
+    static constexpr double DIST_EPS = 100.0;
 
 public:
     evolution()=default;
     std::string genName="000x";
     evolution(const int& generation_size, std::shared_ptr<pathway> &pthw);
+    evolution(int generation_size,
+              const QStringList &geoMaps);
     virtual ~evolution();
 
     int generation;
     int clock=0;
     int min_speed = 100;
     int tst=0;
+
+    /* --- переключение карт --- */
+    QStringList geo_files;         // список путей
+    int cur_map = -1;
+    bool advance_map();           // загружает следующую карту
+
+    /* --- детектор стагнации --- */
+    int stagnate_cnt = 0;
+    double best_prev = 1e9;
+    static constexpr int N_STAG = 5;   // поколений без прироста
+    static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
 
     std::vector<std::unique_ptr<ship_physics>> population;
     std::vector<std::string> names;

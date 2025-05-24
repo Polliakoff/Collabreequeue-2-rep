@@ -155,73 +155,6 @@ bool ship::collision(polygon &pol)
     return false;
 }
 
-// void ship::eyesight(polygon &pol)
-// {
-//     vector<double> temp_distances;
-//     for(int i=0;i<6;i++){
-//         temp_distances.emplace_back(-1);
-//     }
-//     vector<pair<double,double>> temp_point_seen;
-//     temp_point_seen.resize(6);
-
-//     for(size_t i = 0; i<eyes.size(); i++){
-//         for(size_t j = 0; j<pol.faces.size();j++){
-//             pair<double,double> checking_point;
-//             int range_1;
-//             int range_2;
-//             if(j!=pol.faces.size()-1){
-//                 range_1 = j;
-//                 range_2 = j+1;
-//             }
-//             else{
-//                 range_1 = j;
-//                 range_2 = 0;
-//             }
-//             checking_point = intersect(eyes[i],pol.faces[j],pol.vertexes[range_1],pol.vertexes[range_2]);
-//             if(checking_point.first != std::numeric_limits<double>::infinity()){
-
-//                 auto cheching_poit_positon = convert_to_ship(checking_point);
-
-//                 double pos_in_mas;
-
-//                 if(i!=2){
-//                     if(cheching_poit_positon.first < 0){
-//                         pos_in_mas = (i+1)*2-2;
-
-//                     }
-//                     else{
-//                         pos_in_mas = (i+1)*2-1;
-//                     }
-//                 }
-//                 else{
-//                     if(cheching_poit_positon.second > 0){
-//                         pos_in_mas = (i+1)*2-2;
-
-//                     }
-//                     else{
-//                         pos_in_mas = (i+1)*2-1;
-//                     }
-//                 }
-
-//                 if(temp_distances[pos_in_mas] == -1){
-//                     temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
-//                     temp_point_seen[pos_in_mas].first = checking_point.first;
-//                     temp_point_seen[pos_in_mas].second = checking_point.second;
-//                 }
-
-//                 else if(temp_distances[pos_in_mas]>=sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2))){
-//                     temp_distances[pos_in_mas] = sqrt(pow(checking_point.first-position.first,2)+pow(checking_point.second-position.second,2));
-//                     temp_point_seen[pos_in_mas].first = checking_point.first;
-//                     temp_point_seen[pos_in_mas].second = checking_point.second;
-//                 }
-//             }
-//         }
-//     }
-
-//     distances = temp_distances;
-//     point_seen = temp_point_seen;
-// }
-
 void ship::eyesight(polygon &pol)
 {
     std::fill(distances.begin(),  distances.end(),  -1);
@@ -252,16 +185,6 @@ void ship::eyesight(polygon &pol)
             ts.push_back( (p.first  - position.first) * dir.x() +
                          (p.second - position.second)* dir.y() );
         }
-
-        // /* сортируем по t, берём крайние */
-        // size_t idxMin = std::distance(ts.begin(), std::min_element(ts.begin(), ts.end()));
-        // size_t idxMax = std::distance(ts.begin(), std::max_element(ts.begin(), ts.end()));
-
-        // const size_t base = iEye*2;
-        // distances [base]     = fabs(ts[idxMin]);
-        // point_seen[base]     = hits[idxMin];
-        // distances [base + 1] = fabs(ts[idxMax]);
-        // point_seen[base + 1] = hits[idxMax];
 
         double bestFwd  = 1e100, bestBack = 1e100;
         pair<double,double> hitFwd, hitBack;

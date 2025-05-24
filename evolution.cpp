@@ -25,11 +25,15 @@ int evolution::chooseParentCount(int G)
     return (err1 < err0 ? p1 : p0);
 }
 
-
-evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
+evolution::evolution(int generation_size, const QStringList &geoMaps)
 {
     fout.open("evolution_obj.log");
-    map = pthw;
+    geo_files = geoMaps.isEmpty()
+                    ? QStringList{ }      // пусто → fallback на «статичную»
+                    : geoMaps;
+
+    if (!advance_map())  // первая карта
+        map = std::make_shared<pathway>();  // статичная дефолт
     for(int i = 0; i < generation_size; i++)
     {
         population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
@@ -41,6 +45,34 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     fout << "";
     fout.close();
 }
+
+evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
+{
+    fout.open("evolution_obj.log");
+    map = pthw;
+    geo_files.clear();
+    for(int i = 0; i < generation_size; i++)
+    {
+        population.emplace_back(std::make_unique<ship_physics>(map->start_point.first,map->start_point.second,
+                                                               map->final_point.first,map->final_point.second));
+        population.back()->rotate_by( map->get_spawn_heading() );
+        names.emplace_back(genName + population.back().get()->name);
+    }
+    generation = generation_size;
+    fout << "";
+    fout.close();
+}
+
+bool evolution::advance_map()
+{
+    if (geo_files.isEmpty()) return false;
+
+    cur_map = (cur_map + 1) % geo_files.size();   // по кругу
+    map = std::make_shared<pathway>( geo_files[cur_map] );
+    // если загрузка GeoJSON не удалась, pathway сам создаст дефолт
+    return true;
+}
+
 
 void evolution::mutate(ship_physics &shp)
 {
@@ -115,25 +147,53 @@ void evolution::evolve()
         ++i;
     } //выбрали норм корабли //доработать
 
-    //отбор родителей
-    std::multimap<double, std::pair<std::string,int>> best;
-
-    for(auto &imp: index){
-        best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
-    }
-
     i=0;
+
+    // //отбор родителей
+    // std::multimap<double, std::pair<std::string,int>> best;
+
+    // for(auto &imp: index){
+    //     best.emplace(population[imp].get()->distance_to_finish, std::make_pair(names[imp],imp));
+    // }
+
+    // i=0;
+    // vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
+    // if(index.size()>0){
+    //     for (auto &m: best){
+    //         newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
+    //         ++i;
+    //         if (i == P_target)
+    //             break;
+    //     } //отобрали семь лучших
+    // }
+
+    // 2) Сортируем по нашему компаратору
+    std::sort(index.begin(), index.end(),
+              [&](int i1, int i2){
+                  double d1 = population[i1]->distance_to_finish;
+                  double d2 = population[i2]->distance_to_finish;
+                  if (cur_map <= 10) {
+                      return d1 < d2;
+                  }
+                  if (std::fabs(d1 - d2) > DIST_EPS) {
+                      return d1 < d2;              // меньшая дистанция — лучше
+                  } else {
+                      return population[i1]->fuel >
+                             population[i2]->fuel;  // при близких дистанциях — больше топлива лучше
+                  }
+              });
+
+    // 3) Берём первые P_target
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
-    if(index.size()>0){
-        for (auto &m: best){
-            newGenParents.push_back(std::make_pair(std::move(population[m.second.second]),m.second.first));
-            ++i;
-            if (i == P_target)
-                break;
-        } //отобрали семь лучших
+    for (int k = 0; k < P_target && k < (int)index.size(); ++k) {
+        int idx = index[k];
+        newGenParents.emplace_back(
+            std::move(population[idx]),
+            names[idx]
+            );
     }
 
-    i=0;
+    // i=0;
 
     names.clear();
     names.reserve(generation);
@@ -227,7 +287,7 @@ void evolution::evolution_stat()
 
     if(clock==5){
         for(auto &i: population){
-            if(i->fuel == 4400){
+            if(i->fuel == 0){
                 i->operational = false;
                 i->can_be_parrent = false;
             }
@@ -261,13 +321,35 @@ void evolution::evolution_stat()
         }
     }
 
-    if(ready_to_evolve || clock==2000){
+    if(ready_to_evolve || clock==5000){
         for(auto &i: population){
-            if(i->get_position().second>300){
+            if(i->distance_to_start<100){
                 i->can_be_parrent = false;
             }
         }
-        evolve();
+
+        /* --------- анализ прироста --------- */
+        if (!geo_files.isEmpty()) {   //  переключать имеет смысл, только если карт > 1
+            /* --------- анализ прироста --------- */
+
+            double best_now = 1e9;
+            for (auto &sh : population)
+                best_now = std::min(best_now, sh->distance_to_finish);
+
+            if (std::abs(best_prev - best_now) < EPS_STAG || (best_prev - best_now) < 0)
+                ++stagnate_cnt;
+            else
+                stagnate_cnt = 0;
+            best_prev = best_now;
+
+            if (stagnate_cnt >= N_STAG && advance_map()) {
+                stagnate_cnt = 0;
+                fout << "=== SWITCH MAP to " << geo_files[cur_map].toStdString()
+                     << " ===\n";
+            }
+        }
+
+        evolve();          // обычное формирование нового поколения
     }
 }
 

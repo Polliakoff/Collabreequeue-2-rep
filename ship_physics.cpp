@@ -10,6 +10,7 @@ ship_physics::ship_physics()
 ship_physics::ship_physics(const double& pos_x,const double& pos_y,const double& dest_x, const double& dest_y):
     ship(pos_x, pos_y), net()
 {
+    initial_position = std::make_pair(pos_x, pos_y);
     id = ++sId;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -25,6 +26,7 @@ ship_physics::ship_physics(ship_physics &a, ship_physics &b, const double &dmnc,
     ship(pos_x,pos_y),
     net(a.net, b.net, dmnc)
 {
+    initial_position = std::make_pair(pos_x, pos_y);
     id = ++sId;
     name = '_'+std::to_string(net.S);
     name.push_back('s');
@@ -40,6 +42,7 @@ ship_physics::ship_physics(const double& pos_x,const double& pos_y,
                            const double& dest_x, const double& dest_y, brain& newBrain, bool noise):
     ship(pos_x, pos_y)
 {
+    initial_position = std::make_pair(pos_x, pos_y);
     id = ++sId;
     net = newBrain;
     if(noise){
@@ -74,7 +77,7 @@ void ship_physics::engine(const int &mode)
     velocity_x -= sin(angle)*thrust*((net.A.back()(0)-0.5)*2);
     velocity_y -= cos(angle)*thrust*((net.A.back()(0)-0.5)*2);
     fuel_consumption = 2*abs((net.A.back()(0)-0.5)*2);
-    fuel -= fuel_consumption;
+    fuel += fuel_consumption;
 }
 
 void ship_physics::helm(const int &mode2)
@@ -84,7 +87,7 @@ void ship_physics::helm(const int &mode2)
 
     angular_velocity += agility*((net.A.back()(1)-0.5)*2);
     fuel_consumption += 1*abs((net.A.back()(1)-0.5)*2);
-    fuel -= fuel_consumption;
+    fuel += fuel_consumption;
     if (angular_velocity > max_maneuver)
     {
         angular_velocity = max_maneuver;
@@ -135,6 +138,7 @@ void ship_physics::friction()
         velocity_x -= friction_value*velocity_x*0.05;
         velocity_y -= friction_value*velocity_y*0.05;
     }
+
 }
 
 void ship_physics::change_destination(const double &dest_x, const double &dest_y)
@@ -159,6 +163,11 @@ void ship_physics::modify_path()
     distance_to_finish = vector_module(path.first,path.second);
 }
 
+void ship_physics::get_distance()
+{
+    distance_to_start = vector_module(initial_position.first - position.first,initial_position.second - position.second);
+}
+
 brain &ship_physics::getBrain()
 {
     return net;
@@ -178,8 +187,9 @@ void ship_physics::update(polygon &map)
 {
     ship::update(map);
     modify_path();
+    get_distance();
     velocity_sum+=abs_velocity;
-    if(fuel <= 0 || collided){
+    if(collided){
         operational = false;
     }
     distance_to_finish = vector_module(path.first,path.second);
@@ -201,7 +211,7 @@ void ship_physics::test_engine(double neuron1, double neuron2)
     velocity_x -= sin(angle)*thrust*(neuron1-neuron2);
     velocity_y -= cos(angle)*thrust*(neuron1-neuron2);
     fuel_consumption = 2*abs(neuron1-neuron2);
-    fuel -= fuel_consumption;
+    fuel += fuel_consumption;
 }
 
 void ship_physics::test_helm(double neuron3, double neuron4)
@@ -210,7 +220,7 @@ void ship_physics::test_helm(double neuron3, double neuron4)
     double max_maneuver = 0.020;
     angular_velocity += agility*(neuron3-neuron4);
     fuel_consumption += 1*abs(neuron3-neuron4);
-    fuel -= fuel_consumption;
+    fuel += fuel_consumption;
     if (angular_velocity > max_maneuver)
     {
         angular_velocity = max_maneuver;
