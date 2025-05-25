@@ -142,9 +142,9 @@
      <widget class="QPushButton" name="pushButton_8">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>0</x>
         <y>460</y>
-        <width>166</width>
+        <width>131</width>
         <height>24</height>
        </rect>
       </property>
@@ -158,14 +158,14 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>60</x>
-        <y>270</y>
-        <width>166</width>
+        <x>40</x>
+        <y>260</y>
+        <width>91</width>
         <height>24</height>
        </rect>
       </property>
       <property name="text">
-       <string>Начать</string>
+       <string>Начать эв-цию</string>
       </property>
      </widget>
      <widget class="QGroupBox" name="groupBox">
@@ -345,6 +345,35 @@
       </property>
       <property name="text">
        <string>Пок. на карте.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_12">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>260</y>
+        <width>111</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Закончить эв-цию</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_13">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>460</y>
+        <width>121</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Провести тест</string>
       </property>
      </widget>
     </widget>

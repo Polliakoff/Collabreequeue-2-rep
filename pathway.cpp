@@ -125,8 +125,6 @@ bool pathway::load_geojson(const QString &fileName)
     cx /= glacier_x.size();
     cy /= glacier_y.size();
 
-    const double SHIFT = 300.0;                       // 20 м – половина ширины судна
-
     /*------------------------------------------------------------------
         1. базовая точка (как раньше)  →  s0                           */
     QPointF s0;
@@ -172,11 +170,30 @@ bool pathway::load_geojson(const QString &fileName)
                  (SAFE_MARGIN - minDist(spawn) + 1.0);
 
     /* 3. финальная точка финиша (если trackEnd был)                   */
-    QPointF finish;
+    // QPointF finish;
+    // if (!trackEnd.isNull())
+    //     finish = mapPt(trackEnd);
+    // else
+    //     finish = QPointF(cx, glacier_y.front());
+
+    QPointF f0;
     if (!trackEnd.isNull())
-        finish = mapPt(trackEnd);
+        f0 = mapPt(trackEnd);
     else
-        finish = QPointF(cx, glacier_y.front());
+        f0 = QPointF(cx, glacier_y.front());
+
+    // аналогично старту: смещение к центроиду + safe margin
+    double vx1 = cx - f0.x();
+    double vy1 = cy - f0.y();
+    double len1 = std::hypot(vx1, vy1);
+    if (len1 > 1e-6) { vx1 /= len1;  vy1 /= len1; }
+
+    QPointF finish = f0 + QPointF(vx1*SHIFT, vy1*SHIFT);
+    // отталкиваем от стен, пока не окажемся в_safe_zone_
+    while (minDist(finish) < SAFE_MARGIN) {
+        finish += QPointF(vx1, vy1) *
+                  (SAFE_MARGIN - minDist(finish) + 1.0);
+    }
 
     start_point = std::make_pair(spawn.x(), spawn.y());
     final_point = std::make_pair(finish.x(), finish.y());

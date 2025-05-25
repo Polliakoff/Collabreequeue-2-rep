@@ -15,6 +15,7 @@
 #include <fstream>      //  std::ofstream в составе класса
 #include <tuple>
 #include <QStringList>
+#include <iomanip>
 
 class evolution
 {
@@ -29,13 +30,17 @@ protected:
     static constexpr double P_DEL_LAYER  = 0.02;
     static int chooseParentCount(int G);
     static constexpr double DIST_EPS = 100.0;
+    QString endSaveFileName = "";
+    bool running = false;
+    bool evolving = true;
+    std::ofstream nmeaLog;
 
 public:
     evolution()=default;
     std::string genName="000x";
     evolution(const int& generation_size, std::shared_ptr<pathway> &pthw);
-    evolution(int generation_size,
-              const QStringList &geoMaps);
+    evolution(const std::shared_ptr<pathway> &pthw, const QString &brainsFile);
+    evolution(int generation_size, const QStringList &geoMaps);
     virtual ~evolution();
 
     int generation;
@@ -67,6 +72,9 @@ public:
     void cnnct();
     void dscnnct();
     void evolve();
+    void saveBestBrains(const QString &fileName);
+    void openNMEALog(const QString &fileName);
+    bool isItRunning();
     std::shared_ptr<pathway> map;
     std::shared_ptr<QTimer> timer;
 

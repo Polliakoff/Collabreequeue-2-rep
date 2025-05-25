@@ -63,6 +63,46 @@ evolution::evolution(const int& generation_size, std::shared_ptr<pathway> &pthw)
     fout.close();
 }
 
+evolution::evolution(const std::shared_ptr<pathway> &pthw, const QString &brainsFile): evolving(false)
+{
+    map = pthw;
+    geo_files.clear();
+    // читаем brains из файла
+    QFile f(brainsFile);
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QDataStream in(&f);
+    in.setFloatingPointPrecision(QDataStream::DoublePrecision);
+    quint32 count;  in >> count;
+    for (quint32 i = 0; i < count; ++i) {
+        brain b; in >> b;
+        auto shp = std::make_unique<ship_physics>(
+            map->start_point.first,
+            map->start_point.second,
+            map->final_point.first,
+            map->final_point.second,
+            b
+            );
+        shp->rotate_by(map->get_spawn_heading());
+        population.emplace_back(std::move(shp));
+        names.emplace_back(genName + population.back()->name);
+    }
+    generation = population.size();
+    openNMEALog("nmea_log.txt");
+}
+
+void evolution::openNMEALog(const QString &fileName) {
+    nmeaLog.open(fileName.toStdString(),
+                 std::ios::out | std::ios::app);
+    if (!nmeaLog.is_open()) {
+        std::cerr << "Failed to open NMEA log file\n";
+        return;
+    }
+    nmeaLog << "# Format: <Timestamp_ms> ID=0x<29bit> DLC=8 Data=[<hex bytes>]\n";
+    nmeaLog << "# PGN127488=EngineRapid, PGN127245=RudderAngle\n";
+    nmeaLog.flush();
+}
+
+
 bool evolution::advance_map()
 {
     if (geo_files.isEmpty()) return false;
@@ -183,6 +223,27 @@ void evolution::evolve()
                   }
               });
 
+    if (endSaveFileName!=""){
+        QFile f(endSaveFileName);
+        if (!f.open(QIODevice::WriteOnly)) return;
+        QDataStream out(&f);
+        out.setFloatingPointPrecision(QDataStream::DoublePrecision);
+        // 3) записать их число и сами объекты brain
+        out << (quint32)P_target;
+        for (int k = 0; k < P_target && k < (int)index.size(); ++k) {
+            int idx = index[k];
+            brain &b = population[idx]->getBrain();
+            out << b;
+        }
+        names.clear();
+        names.reserve(generation);
+        population.clear();
+        think_n_do_connections.clear();
+        update_connections.clear();
+        running = false;
+        return;
+    }
+
     // 3) Берём первые P_target
     vector<std::pair<std::unique_ptr<ship_physics>,std::string>> newGenParents;
     for (int k = 0; k < P_target && k < (int)index.size(); ++k) {
@@ -277,12 +338,23 @@ void evolution::evolve()
     cnnct();
 }
 
+void evolution::saveBestBrains(const QString &fileName)
+{
+    endSaveFileName = fileName;
+}
+
+bool evolution::isItRunning()
+{
+    return running;
+}
+
 evolution::~evolution(){
 
 }
 
 void evolution::evolution_stat()
 {
+    running = true;
     ++clock;
 
     if(clock==5){
@@ -350,10 +422,11 @@ void evolution::evolution_stat()
             }
         }
 
-        evolve();          // обычное формирование нового поколения
+        if(evolving){
+            evolve();          // обычное формирование нового поколения
+        }
     }
 }
-
 
 void evolution::cnnct(std::shared_ptr<QTimer> &timer)
 {
@@ -362,9 +435,88 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
     for(int i = 0; i < t; i++){
         update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                          [=](){population[i]->update(*map.get());}));
+        if (evolving){
+            think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
+                                                                 [=](){population[i]->think_n_do();}));
+        }
+        else {
+            think_n_do_connections.emplace_back(
+                QObject::connect(timer.get(), &QTimer::timeout,
+                                 [this, i, timer]() {
+                                     auto &sh = *population[i];
+                                     sh.think_n_do();
 
-        think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                             [=](){population[i]->think_n_do();}));
+                                     // Нормализованные сигналы [-1..+1]
+                                     double thrNorm = (sh.getBrain().A.back()(0) - 0.5)*2.0;
+                                     double rudNorm = (sh.getBrain().A.back()(1) - 0.5)*2.0;
+
+                                     // Масштаб в реальные единицы
+                                     uint16_t rawRPM = uint16_t(std::round(thrNorm * 2000.0 / 0.25));
+                                     int16_t  rawAng = int16_t(std::round(rudNorm * 0.5236   /0.0001));
+
+                                     // Собираем 29-битные ID
+                                     // Получаем уникальный байт адреса из поля id корабля
+                                     uint8_t sa = static_cast<uint8_t>(sh.id & 0xFF);
+
+                                     // Формируем расширенный CAN-ID, подставляя реальный SA
+                                     uint32_t idEngine = (3u << 26)
+                                                         | (0u << 24)
+                                                         | (0xF2u << 16)
+                                                         | (0x00u << 8)
+                                                         |  sa;
+                                     uint32_t idRudder = (3u << 26)
+                                                         | (0u << 24)
+                                                         | (0xF1u << 16)
+                                                         | (0x05u << 8)
+                                                         |  sa;
+
+                                     // Упаковка 8 байт
+                                     uint8_t dataEng[8] = {
+                                         0x00,
+                                         uint8_t(rawRPM &0xFF),
+                                         uint8_t(rawRPM>>8),
+                                         0xFF,0xFF,0xFF,0xFF,0xFF
+                                     };
+                                     uint8_t dataRud[8] = {
+                                         0x00,
+                                         uint8_t(rawAng &0xFF),
+                                         uint8_t(rawAng>>8),
+                                         0xFF,0xFF,0xFF,0xFF,0xFF
+                                     };
+
+                                     // Время в мс
+                                     double timestamp = clock * timer->interval();
+
+                                     // Запись Engine
+                                     nmeaLog << timestamp
+                                             << " ID=0x" << std::hex << std::uppercase << idEngine << std::dec
+                                             << " DLC=8 Data=[";
+                                     for (int b=0; b<8; ++b) {
+                                         nmeaLog << std::setw(2)<<std::setfill('0')
+                                         << std::hex << std::uppercase
+                                         << int(dataEng[b]);
+                                         if (b<7) nmeaLog<<' ';
+                                     }
+                                     nmeaLog << std::dec << "]\n";
+
+                                     // Запись Rudder
+                                     nmeaLog << timestamp
+                                             << " ID=0x" << std::hex << std::uppercase << idRudder << std::dec
+                                             << " DLC=8 Data=[";
+                                     for (int b=0; b<8; ++b) {
+                                         nmeaLog << std::setw(2)<<std::setfill('0')
+                                         << std::hex << std::uppercase
+                                         << int(dataRud[b]);
+                                         if (b<7) nmeaLog<<' ';
+                                     }
+                                     nmeaLog << std::dec << "]\n";
+
+                                     // Сразу сбрасываем буфер
+                                     nmeaLog.flush();
+                                 })
+                );
+        }
+
     }
 }
 
@@ -406,3 +558,4 @@ void evolution::dscnnct()
         ++num;
     }
 }
+
