@@ -455,8 +455,20 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
                                      int16_t  rawAng = int16_t(std::round(rudNorm * 0.5236   /0.0001));
 
                                      // Собираем 29-битные ID
-                                     uint32_t idEngine = (3u<<26)|(0u<<24)|(0xF2u<<16)|(0x00u<<8)|0x01u;
-                                     uint32_t idRudder = (3u<<26)|(0u<<24)|(0xF1u<<16)|(0x05u<<8)|0x01u;
+                                     // Получаем уникальный байт адреса из поля id корабля
+                                     uint8_t sa = static_cast<uint8_t>(sh.id & 0xFF);
+
+                                     // Формируем расширенный CAN-ID, подставляя реальный SA
+                                     uint32_t idEngine = (3u << 26)
+                                                         | (0u << 24)
+                                                         | (0xF2u << 16)
+                                                         | (0x00u << 8)
+                                                         |  sa;
+                                     uint32_t idRudder = (3u << 26)
+                                                         | (0u << 24)
+                                                         | (0xF1u << 16)
+                                                         | (0x05u << 8)
+                                                         |  sa;
 
                                      // Упаковка 8 байт
                                      uint8_t dataEng[8] = {
