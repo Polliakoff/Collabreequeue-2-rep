@@ -87,8 +87,20 @@ evolution::evolution(const std::shared_ptr<pathway> &pthw, const QString &brains
         names.emplace_back(genName + population.back()->name);
     }
     generation = population.size();
+    openNMEALog("nmea_log.txt");
 }
 
+void evolution::openNMEALog(const QString &fileName) {
+    nmeaLog.open(fileName.toStdString(),
+                 std::ios::out | std::ios::app);
+    if (!nmeaLog.is_open()) {
+        std::cerr << "Failed to open NMEA log file\n";
+        return;
+    }
+    nmeaLog << "# Format: <Timestamp_ms> ID=0x<29bit> DLC=8 Data=[<hex bytes>]\n";
+    nmeaLog << "# PGN127488=EngineRapid, PGN127245=RudderAngle\n";
+    nmeaLog.flush();
+}
 
 
 bool evolution::advance_map()
@@ -416,7 +428,6 @@ void evolution::evolution_stat()
     }
 }
 
-
 void evolution::cnnct(std::shared_ptr<QTimer> &timer)
 {
     this->timer=timer;
@@ -424,9 +435,76 @@ void evolution::cnnct(std::shared_ptr<QTimer> &timer)
     for(int i = 0; i < t; i++){
         update_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
                                                          [=](){population[i]->update(*map.get());}));
+        if (evolving){
+            think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
+                                                                 [=](){population[i]->think_n_do();}));
+        }
+        else {
+            think_n_do_connections.emplace_back(
+                QObject::connect(timer.get(), &QTimer::timeout,
+                                 [this, i, timer]() {
+                                     auto &sh = *population[i];
+                                     sh.think_n_do();
 
-        think_n_do_connections.emplace_back(QObject::connect(timer.get(), &QTimer::timeout,
-                                                             [=](){population[i]->think_n_do();}));
+                                     // Нормализованные сигналы [-1..+1]
+                                     double thrNorm = (sh.getBrain().A.back()(0) - 0.5)*2.0;
+                                     double rudNorm = (sh.getBrain().A.back()(1) - 0.5)*2.0;
+
+                                     // Масштаб в реальные единицы
+                                     uint16_t rawRPM = uint16_t(std::round(thrNorm * 2000.0 / 0.25));
+                                     int16_t  rawAng = int16_t(std::round(rudNorm * 0.5236   /0.0001));
+
+                                     // Собираем 29-битные ID
+                                     uint32_t idEngine = (3u<<26)|(0u<<24)|(0xF2u<<16)|(0x00u<<8)|0x01u;
+                                     uint32_t idRudder = (3u<<26)|(0u<<24)|(0xF1u<<16)|(0x05u<<8)|0x01u;
+
+                                     // Упаковка 8 байт
+                                     uint8_t dataEng[8] = {
+                                         0x00,
+                                         uint8_t(rawRPM &0xFF),
+                                         uint8_t(rawRPM>>8),
+                                         0xFF,0xFF,0xFF,0xFF,0xFF
+                                     };
+                                     uint8_t dataRud[8] = {
+                                         0x00,
+                                         uint8_t(rawAng &0xFF),
+                                         uint8_t(rawAng>>8),
+                                         0xFF,0xFF,0xFF,0xFF,0xFF
+                                     };
+
+                                     // Время в мс
+                                     double timestamp = clock * timer->interval();
+
+                                     // Запись Engine
+                                     nmeaLog << timestamp
+                                             << " ID=0x" << std::hex << std::uppercase << idEngine << std::dec
+                                             << " DLC=8 Data=[";
+                                     for (int b=0; b<8; ++b) {
+                                         nmeaLog << std::setw(2)<<std::setfill('0')
+                                         << std::hex << std::uppercase
+                                         << int(dataEng[b]);
+                                         if (b<7) nmeaLog<<' ';
+                                     }
+                                     nmeaLog << std::dec << "]\n";
+
+                                     // Запись Rudder
+                                     nmeaLog << timestamp
+                                             << " ID=0x" << std::hex << std::uppercase << idRudder << std::dec
+                                             << " DLC=8 Data=[";
+                                     for (int b=0; b<8; ++b) {
+                                         nmeaLog << std::setw(2)<<std::setfill('0')
+                                         << std::hex << std::uppercase
+                                         << int(dataRud[b]);
+                                         if (b<7) nmeaLog<<' ';
+                                     }
+                                     nmeaLog << std::dec << "]\n";
+
+                                     // Сразу сбрасываем буфер
+                                     nmeaLog.flush();
+                                 })
+                );
+        }
+
     }
 }
 
