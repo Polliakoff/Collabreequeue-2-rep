@@ -43,6 +43,26 @@ void pathway::make_my_way()
             }
         }
     }
+
+    qDebug().noquote() << "\n=== Pathway dump =====================";
+
+    for (size_t i = 0; i < vertexes.size(); ++i) {
+        qDebug().noquote()
+        << "  [" << qSetFieldWidth(2) << i << qSetFieldWidth(0) << "]  ("
+        << vertexes[i].first  << "," << vertexes[i].second << ")";
+    }
+
+    qDebug().noquote()
+        << "----------------------------------------"
+        << "\n  start_point : (" << start_point.first  << "," << start_point.second << ")"
+        << "\n  final_point : (" << final_point.first  << "," << final_point.second << ")";
+
+    const double DEG = 180.0 / M_PI;
+    qDebug().noquote()
+        << "  spawn_heading : "
+        << spawn_heading          << " rad  ("
+        << spawn_heading * DEG    << "°)";
+    qDebug().noquote() << "=======================================\n";
 }
 
 bool pathway::load_geojson(const QString &fileName)
