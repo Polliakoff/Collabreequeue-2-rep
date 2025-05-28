@@ -28,6 +28,10 @@ protected:
     static constexpr double P_SPLIT      = 0.05;
     static constexpr double P_ADD_LAYER  = 0.02;
     static constexpr double P_DEL_LAYER  = 0.02;
+    static constexpr int N_STAG = 3;   // поколений без прироста
+    static constexpr int N_GEN = 20;   // поколений без прироста
+    static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
+    static constexpr int GEN_TIME  = 10000;
     static int chooseParentCount(int G);
     static constexpr double DIST_EPS = 100.0;
     QString endSaveFileName = "";
@@ -57,9 +61,6 @@ public:
     int stagnate_cnt = 0;
     int gen_cnt = 0;
     double best_prev = 1e9;
-    static constexpr int N_STAG = 3;   // поколений без прироста
-    static constexpr int N_GEN = 10;   // поколений без прироста
-    static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
 
     std::vector<std::unique_ptr<ship_physics>> population;
     std::vector<std::string> names;

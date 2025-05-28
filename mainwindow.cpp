@@ -236,7 +236,7 @@ void MainWindow::on_pushButton_6_clicked()
     if (tmblr_slow_time == true) {
         ui->pushButton_6->setText("Ускорить");
         update_timer->stop();
-        update_timer->start(40);
+        update_timer->start(80);
     }
     else {
         ui->pushButton_6->setText("Замедлить");
@@ -255,7 +255,7 @@ void MainWindow::on_pushButton_7_clicked()
     }
     else {
         ui->pushButton_7->setText("Пауза");
-        if(tmblr_slow_time == true) update_timer->start(40);
+        if(tmblr_slow_time == true) update_timer->start(80);
         else update_timer->start(1);
         painter_timer->start(100);
     }
@@ -503,7 +503,7 @@ void MainWindow::on_pushButton_13_clicked()
     ui->pushButton_6->setText("Ускорить");
     exam_run = true;
 
-    update_timer->start(40);
+    update_timer->start(80);
     painter_timer->start(100);
 }
 

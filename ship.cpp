@@ -125,6 +125,11 @@ void ship::move_by_coords(const double &delta_x, const double &delta_y)
     for(auto &j: eyes){
         j.move_by(delta_x,delta_y);
     }
+
+    constexpr double JITTER = 1e-5;      // 0.00057°
+    double dphi = (jitter_toggle ?  JITTER : -JITTER);
+    jitter_toggle = !jitter_toggle;      // меняем знак на следующий шаг
+    rotate_by(dphi);
 }
 
 void ship::move_by_distance(const double &distance)

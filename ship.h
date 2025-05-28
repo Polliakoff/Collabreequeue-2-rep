@@ -8,12 +8,14 @@
 #include <QObject>
 #include <algorithm>  // для std::sort
 #include <cmath>
+#include <QRandomGenerator>
 
 class ship: public QObject
 {
     Q_OBJECT
 protected:
     pair<double, double> position;
+    bool jitter_toggle = false;
 public:
     explicit ship(QObject *parent = nullptr);//не использовать
     ship(const double& pos_x,const double& pos_y); // задавать корабль исключительно этим конструктором с установленной позицией

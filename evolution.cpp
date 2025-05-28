@@ -393,7 +393,7 @@ void evolution::evolution_stat()
         }
     }
 
-    if(ready_to_evolve || clock==5000){
+    if(ready_to_evolve || clock==GEN_TIME){
         for(auto &i: population){
             if(i->distance_to_start<100){
                 i->can_be_parrent = false;

@@ -120,25 +120,62 @@ void ship_physics::brainstorm()
 void ship_physics::friction()
 {
 
-    abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
-    if (velocity_x < 0.0001 && velocity_x > -0.0001 && velocity_y < 0.0001 && velocity_y > -0.0001)
-    {
-        velocity_x = 0.000001;
-        velocity_y = 0.000001;
+    // abs_velocity = sqrt(velocity_x*velocity_x + velocity_y*velocity_y);
+    // if (velocity_x < 0.0001 && velocity_x > -0.0001 && velocity_y < 0.0001 && velocity_y > -0.0001)
+    // {
+    //     velocity_x = 0.000001;
+    //     velocity_y = 0.000001;
+    // }
+
+    // actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
+
+    // ship_and_velocity_angle = vectors_angle(velocity_x,velocity_y,eyes[2].direction[0],eyes[2].direction[1]);
+
+    // friction_value = -0.139*ship_and_velocity_angle*ship_and_velocity_angle + 0.5639*ship_and_velocity_angle + 0.1886;
+
+    // if (velocity_x != 0 || velocity_y != 0)
+    // {
+    //     velocity_x -= friction_value*velocity_x*0.05;
+    //     velocity_y -= friction_value*velocity_y*0.05;
+    // }
+
+    // 1. текущая скорость как вектор
+    Eigen::Vector2d vel(velocity_x, velocity_y);
+    double speed = vel.norm();
+
+    // 2. если почти стоит — зануляем и выходим
+    if (speed < 1e-6) {
+        velocity_x = velocity_y = 0.0;
+        abs_velocity = 0.0;
+        return;
     }
 
-    actual_angle = acos((velocity_y)/(sqrt(velocity_x*velocity_x+velocity_y*velocity_y)));
+    // 3. базовое линейное демпфирование    (5 % за кадр)
+    const double LIN_DAMP = 0.05;
 
-    ship_and_velocity_angle = vectors_angle(velocity_x,velocity_y,eyes[2].direction[0],eyes[2].direction[1]);
+    // 4. добавочный боковой демпф (чем боковее — тем сильнее)
+    //    angle = угол между вектором скорости и направлением «носа» (eye #2)
+    Eigen::Vector2d head(eyes[2].direction[0], eyes[2].direction[1]);
+    head.normalize();
+    double cosPhi = vel.normalized().dot(head);     //  +1 вперёд, 0 боком, –1 назад
+    double sideFactor = 1.0 - std::fabs(cosPhi);    //  0 вперёд/назад, 1 строго боком
+    const double SIDE_DAMP = 0.15;                  //  максимум +15 % сбоку
 
-    friction_value = -0.139*ship_and_velocity_angle*ship_and_velocity_angle + 0.5639*ship_and_velocity_angle + 0.1886;
+    double k = LIN_DAMP + SIDE_DAMP * sideFactor;   // итоговый коэффициент
 
-    if (velocity_x != 0 || velocity_y != 0)
-    {
-        velocity_x -= friction_value*velocity_x*0.05;
-        velocity_y -= friction_value*velocity_y*0.05;
-    }
+    // 5. применяем: v_new = v_old · (1 – k)
+    vel *= (1.0 - k);
 
+    velocity_x   = vel.x();
+    velocity_y   = vel.y();
+    abs_velocity = vel.norm();
+
+    constexpr double ANG_DAMP = 0.025;   // 2.5 % в кадр
+    angular_velocity *= (1.0 - ANG_DAMP);
+
+    // обнуляем микроскопические значения, чтобы не «ползли» дальше
+    if (std::fabs(angular_velocity) < 1e-6)
+        angular_velocity = 0.0;
 }
 
 void ship_physics::change_destination(const double &dest_x, const double &dest_y)
