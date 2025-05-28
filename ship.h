@@ -34,6 +34,11 @@ public:
                           const pair<double,double>& c,
                           const pair<double,double>& d,
                           pair<double,double>& out);
+    // fallback binary search если hits<2
+    double findBoundary(const Eigen::Vector2d& dir,
+                        polygon &pol,
+                        double t_lo,
+                        double t_hi);
     void move_by_coords(const double& new_pos_x,const double& new_pos_y);
     void move_by_distance(const double& distance);
     double get_angle();

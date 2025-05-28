@@ -19,8 +19,8 @@ public:
     pair<double, double> start_point;
     vector <double> glacier_x;
     vector <double> glacier_y;
-    static constexpr double SAFE_MARGIN = 50.0;   // м — с каждой стороны корабля
-    static constexpr double SHIFT = 250.0;
+    static constexpr double SAFE_MARGIN = 20.0;   // м — с каждой стороны корабля
+    static constexpr double SHIFT = 50.0;
     double   spawn_heading = 0.0;                 // рад; + вправо, – влево
 
     bool generator_switch = false;

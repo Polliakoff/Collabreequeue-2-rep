@@ -17,39 +17,39 @@ from tkinter import ttk
 from pathlib import Path
 
 # ─── 0. Глобальные параметры ───────────────────────────────────
-BBOX        = (83.05, 73.12, 83.12, 73.19)
-ORIGINAL_BBOX = BBOX
-LAYER       = "arctic_icechart_metno"
-WIDTH_M     = 500
-CLEAR_M0    = 80
-GRID_M0     = 50
-SIMPLIFY_M  = 20
-MAX_RETRY   = 4
-PENALTY_B   = 8.0
-OUT_FILE    = Path("corridor.geojson")
+BBOX        = (83.05, 73.12, 83.12, 73.19)   # исходный прямоугольник запроса (lon1,lat1,lon2,lat2)
+ORIGINAL_BBOX = BBOX                          # копия BBOX, чтобы возвращаться к исходному
+LAYER       = "arctic_icechart_metno"         # WFS-слой PolarView, откуда берётся лёд
+WIDTH_M     = 500                             # ширина коридора (от борта до борта) в метрах
+CLEAR_M0    = 80                              # стартовый безопасный зазор до льда (м), будет уменьшаться
+GRID_M0     = 50                              # стартовый шаг растровой сетки (м), будет уменьшаться
+SIMPLIFY_M  = 20                              # толеранс упрощения финальных полигонов (м)
+MAX_RETRY   = 4                               # сколько раз пробуем уменьшать CLEAR/GRID, если нет пути
+PENALTY_B   = 8.0                             # коэффициент «штрафа» за близость к льду в весах рёбер A*
+OUT_FILE    = Path("corridor.geojson")        # файл для сохранения single-результата
 
-AUTO_MARGIN_M = 5_000
-MAX_AREA_M2   = 1.0e8
-FRAG_M        = 800
-GAP_FRAC      = 0.25
-JITTER_FRAC   = 0.40
-NEAR_CELLS    = 4
+AUTO_MARGIN_M = 5_000                         # запас (м) вокруг найденного льда, когда автоматически ужимаем BBOX
+MAX_AREA_M2   = 1.0e8                         # порог площади полигона (м²), выше которого он будет дробиться
+FRAG_M        = 800                           # шаг сетки дробления больших полигонов (м)
+GAP_FRAC      = 0.25                          # доля FRAG_M, вырезаемая как «зазор» между кусками при дроблении
+JITTER_FRAC   = 0.40                          # случайный сдвиг вершин фрагментов (доля FRAG_M) для неровной кромки
+NEAR_CELLS    = 4                             # радиус (ячейки) ближнего поиска воды при выборе старт/финиш
 
-REMOVE_FRAC = 0.8
-REMOVE_N    = None
-RANDOM_SEED = 42
+REMOVE_FRAC = 0.8                             # доля мелких ледовых полигонов, которые случайно удаляются (упрощение сцены)
+REMOVE_N    = None                            # альтернативно: удалить ровно N полигонов (приоритетнее, если задано)
+RANDOM_SEED = 42                              # базовое семя генератора случайных чисел
 
-MIN_SPAN_KM = 30
-MAX_SPAN_KM = 60
-ROI_TRIES   = 120
+MIN_SPAN_KM = 30                              # минимальная ширина/высота случайного ROI (км)
+MAX_SPAN_KM = 60                              # максимальная ширина/высота случайного ROI (км)
+ROI_TRIES   = 120                             # попыток сгенерировать ROI, который действительно пересекает лёд
 
-INTERACTIVE_ROI = False
-INTERACTIVE_AB  = False
+INTERACTIVE_ROI = False                       # True → даём пользователю мышкой нарисовать ROI
+INTERACTIVE_AB  = False                       # True → даём пользователю указать точки START/END вручную
 
-NUM_SAMPLES = 200
-TRAIN_FRAC  = 0.8
-OUT_DIR     = Path("corridor_dataset")
-BATCH_MODE  = False
+NUM_SAMPLES = 200                             # сколько маршрутов сгенерировать в batch-режиме
+TRAIN_FRAC  = 0.8                             # доля train-подмножества в датасете
+OUT_DIR     = Path("corridor_dataset")        # куда складывать batch-результаты
+BATCH_MODE  = False                           # переключатель batch / single (выставляется в GUI)
 
 # ─── 1. GUI для настройки перед работой ─────────────────────────
 def launch_gui():

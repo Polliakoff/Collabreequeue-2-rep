@@ -94,6 +94,24 @@ bool ship::segmentIntersect(const pair<double, double> &a, const pair<double, do
 
 }
 
+// поиск t, при котором луч из position выходит/входит в полигон
+double ship::findBoundary(const Eigen::Vector2d& dir, polygon &pol,
+                          double t_lo, double t_hi)
+{
+    for(int iter=0; iter<40; ++iter){
+        double mid = 0.5*(t_lo + t_hi);
+        pair<double,double> p {
+            position.first  + dir.x()*mid,
+            position.second + dir.y()*mid
+        };
+        if ( point_to_poly(p, pol) )
+            t_lo = mid;
+        else
+            t_hi = mid;
+    }
+    return 0.5*(t_lo + t_hi);
+}
+
 void ship::move_by_coords(const double &delta_x, const double &delta_y)
 {
     position.first+=delta_x;
@@ -186,23 +204,58 @@ void ship::eyesight(polygon &pol)
                          (p.second - position.second)* dir.y() );
         }
 
-        double bestFwd  = 1e100, bestBack = 1e100;
-        pair<double,double> hitFwd, hitBack;
+        // double bestFwd  = 1e100, bestBack = 1e100;
+        // pair<double,double> hitFwd, hitBack;
 
-        for (size_t n = 0; n < ts.size(); ++n) {
-            double t = ts[n];
-            if (t >= 1e-9) {                       // вперед
-                if (t < bestFwd) { bestFwd = t; hitFwd = hits[n]; }
-            } else if (t <= -1e-9) {               // назад
-                if (-t < bestBack) { bestBack = -t; hitBack = hits[n]; }
-            }
-        }
+        // for (size_t n = 0; n < ts.size(); ++n) {
+        //     double t = ts[n];
+        //     if (t >= 1e-9) {                       // вперед
+        //         if (t < bestFwd) { bestFwd = t; hitFwd = hits[n]; }
+        //     } else if (t <= -1e-9) {               // назад
+        //         if (-t < bestBack) { bestBack = -t; hitBack = hits[n]; }
+        //     }
+        // }
+
+        // const size_t base = iEye*2;
+        // distances [base]     = bestBack;
+        // point_seen[base]     = hitBack;
+        // distances [base + 1] = bestFwd;
+        // point_seen[base + 1] = hitFwd;
 
         const size_t base = iEye*2;
-        distances [base]     = bestBack;
-        point_seen[base]     = hitBack;
-        distances [base + 1] = bestFwd;
-        point_seen[base + 1] = hitFwd;
+        if (hits.size() >= 2) {
+            // нормальный случай: берём ближайший назад / вперёд
+            double bestFwd  = 1e100, bestBack = 1e100;
+            pair<double,double> hitFwd, hitBack;
+            for (size_t n = 0; n < ts.size(); ++n) {
+                double t = ts[n];
+                if (t >= 1e-9 && t < bestFwd) {
+                    bestFwd = t; hitFwd = hits[n];
+                } else if (t <= -1e-9 && -t < bestBack) {
+                    bestBack = -t; hitBack = hits[n];
+                }
+            }
+            distances[base]     = bestBack;
+            point_seen[base]    = hitBack;
+            distances[base + 1] = bestFwd;
+            point_seen[base + 1] = hitFwd;
+        }
+        else {
+            // fallback: бинарный поиск первой границы
+            double bf = findBoundary(dir, pol, 0.0, +1e6);
+            double bb = findBoundary(dir, pol, 0.0, -1e6);
+            distances[base]     = bb;
+            point_seen[base]    = {
+                position.first  + dir.x()*(-bb),
+                position.second + dir.y()*(-bb)
+            };
+            distances[base + 1] = bf;
+            point_seen[base + 1] = {
+                position.first  + dir.x()*bf,
+                position.second + dir.y()*bf
+            };
+        }
+
     }
 }
 
@@ -212,48 +265,68 @@ void ship::update(polygon &map)
     collided = collision(map);
 }
 
-bool point_to_poly(const pair<double,double>& point, polygon &pol)
-{
-    int intersections_l = 0;
-    int intersections_r = 0;
-    auto input_vertexes = pol.vertexes;
-    straight_line rays(point.first, point.second, point.first+1,point.second+1);
-    for(size_t j = 0; j<pol.faces.size();j++){
-        int range_1;
-        int range_2;
-        if(j!=pol.faces.size()-1){
-            range_1 = j;
-            range_2 = j+1;
-        }
-        else{
-            range_1 = j;
-            range_2 = 0;
-        }
-        auto checkig_point = intersect(pol.faces[j],rays,pol.vertexes[range_1],pol.vertexes[range_2]);
-        if(checkig_point.first != std::numeric_limits<double>::infinity()){
-            auto found{std::find(input_vertexes.begin(), input_vertexes.end(),
-                                 checkig_point)};
-            if(found != input_vertexes.end()){
-                pair<double,double> fixing_vector = perp_vect(std::make_pair(rays.direction(0),rays.direction(1)),0.1);
-                found->first+=fixing_vector.first;
-                found->second+=fixing_vector.second;
-                polygon new_poly;
-                for(auto i:input_vertexes){
-                    new_poly.add_point(i.first,i.second);
-                }
-                return point_to_poly(point,new_poly);
-            }
-            else{
-                if(checkig_point.first>point.first) intersections_r++;
-                else intersections_l++;
+// bool point_to_poly(const pair<double,double>& point, polygon &pol)
+// {
+//     int intersections_l = 0;
+//     int intersections_r = 0;
+//     auto input_vertexes = pol.vertexes;
+//     straight_line rays(point.first, point.second, point.first+1,point.second+1);
+//     for(size_t j = 0; j<pol.faces.size();j++){
+//         int range_1;
+//         int range_2;
+//         if(j!=pol.faces.size()-1){
+//             range_1 = j;
+//             range_2 = j+1;
+//         }
+//         else{
+//             range_1 = j;
+//             range_2 = 0;
+//         }
+//         auto checkig_point = intersect(pol.faces[j],rays,pol.vertexes[range_1],pol.vertexes[range_2]);
+//         if(checkig_point.first != std::numeric_limits<double>::infinity()){
+//             auto found{std::find(input_vertexes.begin(), input_vertexes.end(),
+//                                  checkig_point)};
+//             if(found != input_vertexes.end()){
+//                 pair<double,double> fixing_vector = perp_vect(std::make_pair(rays.direction(0),rays.direction(1)),0.1);
+//                 found->first+=fixing_vector.first;
+//                 found->second+=fixing_vector.second;
+//                 polygon new_poly;
+//                 for(auto i:input_vertexes){
+//                     new_poly.add_point(i.first,i.second);
+//                 }
+//                 return point_to_poly(point,new_poly);
+//             }
+//             else{
+//                 if(checkig_point.first>point.first) intersections_r++;
+//                 else intersections_l++;
 
-            }
+//             }
+//         }
+//     }
+//     bool result;
+//     if(intersections_l % 2 != 0 && intersections_r % 2 != 0) result = true;
+//     else result = false;
+//     return result;
+// }
+
+bool point_to_poly(const pair<double,double>& pt, polygon &pol)
+{
+    bool inside = false;
+    const auto &V = pol.vertexes;
+    size_t n = V.size();
+    for (size_t i = 0, j = n - 1; i < n; j = i++) {
+        const auto &A = V[i], &B = V[j];
+        bool yi = (A.second > pt.second);
+        bool yj = (B.second > pt.second);
+        if (yi != yj) {
+            double xInt = A.first +
+                          (pt.second - A.second) * (B.first - A.first) /
+                              (B.second - A.second);
+            if (xInt > pt.first)
+                inside = !inside;
         }
     }
-    bool result;
-    if(intersections_l % 2 != 0 && intersections_r % 2 != 0) result = true;
-    else result = false;
-    return result;
+    return inside;
 }
 
 pair<double, double> point_rotation(const pair<double, double> &point, const pair<double, double> &axis, const double &delta_angle)
