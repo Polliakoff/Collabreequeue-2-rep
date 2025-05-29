@@ -33,6 +33,7 @@ protected:
     static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
     static constexpr int GEN_TIME  = 15000;
     static constexpr int FUEL_COMPET = 2;
+    static constexpr double INTRS = 0.6;
     static int chooseParentCount(int G);
     static constexpr double DIST_EPS = 100.0;
     QString endSaveFileName = "";

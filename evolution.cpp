@@ -262,7 +262,7 @@ void evolution::evolve()
     think_n_do_connections.clear();
     update_connections.clear();
 
-    double dmnc = 0.6;
+    double dmnc = INTRS;
     population.reserve(generation);
     fout << "!!!NEW GENERATION!!!\t" << genName << "\twe have " << newGenParents.size() << " parents" << "\n\n";
     if(newGenParents.size()==1){
