@@ -67,6 +67,7 @@ void pathway::make_my_way()
 
 bool pathway::load_geojson(const QString &fileName)
 {
+    /* ---------- 1. чтение GeoJSON как было ----------------------- */
     QFile f(fileName);
     if (!f.open(QIODevice::ReadOnly))  return false;
 
@@ -77,158 +78,186 @@ bool pathway::load_geojson(const QString &fileName)
     QJsonObject root = doc.object();
     if (root["type"] != "FeatureCollection")     return false;
 
-    /* --- извлекаем границы полигона "safe" и линию "track" --- */
     QVector<QPointF> safeRing;
     QPointF trackStart, trackEnd;
-    for (const QJsonValue &v : root["features"].toArray()) {
+    for (const QJsonValue &v : root["features"].toArray())
+    {
         QJsonObject feat = v.toObject();
         QString kind = feat["properties"].toObject()["kind"].toString();
         QJsonObject geom = feat["geometry"].toObject();
 
         if (kind == "safe" && geom["type"] == "Polygon") {
             QJsonArray ring = geom["coordinates"].toArray().first().toArray();
-            int n = ring.size();
-            // последний элемент — тот же, что и первый, его пропускаем
-            for (int i = 0; i < n - 1; ++i) {
+            for (int i=0; i<ring.size()-1; ++i) {
                 QJsonArray a = ring[i].toArray();
-                safeRing.append(QPointF(a[0].toDouble(), a[1].toDouble())); // lon,lat
+                safeRing.append(QPointF(a[0].toDouble(), a[1].toDouble()));
             }
         }
         if (kind == "track" && geom["type"] == "LineString") {
             QJsonArray line = geom["coordinates"].toArray();
             if (!line.isEmpty()) {
-                QJsonArray a0 = line.first().toArray();
-                QJsonArray a1 = line.last ().toArray();
-                trackStart = QPointF(a0[0].toDouble(), a0[1].toDouble());
-                trackEnd   = QPointF(a1[0].toDouble(), a1[1].toDouble());
+                trackStart = QPointF(line.first ().toArray()[0].toDouble(),
+                                     line.first ().toArray()[1].toDouble());
+                trackEnd   = QPointF(line.last  ().toArray()[0].toDouble(),
+                                   line.last  ().toArray()[1].toDouble());
             }
         }
     }
-    if (safeRing.isEmpty())  return false;
+    if (safeRing.isEmpty()) return false;
 
-    // находим среднюю широту для расчёта «метров на градус долгот»
+    /* ---------- 2. проекция lon/lat → метры ---------------------- */
     double lat0 = 0.0;
-    for (const QPointF &p : safeRing) lat0 += p.y();
-    lat0 /= safeRing.size();  // средняя широта
-    const double m_per_deg_lat = 110574.0;                                // метры/° широты
-    const double m_per_deg_lon = 111320.0 * std::cos(lat0 * M_PI/180.0);  // метры/° долготы
-    // находим минимальные координаты (для смещения в ноль)
-    double minLon = safeRing[0].x(), minLat = safeRing[0].y(),
-        maxLat = safeRing[0].y();
-    for (const QPointF &p : safeRing) {
+    for (const auto &p : safeRing) lat0 += p.y();
+    lat0 /= safeRing.size();
+
+    const double m_per_deg_lat = 110574.0;
+    const double m_per_deg_lon = 111320.0 * std::cos(lat0*M_PI/180.0);
+
+    double minLon=safeRing[0].x(), maxLat=safeRing[0].y();
+    for (const auto &p : safeRing) {
         minLon = std::min(minLon, p.x());
-        minLat = std::min(minLat, p.y());
         maxLat = std::max(maxLat, p.y());
     }
-    // функция маппинга: 1° → m_per_deg_* метров, судно остаётся ±10 м
     auto mapPt = [&](const QPointF &q)->QPointF {
-        double x = (q.x() - minLon) * m_per_deg_lon;
-        double y = (maxLat - q.y()) * m_per_deg_lat;
-        return QPointF(x, y);
+        return {(q.x()-minLon)*m_per_deg_lon,
+                (maxLat-q.y())*m_per_deg_lat};
     };
 
-    glacier_x.clear();
-    glacier_y.clear();
-    for (const QPointF &p : safeRing) {
+    glacier_x.clear(); glacier_y.clear();
+    for (const auto &p : safeRing) {
         QPointF m = mapPt(p);
         glacier_x.push_back(m.x());
         glacier_y.push_back(m.y());
     }
-    l_count = glacier_x.size() / 2;
-    r_count = glacier_x.size() - l_count - 1;
-    generated = true;          // «как будто» сгенерирована
+    l_count = glacier_x.size()/2;
+    r_count = glacier_x.size()-l_count-1;
+    generated = true;
 
-    // --- определяем центроид safe-полигона (в метрах) ---
-    double cx = 0.0, cy = 0.0;
-    for (double x : glacier_x) cx += x;
-    for (double y : glacier_y) cy += y;
-    cx /= glacier_x.size();
-    cy /= glacier_y.size();
-
-    /*------------------------------------------------------------------
-        1. базовая точка (как раньше)  →  s0                           */
-    QPointF s0;
-    if (!trackStart.isNull())
-        s0 = mapPt(trackStart);
-    else
-        s0 = QPointF(cx, cy);
-
-    /* 2. смещаем к центроиду на SHIFT и ДОПОЛНИТЕЛЬНО так,
-          чтобы отступ от любого ребра ≥ SAFE_MARGIN                  */
-    auto pointToSeg = [](double px, double py,
-                         double x1,double y1,double x2,double y2) -> double
+    /* ---------- 3. сервисные лямбды ------------------------------ */
+    auto inPoly = [&](double x,double y)->bool
     {
-        double vx = x2-x1,  vy = y2-y1;
-        double t = ((px-x1)*vx + (py-y1)*vy) / (vx*vx+vy*vy);
-        t = std::clamp(t,0.0,1.0);
-        double dx = x1 + t*vx - px;
-        double dy = y1 + t*vy - py;
+        bool inside=false; int n=glacier_x.size();
+        for (int i=0,j=n-1;i<n;j=i++)
+        {
+            double yi=glacier_y[i], yj=glacier_y[j];
+            if ( (yi>y) != (yj>y) )
+            {
+                double xi=glacier_x[i], xj=glacier_x[j];
+                if (x < (xj-xi)*(y-yi)/(yj-yi)+xi) inside=!inside;
+            }
+        }
+        return inside;
+    };
+
+    auto distSeg = [](double px,double py,
+                      double x1,double y1,double x2,double y2)->double
+    {
+        double vx=x2-x1, vy=y2-y1;
+        double t=((px-x1)*vx+(py-y1)*vy)/(vx*vx+vy*vy);
+        t=std::clamp(t,0.0,1.0);
+        double dx=x1+vx*t-px, dy=y1+vy*t-py;
         return std::hypot(dx,dy);
     };
 
-    double vx0 = cx - s0.x();
-    double vy0 = cy - s0.y();
-    double len0 = std::hypot(vx0, vy0);
-    if (len0 > 1e-6) { vx0 = vx0/len0;  vy0 = vy0/len0; }
-
-    QPointF spawn = s0 + QPointF(vx0*SHIFT, vy0*SHIFT);
-
-    /* итеративно отталкиваемся от стен, пока минимальное
-      расстояние не станет ≥ SAFE_MARGIN                           */
-    auto minDist = [&] (const QPointF &p)->double {
-        double mn = 1e9;
-        int n = glacier_x.size();
-        for (int i=0;i<n;++i)
-            mn = std::min(mn,
-                          pointToSeg(p.x(),p.y(),
-                                     glacier_x[i], glacier_y[i],
-                                     glacier_x[(i+1)%n], glacier_y[(i+1)%n]));
-        return mn;
+    auto minDist = [&](double x,double y)->double
+    {
+        double m=1e9; int n=glacier_x.size();
+        for(int i=0;i<n;++i)
+            m=std::min(m,distSeg(x,y,
+                                    glacier_x[i],glacier_y[i],
+                                    glacier_x[(i+1)%n],glacier_y[(i+1)%n]));
+        return m;
     };
-    while (minDist(spawn) < SAFE_MARGIN)
-        spawn += QPointF(vx0, vy0) *
-                 (SAFE_MARGIN - minDist(spawn) + 1.0);
 
-    /* 3. финальная точка финиша (если trackEnd был)                   */
-    // QPointF finish;
-    // if (!trackEnd.isNull())
-    //     finish = mapPt(trackEnd);
-    // else
-    //     finish = QPointF(cx, glacier_y.front());
+    /* ---------- 4. функция «внутренний сдвиг» -------------------- */
+    auto inwardShift = [&](QPointF p0)->QPointF
+    {
+        /* 4.1 ищем ПРОЕКЦИЮ P′ на ближайший отрезок ---------------- */
+        double best=1e99; double projX=0, projY=0;
+        int bestIdx=-1, n=glacier_x.size();
+        for(int i=0;i<n;++i)
+        {
+            int k=(i+1)%n;
+            double x1=glacier_x[i], y1=glacier_y[i];
+            double x2=glacier_x[k], y2=glacier_y[k];
+            /* проектируем p0 на отрезок i-k */
+            double vx=x2-x1, vy=y2-y1;
+            double t=((p0.x()-x1)*vx+(p0.y()-y1)*vy)/(vx*vx+vy*vy);
+            t=std::clamp(t,0.0,1.0);
+            double qx=x1+vx*t, qy=y1+vy*t;
+            double d=std::hypot(qx-p0.x(),qy-p0.y());
+            if(d<best){best=d; projX=qx; projY=qy; bestIdx=i;}
+        }
 
-    QPointF f0;
-    if (!trackEnd.isNull())
-        f0 = mapPt(trackEnd);
-    else
-        f0 = QPointF(cx, glacier_y.front());
+        /* 4.2 нормаль к рёбру bestIdx ------------------------------ */
+        int j=bestIdx, k=(bestIdx+1)%glacier_x.size();
+        double ex=glacier_x[k]-glacier_x[j];
+        double ey=glacier_y[k]-glacier_y[j];
+        double len=std::hypot(ex,ey);
+        ex/=len; ey/=len;
+        double nx= ey, ny=-ex;              // нормаль «влево»
+        if(!inPoly(projX+nx,projY+ny)) {nx=-nx; ny=-ny;} // внутрь
 
-    // аналогично старту: смещение к центроиду + safe margin
-    double vx1 = cx - f0.x();
-    double vy1 = cy - f0.y();
-    double len1 = std::hypot(vx1, vy1);
-    if (len1 > 1e-6) { vx1 /= len1;  vy1 /= len1; }
+        /* 4.3 двоичный поиск макс. сдвига ≤ SHIFT ------------------ */
+        double lo=0, hi=SHIFT;
+        for(int it=0; it<25; ++it)
+        {
+            double mid=(lo+hi)*0.5;
+            double tx=projX+nx*mid, ty=projY+ny*mid;
+            if(inPoly(tx,ty)&&minDist(tx,ty)>=SAFE_MARGIN) lo=mid;
+            else hi=mid;
+        }
 
-    QPointF finish = f0 + QPointF(vx1*SHIFT, vy1*SHIFT);
-    // отталкиваем от стен, пока не окажемся в_safe_zone_
-    while (minDist(finish) < SAFE_MARGIN) {
-        finish += QPointF(vx1, vy1) *
-                  (SAFE_MARGIN - minDist(finish) + 1.0);
-    }
+        // /* 4.4 если даже lo=0 не удовлетворяет SAFE_MARGIN,
+        //        берём половину минимального пролёта */
+        // if(minDist(projX+nx*lo, projY+ny*lo) < SAFE_MARGIN)
+        // {
+        //     double d=minDist(projX,projY);
+        //     lo=std::max(0.0, d*0.5);              // половина ширины
+        // }
 
-    start_point = std::make_pair(spawn.x(), spawn.y());
-    final_point = std::make_pair(finish.x(), finish.y());
+        // return {projX+nx*lo, projY+ny*lo};
 
-    /*------------------------------------------------------------------
-        4. выбираем курс на цель */
+        /* 4.4 итоговое смещение lo даёт точку Q = P′ + n·lo            */
+        double qx = projX + nx*lo;
+        double qy = projY + ny*lo;
+        double cur = minDist(qx,qy);
 
-    double dx = final_point.first  - start_point.first;
-    double dy = final_point.second - start_point.second;
-    spawn_heading = std::atan2(dx, dy) + M_PI;
-    if (spawn_heading > M_PI) spawn_heading -= 2*M_PI;
-    else if (spawn_heading <= -M_PI) spawn_heading += 2*M_PI;
+        /* 4.5 если расстояние до стены < SAFE_MARGIN,
+           доталкиваемся ещё чуть-чуть внутрь                       */
+        if (cur < SAFE_MARGIN - 1e-6)           // небольшой EPS
+        {
+            double delta = SAFE_MARGIN - cur + 1.0;   // «+1 м» запас
+            lo = std::min(lo + delta, SHIFT);         // не выходим за SHIFT
+            qx = projX + nx*lo;
+            qy = projY + ny*lo;
+        }
+
+        return {qx,qy};
+    };
+
+    /* ---------- 5. итоговые точки ------------------------------- */
+    QPointF spawn  = inwardShift(!trackStart.isNull()
+                                    ? mapPt(trackStart)
+                                    : QPointF(glacier_x.front(),glacier_y.front()));
+
+    QPointF finish = inwardShift(!trackEnd.isNull()
+                                     ? mapPt(trackEnd)
+                                     : QPointF(glacier_x.back(),glacier_y.back()));
+
+    start_point  ={spawn.x(),  spawn.y()};
+    final_point  ={finish.x(), finish.y()};
+
+    /* ---------- 6. курс на цель --------------------------------- */
+    double dx=final_point.first-start_point.first;
+    double dy=final_point.second-start_point.second;
+    spawn_heading=std::atan2(dx,dy)+M_PI;
+    if(spawn_heading> M_PI) spawn_heading-=2*M_PI;
+    if(spawn_heading<=-M_PI) spawn_heading+=2*M_PI;
 
     return true;
 }
+
 
 void pathway::generator()
 {

@@ -29,14 +29,16 @@ protected:
     static constexpr double P_ADD_LAYER  = 0.02;
     static constexpr double P_DEL_LAYER  = 0.02;
     static constexpr int N_STAG = 3;   // поколений без прироста
-    static constexpr int N_GEN = 20;   // поколений без прироста
+    static constexpr int N_GEN = 10;
     static constexpr double EPS_STAG = 5.0;  // м (разница «почти не изм.»)
-    static constexpr int GEN_TIME  = 10000;
+    static constexpr int GEN_TIME  = 15000;
+    static constexpr int FUEL_COMPET = 2;
     static int chooseParentCount(int G);
     static constexpr double DIST_EPS = 100.0;
     QString endSaveFileName = "";
     bool running = false;
     bool evolving = true;
+    bool showing = false;
     std::ofstream nmeaLog;
 
 public:

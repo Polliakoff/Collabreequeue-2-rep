@@ -226,7 +226,7 @@ void ship_physics::update(polygon &map)
     modify_path();
     get_distance();
     velocity_sum+=abs_velocity;
-    if(collided){
+    if(collided || distance_to_finish<=100){
         operational = false;
     }
     distance_to_finish = vector_module(path.first,path.second);

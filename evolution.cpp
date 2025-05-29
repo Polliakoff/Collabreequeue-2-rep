@@ -212,13 +212,13 @@ void evolution::evolve()
               [&](int i1, int i2){
                   double d1 = population[i1]->distance_to_finish;
                   double d2 = population[i2]->distance_to_finish;
-                  if (cur_map <= 10) {
+                  if (cur_map <= FUEL_COMPET) {
                       return d1 < d2;
                   }
                   if (std::fabs(d1 - d2) > DIST_EPS) {
                       return d1 < d2;              // меньшая дистанция — лучше
                   } else {
-                      return population[i1]->fuel >
+                      return population[i1]->fuel <
                              population[i2]->fuel;  // при близких дистанциях — больше топлива лучше
                   }
               });
@@ -355,7 +355,9 @@ evolution::~evolution(){
 void evolution::evolution_stat()
 {
     running = true;
-    ++clock;
+    if (!showing){
+        ++clock;
+    }
 
     if(clock==5){
         for(auto &i: population){
@@ -393,7 +395,10 @@ void evolution::evolution_stat()
         }
     }
 
-    if(ready_to_evolve || clock==GEN_TIME){
+    int time_to_stop = GEN_TIME;
+    if (!evolving) time_to_stop = 1.5 * GEN_TIME;
+
+    if(ready_to_evolve || clock==time_to_stop){
         for(auto &i: population){
             if(i->distance_to_start<100){
                 i->can_be_parrent = false;
@@ -424,6 +429,15 @@ void evolution::evolution_stat()
 
         if(evolving){
             evolve();          // обычное формирование нового поколения
+        }
+        else{
+            showing = true;
+            int num = 0;
+            for(auto &shp: population){
+                QObject::disconnect(update_connections[num]);
+                QObject::disconnect(think_n_do_connections[num]);
+                ++num;
+            } //стоп машина
         }
     }
 }
